@@ -6,7 +6,7 @@ nodejs
 npm
 
 #### SETTING
-1. react-create-app '프로젝트명'
+1. create-react-app '프로젝트명'
 2. git clone 'https://github.com/PPOS2EUN/ROS.git'
 
 #### START

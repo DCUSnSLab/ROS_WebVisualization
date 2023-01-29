@@ -1,62 +1,54 @@
 import React, {useEffect, useState} from "react";
 import ROSLIB from "roslib";
 
+// 230129 16:39 랩짱의 팩폭 고발 너무 무섭습니다 ㅜㅜ
+// 보은 : 이슈발생. client가 계속 rosbridge 서버 connect된다. 최대 254까지. 문제가 되나요?
+// 준홍 : 당연히 문제가 되지!!!(버럭)
 
-let ROSLIB1 = require('roslib');
+// ros가 업데이트 될 때 마다
+// ros 데이터 구독을 위한 웹소켓 인스턴스를 계속 생성하는 것 같다.
+
+
+// 1. addr 객체, ros 객체를 Bag_get 밖으로 빼네니까 클라이언트로 다시 접속 안 하고 계속 unsub랑 sub만 반복
+const addr = "ws://localhost:9090"
+let ros = new ROSLIB.Ros({
+    url : addr
+})
+
+let listener = new ROSLIB.Topic({
+    ros: ros,
+    name: "/gps_data",
+    messageType: "sensor_msgs/NavSatFix"
+});
+
 function Bag_get(){
-
     const [msg, setMsg] = useState('');
+    const [lat, setLat] = useState();
+    const [long, setLong] = useState();
 
-    var ros = new ROSLIB.Ros({
-        url : 'ws://localhost:9090'
-    })
+    ros.on("connection", () => {
+        setMsg("Connected to websocket server.");
+    });
+    ros.on("error", () => {
+        const error = "Error connecting to websocket server.";
+        setMsg(error);
+    });
+    ros.on("close", () => {
+        setMsg("Connection to websocket server closed.");
+    });
 
-    useEffect(() => {
-        const ROSConnect = () => {
-            try {
-                ros.on("connection", () => {
-                    console.log("Connected to websocket server.");
-                    setMsg("Connected to websocket server.");
-                    ROSGet(ros);
-                });
-                ros.on("error", () => {
-                    const error = "Error connecting to websocket server.";
-                    console.log(error);
-                    setMsg(error);
-                    alert({ error });
-                });
-                ros.on("close", () => {
-                    console.log("Connection to websocket server closed.");
-                    setMsg("Connection to websocket server closed.");
-                });
-            } catch {
-                const error = "Failed to construct websocket. The URL is invalid.";
-                setMsg("Failed to construct websocket. The URL is invalid.");
-                console.log(error);
-                alert({ error });
-            }
-        };
-        ROSConnect();
-    }, []);
-    const ROSGet = (ros: any) => {
-        let listener = new ROSLIB.Topic({
-            ros: ros,
-            name: "/chatter",
-            messageType: "std_msgs/String",
-        });
-
-        listener.subscribe((message) => {
-            // to do message
-            setMsg('Received message on ' + listener.name + ': ' + message.data);
-            listener.unsubscribe();
-
-        });
-    };
+    listener.subscribe((message) => {
+        // to do message
+        setMsg('Received message on ' + listener.name + message);
+        setLat(message.latitude);
+        setLong(message.longitude);
+    });
 
     return(
-        <div>
-            <p>Check MSG</p>
-            <p>{msg}</p>
+        <div style={{textAlign : 'center'}}>
+            <h1>Check MSG</h1>
+            <h2>{msg}</h2>
+            <h2>( {lat} , {long} )</h2>
         </div>
     );
 }

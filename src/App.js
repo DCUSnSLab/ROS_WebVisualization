@@ -1,10 +1,10 @@
 import React from "react";
-import Bag_get from "./bag_get";
+import KaKaoMap from "./KaKaomap";
 
 function App() {
   return (
     <div>
-        <Bag_get/>
+        <KaKaoMap/>
     </div>
   );
 }

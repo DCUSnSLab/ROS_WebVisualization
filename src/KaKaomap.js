@@ -1,7 +1,8 @@
 /* global kakao */
 import React, {useEffect, useState, useRef} from 'react';
-import ROSLIB from "roslib";
+import * as ROSLIB from 'roslib';
 import {MapMarker, Map} from "react-kakao-maps-sdk";
+import * as ROS3D from 'ros3d';
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -29,6 +30,20 @@ const Kakaomap = () => {
         setMsg("Connection to websocket server closed.");
     });
 
+    const viewer = new ROS3D.Viewer({
+        width : 800,
+        height : 600,
+        antialias : true
+    });
+
+    const tfClient = new ROSLIB.TFClient({
+        ros : ros,
+        angularThres : 0.01,
+        transThres : 0.01,
+        rate : 10.0,
+        topic: '/velodyne_points'
+    });
+
     useEffect(() => {
         listener.subscribe((message) => {
             setMsg('Received message on ' + listener.name + " " + message);
@@ -37,22 +52,21 @@ const Kakaomap = () => {
         });
     }, []);
 
-
     return (
-    <div style={{ textAlign : "center" }}>
+    <div className="container">
         <h1>Check MSG</h1>
         <h2>{msg}</h2>
         <h2>( {lat} , {long} )</h2>
         {lat && long &&
             <Map // 지도를 표시할 Container
                 center={{
-                    lat: lat,
-                    lng: long
+                    lat: 35.9138,
+                    lng: 128.8036
                 }}
                 style={{
                     // 지도의 크기
                     width: "100%",
-                    height: "450px",
+                    height: "600px",
                 }}
                 level={3} // 지도의 확대 레벨
             >

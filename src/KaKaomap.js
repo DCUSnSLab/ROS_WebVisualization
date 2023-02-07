@@ -30,20 +30,6 @@ const Kakaomap = () => {
         setMsg("Connection to websocket server closed.");
     });
 
-    const viewer = new ROS3D.Viewer({
-        width : 800,
-        height : 600,
-        antialias : true
-    });
-
-    const tfClient = new ROSLIB.TFClient({
-        ros : ros,
-        angularThres : 0.01,
-        transThres : 0.01,
-        rate : 10.0,
-        topic: '/velodyne_points'
-    });
-
     useEffect(() => {
         listener.subscribe((message) => {
             setMsg('Received message on ' + listener.name + " " + message);

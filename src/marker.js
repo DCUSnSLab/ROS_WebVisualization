@@ -18,6 +18,7 @@ export default class Simulator extends Component {
             antialias : true,
             background : '#111111'
         });
+
         ros.on("connection", () => {
             console.log("Connected to websocket server.");
         });
@@ -35,8 +36,7 @@ export default class Simulator extends Component {
             ros : ros,
             angularThres : 0.01,
             transThres : 0.01,
-            rate : 10.0,
-            fixedFrame : '/velodyne'
+            rate : 10.0
         });
 
         const tmpSub = new ROS3D.PointCloud2({

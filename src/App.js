@@ -7,9 +7,6 @@ function App() {
   return (
     <div>
         {/*<KaKaoMap/>*/}
-        {/*<Marker/>*/}
-        <MM/>
-        <Pcd_data/>
     </div>
   );
 }

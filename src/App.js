@@ -1,14 +1,16 @@
-import React from "react";
-import KaKaoMap from "./KaKaomap";
-import Marker from "./marker";
-import Pcd_data, {MM} from "./pcd_data";
+import React, {useEffect, useState, useRef} from "react";
+import ROSLIB from "roslib";
+import Kakaomap from "./KaKaomap";
+import Pcd_data from "./pcd_data";
+import './static/App.css';
 
-function App() {
-  return (
-    <div>
-        {/*<KaKaoMap/>*/}
-    </div>
-  );
+const App = () => {
+    return(
+        <div className="container">
+            <Kakaomap/>
+            <Pcd_data/>
+        </div>
+    )
 }
 
 export default App;

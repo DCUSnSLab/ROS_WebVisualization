@@ -16,18 +16,19 @@ const listener = new ROSLIB.Topic({
 
 const Kakaomap = () => {
     const [msg, setMsg] = useState();
+    const [con, setCon] = useState();
     const [lat, setLat] = useState();
     const [long, setLong] = useState();
 
     ros.on("connection", () => {
-        setMsg("Connected to websocket server.");
+        setCon("Connected to websocket server.");
     });
     ros.on("error", () => {
         const error = "Error connecting to websocket server.";
-        setMsg(error);
+        setCon(error);
     });
     ros.on("close", () => {
-        setMsg("Connection to websocket server closed.");
+        setCon("Connection to websocket server closed.");
     });
 
     useEffect(() => {
@@ -40,9 +41,10 @@ const Kakaomap = () => {
 
     return (
     <div className="container">
-        <h1>Check MSG</h1>
-        <h2>{msg}</h2>
-        <h2>( {lat} , {long} )</h2>
+        <h3>{con}</h3>
+        <h2>Check MSG</h2>
+        <h3>{msg}</h3>
+        <h3>( {lat} , {long} )</h3>
         {lat && long &&
             <Map // 지도를 표시할 Container
                 center={{
@@ -51,8 +53,8 @@ const Kakaomap = () => {
                 }}
                 style={{
                     // 지도의 크기
-                    width: "100%",
-                    height: "600px",
+                    width: "600px",
+                    height: "450px",
                 }}
                 level={3} // 지도의 확대 레벨
             >

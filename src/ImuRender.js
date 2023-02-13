@@ -15,31 +15,36 @@ ros.on("error", () => {});
 ros.on("close", () => {});
 
 
-const imu_listener = new ROSLIB.Topic({
-    ros : ros,
-    name : '/zed2/zed_node/imu/data',
-    messageType: 'sensor_msgs/Imu'
+const image_R_topic = new ROSLIB.Topic({
+    ros: ros,
+    name: '/zed2/zed_node/right/image_rect_color/compressed',
+    messageType: 'sensor_msgs/CompressedImage'
 });
 
+const image_L_topic = new ROSLIB.Topic({
+    ros: ros,
+    name: '/zed2/zed_node/left/image_rect_color/compressed',
+    messageType: 'sensor_msgs/CompressedImage'
+});
 
 function ImuRender () {
 
-    const [img, setImg] = useState();
+    const [Rimg, setRImg] = useState();
+    const [Limg, setLImg] = useState();
 
-    useEffect(() => {
-        const image_topic = new ROSLIB.Topic({
-            ros: ros,
-            name: '/zed2/zed_node/right/image_rect_color/compressed',
-            messageType: 'sensor_msgs/CompressedImage'
+        image_R_topic.subscribe(function(message) {
+            setRImg("data:image/jpg;base64," + message.data);
         });
-        image_topic.subscribe(function(message) {
-            setImg("data:image/jpg;base64," + message.data);
+        image_L_topic.subscribe(function(message) {
+            setLImg("data:image/jpg;base64," + message.data);
         });
-    });
 
     return(
-      <div datasrc={img}>
-          <img src={img}></img>
+      <div>
+          <h3>right</h3>
+          <img src={Rimg}></img>
+          <h3>left</h3>
+          <img src={Limg}></img>
       </div>
     );
 }

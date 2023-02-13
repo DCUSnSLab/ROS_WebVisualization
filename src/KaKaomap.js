@@ -10,9 +10,10 @@ const ros = new ROSLIB.Ros({
 
 const listener = new ROSLIB.Topic({
     ros: ros,
-    name: "/converted_gps_data",
+    name: "/ublox/fix",
     messageType: "sensor_msgs/NavSatFix"
 });
+
 
 const Kakaomap = () => {
     const [msg, setMsg] = useState();

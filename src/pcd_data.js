@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import {Viewer, Grid, PointCloud2, UrdfClient} from 'ros3d';
 import * as ROSLIB from 'roslib';
 import * as ROS3D from 'ros3d';
+import * as THREE from 'three';
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -11,6 +12,7 @@ const ros = new ROSLIB.Ros({
 ros.on("connection", () => {});
 ros.on("error", () => {});
 ros.on("close", () => {});
+
 
 function Simula(){
 
@@ -36,11 +38,15 @@ function Simula(){
             material : {size: 0.01, color: 0xff00ff },
             max_pts : 50000
         });
-    })
+
+
+
+    });
+
     return(
         <>
             <h2>/velodyne_points</h2>
-            <span id="viewer"></span>
+            <div id="viewer"></div>
         </>
     );
 }

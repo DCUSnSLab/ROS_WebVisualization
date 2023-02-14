@@ -9,9 +9,6 @@ const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
-ros.on("connection", () => {});
-ros.on("error", () => {});
-ros.on("close", () => {});
 
 
 function Simula(){
@@ -24,10 +21,11 @@ function Simula(){
             antialias : true,
             background : '#111111',
         });
+        viewer.addObject(new ROS3D.Grid());
 
         const tfClient = new ROSLIB.TFClient({
             ros : ros,
-            fixedFrame: 'velodyne',
+            fixedFrame: '/velodyne',
         });
 
         const cloudClient = new ROS3D.PointCloud2({
@@ -38,8 +36,6 @@ function Simula(){
             material : {size: 0.01, color: 0xff00ff },
             max_pts : 50000
         });
-
-
 
     });
 

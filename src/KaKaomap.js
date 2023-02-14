@@ -21,16 +21,6 @@ const Kakaomap = () => {
     const [lat, setLat] = useState();
     const [long, setLong] = useState();
 
-    ros.on("connection", () => {
-        setCon("Connected to websocket server.");
-    });
-    ros.on("error", () => {
-        const error = "Error connecting to websocket server.";
-        setCon(error);
-    });
-    ros.on("close", () => {
-        setCon("Connection to websocket server closed.");
-    });
 
     useEffect(() => {
         listener.subscribe((message) => {

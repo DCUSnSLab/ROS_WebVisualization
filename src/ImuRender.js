@@ -1,52 +1,62 @@
 import React, {Component, useEffect, useState} from 'react';
 import ReactDOM from 'react-dom/client';
-import {Viewer, Grid, PointCloud2, UrdfClient} from 'ros3d';
+import {Viewer, Grid, PointCloud2, UrdfClient, TFAxes} from 'ros3d';
 import * as ROSLIB from 'roslib';
 import * as ROS3D from 'ros3d';
 import * as THREE from 'three';
-
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
-ros.on("connection", () => {});
-ros.on("error", () => {});
-ros.on("close", () => {});
+const ImuRender = () => {
 
+    useEffect(() => {
 
-const image_R_topic = new ROSLIB.Topic({
-    ros: ros,
-    name: '/zed2/zed_node/right/image_rect_color/compressed',
-    messageType: 'sensor_msgs/CompressedImage'
-});
-
-const image_L_topic = new ROSLIB.Topic({
-    ros: ros,
-    name: '/zed2/zed_node/left/image_rect_color/compressed',
-    messageType: 'sensor_msgs/CompressedImage'
-});
-
-function ImuRender () {
-
-    const [Rimg, setRImg] = useState();
-    const [Limg, setLImg] = useState();
-
-        image_R_topic.subscribe(function(message) {
-            setRImg("data:image/jpg;base64," + message.data);
+        const viewer = new Viewer({
+            divID : 'viewer',
+            width: 1000,
+            height: 400,
+            antialias : true,
+            background : '#111111',
         });
-        image_L_topic.subscribe(function(message) {
-            setLImg("data:image/jpg;base64," + message.data);
-        });
+        viewer.addObject(new ROS3D.Grid());
+
+
+        // /tf tfclient 생성
+        const ClientTF_tf = new ROSLIB.TFClient({
+            ros : ros,
+            topic : '/tf',
+            messageType: 'tf2_msgs/TFMessage',
+            rootObject: viewer.scene
+        })
+
+        // /zed2/zed_node/path_map 시각화
+        const PathVisualize = new ROS3D.Path({
+            ros : ros,
+            tfClient: ClientTF_tf,
+            fixedFrame: 'map',
+            topic : '/zed2/zed_node/path_map',
+            rootObject: viewer.scene
+        })
+
+        // /zed2/zed_node/pose 시각화 전진방향
+        const poseVisualize = new ROS3D.Pose({
+            ros : ros,
+            tfClient : ClientTF_tf,
+            fixedFrame: 'odom',
+            topic : '/zed2/zed_node/pose',
+            rootObject: viewer.scene
+        })
+
+    })
 
     return(
-      <div>
-          <h3>right</h3>
-          <img src={Rimg}></img>
-          <h3>left</h3>
-          <img src={Limg}></img>
-      </div>
+        <div>
+            <h2>IMU</h2>
+            <div id='viewer'></div>
+            <div></div>
+        </div>
     );
 }
-
 export default ImuRender;

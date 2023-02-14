@@ -5,23 +5,21 @@ const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
+const TfClient = new ROSLIB.TFClient({
+    ros: ros,
+    fixedFrame : 'map'
+})
+
 const PoseXYZ = () => {
-    const [mapTF, setmapTF] = useState('');
     const [odomTF, setdodmTF] = useState('');
     const [baseTF, setbaseTF] = useState('');
 
     useEffect(() => {
-
-        const TfClient = new ROSLIB.Topic({
-            ros: ros,
-            name: "/tf",
-            messageType: "tf2_msgs/TFMessage"
+        TfClient.subscribe('odom', (msg) => {
+            setdodmTF(msg.translation.x + ", " + msg.translation.y + ", " + msg.translation.z);
         })
-
-        TfClient.subscribe((msg) => {
-            // console.log(msg.position.x);
-            setmapTF(msg.position.x + ', ' + msg.position.y + ', ' + msg.position.z);
-            // setbaseTF(msg.pose.pose.position.x + ', ' + msg.pose.pose.position.y + ', ' + msg.pose.pose.position.z);
+        TfClient.subscribe('base_link', (msg) => {
+            setbaseTF(msg.translation.x + ", " + msg.translation.y + ", " + msg.translation.z);
         })
     })
 
@@ -29,15 +27,14 @@ const PoseXYZ = () => {
         <div>
             <div>
                 <h1>map</h1>
-                <h2>{mapTF}</h2>
             </div>
             <div>
                 <h1>odom</h1>
-                <h2>{odomTF}</h2>
+                <h3>{odomTF}</h3>
             </div>
             <div>
                 <h1>base_link</h1>
-                <h2>{baseTF}</h2>
+                <h3>{baseTF}</h3>
             </div>
         </div>
     );

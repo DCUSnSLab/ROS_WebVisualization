@@ -19,10 +19,19 @@ const App = () => {
 
     return(
         <div className="container">
-            <PoseXYZ/>
-            {/*<ImuRender/>*/}
+            {/* frame XYZ*/}
+            {/*<PoseXYZ/>*/}
+
+            {/*3D => path_map, pose */}
+            <ImuRender/>
+
+            {/* gps data visualization*/}
             {/*<Kakaomap/>*/}
+
+            {/* velodyne point cloud visualization */}
             {/*<Pcd_data/>*/}
+
+            {/* left && right compressedImage visualization  */}
             {/*<ImageLR/>*/}
         </div>
     )

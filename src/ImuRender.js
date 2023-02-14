@@ -22,20 +22,21 @@ const ImuRender = () => {
         });
         viewer.addObject(new ROS3D.Grid());
 
-
         // /tf tfclient 생성
         const ClientTF_tf = new ROSLIB.TFClient({
             ros : ros,
             topic : '/tf',
-            messageType: 'tf2_msgs/TFMessage',
-            rootObject: viewer.scene
+            messageType: 'tf2_msgs/TFMessage'
         })
+        viewer.addObject(new ROS3D.Axes());
 
         // /zed2/zed_node/path_map 시각화
         const PathVisualize = new ROS3D.Path({
             ros : ros,
+            //tf
             tfClient: ClientTF_tf,
-            fixedFrame: 'map',
+            //frame setting
+            // fixedFrame: 'map',
             topic : '/zed2/zed_node/path_map',
             rootObject: viewer.scene
         })
@@ -43,10 +44,26 @@ const ImuRender = () => {
         // /zed2/zed_node/pose 시각화 전진방향
         const poseVisualize = new ROS3D.Pose({
             ros : ros,
+            //tf
             tfClient : ClientTF_tf,
-            fixedFrame: 'odom',
+            //frame setting
+            // fixedFrame: 'odom',
             topic : '/zed2/zed_node/pose',
             rootObject: viewer.scene
+        })
+
+        const odomClient = new ROSLIB.TFClient({
+            ros : ros,
+            fixedFrame : 'odom'
+        })
+
+
+        //odom visualize working
+        const odomVisualize = new ROS3D.Odometry({
+            ros : ros,
+            topic : '/zed2/zed_node/odom',
+            tfClient: odomClient,
+            rootObject : viewer.scene
         })
 
     })

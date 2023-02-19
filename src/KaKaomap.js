@@ -14,13 +14,11 @@ const listener = new ROSLIB.Topic({
     messageType: "sensor_msgs/NavSatFix"
 });
 
-
 const Kakaomap = () => {
     const [msg, setMsg] = useState();
     const [con, setCon] = useState();
     const [lat, setLat] = useState();
     const [long, setLong] = useState();
-
 
     useEffect(() => {
         listener.subscribe((message) => {

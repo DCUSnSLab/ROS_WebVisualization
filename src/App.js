@@ -5,7 +5,7 @@ import './static/App.css';
 import ImuRender from "./ImuRender";
 import * as ROSLIB from 'roslib';
 import ImageLR from "./ImageLR";
-import PoseXYZ from "./poseXYZ";
+import SCVInfo from "./SCVInfo";
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -20,7 +20,7 @@ const App = () => {
     return(
         <div className="container">
             {/* frame XYZ*/}
-            {/*<PoseXYZ/>*/}
+            <SCVInfo/>
 
             {/*3D => path_map, pose */}
             <ImuRender/>

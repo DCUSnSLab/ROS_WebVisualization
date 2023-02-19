@@ -3,4 +3,5 @@ html{
 }
 .container{
     color: white;
+    display: inline-block;
 }

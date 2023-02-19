@@ -9,14 +9,12 @@ const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
-
-
 function Simula(){
 
     useEffect(() => {
         const viewer = new Viewer({
             divID : 'viewer',
-            width: 500,
+            width: 1000,
             height: 400,
             antialias : true,
             background : '#111111',
@@ -41,7 +39,7 @@ function Simula(){
 
     return(
         <>
-            <h2>/velodyne_points</h2>
+            <h2>velodyne_points</h2>
             <div id="viewer"></div>
         </>
     );

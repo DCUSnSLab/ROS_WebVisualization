@@ -1,9 +1,9 @@
 import React, {Component, useEffect, useState} from 'react';
 import * as ROSLIB from 'roslib';
 
-const ObjectDT = () => {
-    
+const ObjDetection = () => {
+
 
 }
 
-export default ObjectDT;
+export default ObjDetection;

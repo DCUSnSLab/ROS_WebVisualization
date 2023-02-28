@@ -12,21 +12,28 @@ const htClient = new ROSLIB.Topic({
 })
 
 const SCVInfo = () => {
-    const [odomTF, setdodmTF] = useState('');
-    const [baseTF, setbaseTF] = useState('');
-    const [ht, setHt] = useState('');
 
-    //hunter_status : 차량 정보
+    const vehicle_state = ["base_state", "battery_voltage", "control_mode",
+        "driver_states", "fault_code", "header",
+        "linear_velocity", "motor_states", "park_mode", "steering_angle"]
+
+    const [value, setValue] = useState([]);
 
     useEffect(() => {
         htClient.subscribe((msg) => {
-            console.log(msg)
+        console.log(Object.keys(msg))
+        console.log(Object.values(msg))
+        setValue(Object.values(msg));
         })
-    })
+    }, [value]);
+
+    const keymap = vehicle_state.map( key =>
+        <h3 key={[key]}>{key} : {[value]}</h3>
+    )
 
     return(
         <div>
-            <div>{ht}</div>
+            <div>{keymap}</div>
         </div>
     );
 }

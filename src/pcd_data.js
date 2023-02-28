@@ -34,7 +34,6 @@ function Simula(){
             material : {size: 0.01, color: 0xff00ff },
             max_pts : 50000
         });
-
     });
 
     return(

@@ -1,5 +1,6 @@
 import React, {Component, useEffect, useState} from 'react';
 import * as ROSLIB from 'roslib';
+import * as ROS3D from 'ros3d';
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -17,10 +18,12 @@ const image_L_topic = new ROSLIB.Topic({
     messageType: 'sensor_msgs/CompressedImage'
 });
 
+
 function ImageLR () {
 
     const [Rimg, setRImg] = useState();
     const [Limg, setLImg] = useState();
+    const [object, setObject] = useState(null);
 
     image_R_topic.subscribe(function(message) {
         setRImg("data:image/jpg;base64," + message.data);
@@ -29,10 +32,11 @@ function ImageLR () {
         setLImg("data:image/jpg;base64," + message.data);
     });
 
+
     return(
         <div>
-            {/*  <h3>right</h3>*/}
-            {/*<img src={Rimg}></img>*/}
+            <h3>right</h3>
+            <img src={Rimg}></img>
             <h3>left</h3>
             <img src={Limg}></img>
         </div>

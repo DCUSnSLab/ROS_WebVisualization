@@ -6,6 +6,8 @@ import ImuRender from "./ImuRender";
 import * as ROSLIB from 'roslib';
 import ImageLR from "./ImageLR";
 import SCVInfo from "./SCVInfo";
+import ObjDetection from "./objDetection";
+import Merong from "./merong";
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -19,11 +21,11 @@ const App = () => {
 
     return(
         <div className="container">
-            {/* frame XYZ*/}
+
             <SCVInfo/>
 
             {/*3D => path_map, pose */}
-            <ImuRender/>
+            {/*<ImuRender/>*/}
 
             {/* gps data visualization*/}
             {/*<Kakaomap/>*/}
@@ -33,6 +35,8 @@ const App = () => {
 
             {/* left && right compressedImage visualization  */}
             {/*<ImageLR/>*/}
+
+            {/*<ObjDetection/>*/}
         </div>
     )
 }

@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/ppos2eun/ROS_webvisualization/devel -DCMAKE_INSTALL_PREFIX=/home/ppos2eun/ROS_webvisualization/install -G Unix Makefiles

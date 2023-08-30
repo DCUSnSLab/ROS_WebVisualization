@@ -1,0 +1,9 @@
+.firstContainer{
+    display: grid;
+    grid-template-columns: 0.3fr 1fr;
+}
+
+.header{
+    width: 100%;
+    height: 65rem;
+}

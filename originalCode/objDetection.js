@@ -7,6 +7,7 @@ const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
+
 // image subscriber
 const image_L_topic = new ROSLIB.Topic({
     ros: ros,

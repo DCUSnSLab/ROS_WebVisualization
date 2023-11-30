@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "react-kakao-maps-sdk": "^1.1.24"
+  },
+  "devDependencies": {
+    "kakao.maps.d.ts": "^0.1.39"
+  }
+}

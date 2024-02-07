@@ -1,28 +1,32 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
-
-import {
-    createBrowserRouter,
-    createRoutesFromElements,
-    Route,
-    RouterProvider,
-} from "react-router-dom";
-
+import {createBrowserRouter, RouterProvider} from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom/client";
 import Visualize from "./Panel/Visualize";
+import MainPage from "./Panel/MainPage";
+import { ProSidebarProvider } from "react-pro-sidebar";
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-      <Route>
-            <Route path="/" element={<App />} />
-            <Route path="/visualize" element={<Visualize />} />
-      </Route>
-  )
+const root = ReactDOM.createRoot(
+  document.getElementById('root')
 );
 
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <RouterProvider router={router}/>
-  </React.StrictMode>
+const router = createBrowserRouter([
+	{
+		path: "/",
+		element: <App />
+	},{
+    path: "/main",
+        element: <MainPage/>
+    },{
+    path: "visualize",
+        element: <Visualize/>
+    }
+]);
+
+root.render(
+  // <React.StrictMode> <-- re-render twice error
+    <ProSidebarProvider>
+        <RouterProvider router={router} />
+    </ProSidebarProvider>
+  // </React.StrictMode>
 );

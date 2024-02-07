@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import * as ROSLIB from 'roslib';
+import {CDBContainer, CDBProgress} from "cdbreact";
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -7,50 +8,48 @@ const ros = new ROSLIB.Ros({
 
 const htClient = new ROSLIB.Topic({
     ros : ros,
-    name : '/scvStatusPub',
+    name : '/pubScvStatus',
     messageType : 'std_msgs/Float32MultiArray'
 })
 
 const cpuClient = new ROSLIB.Topic({
     ros : ros,
-    name : '/cpuPub',
+    name : '/pubCpu',
     messageType : 'std_msgs/Float64'
 })
 const ramClient = new ROSLIB.Topic({
     ros : ros,
-    name : '/ramPub',
+    name : '/pubRam',
     messageType : 'std_msgs/Float64'
 })
 const gpuClient = new ROSLIB.Topic({
     ros : ros,
-    name : '/gpuPub',
+    name : '/pubGpu',
     messageType : 'std_msgs/Float64'
 })
 
 const ipClient = new ROSLIB.Topic({
     ros : ros,
-    name : '/scvIPPub',
+    name : '/pubScvIP',
     messageType : 'std_msgs/String'
 })
+
+const huntest = new ROSLIB.Topic({
+    ros : ros,
+    name : '/hunter_status',
+    messageType : 'hunter_msgs/HunterStatus'
+})
+
+
+
 const VehicleStatus = () => {
 
-    const vehicle_state = ["base_state", "battery_voltage", "control_mode",
-        "driver_states", "fault_code", "header",
-        "linear_velocity", "motor_states", "park_mode", "steering_angle"]
-
-    const vehicle_state_custom = ["control_mode", "base_state", "park_mode",
-        "battery_voltage", "linear_velocity", "steering_angle"]
-
-    const [hs, setHS] = useState([]);
     const [cpu, setCPU] = useState([]);
     const [ram, setRAM] = useState([]);
     const [gpu, setGPU] = useState([]);
     const [ip, setIP] = useState([]);
 
     useEffect(() => {
-        htClient.subscribe((msg) => {
-            setHS(msg.data)
-        })
         cpuClient.subscribe((msg)=> {
             setCPU(msg.data) 
         })
@@ -63,23 +62,53 @@ const VehicleStatus = () => {
         ipClient.subscribe((msg)=> {
             setIP(msg.data)
         })
-        htClient.subscribe((data) => {
-            setHS(data.data)
+        huntest.subscribe((msg)=> {
+            console.log(msg)
+            // 데이터가 나오지 않았던 이유 msg.data 속성으로 불러왔기 때문
+            // 이미 JSON 타입으로 메세지 출판
         })
     }, []);
 
-    const stateFloatArr = hs.map((data, num) =>
-        <h2> {vehicle_state_custom[num]} : {data} </h2> )
-
     return(
-        <div>
-            {stateFloatArr}
-            <h2>CPU : {cpu}%</h2>
-            <h2>RAM : {ram}%</h2>
-            <h2>GPU : {gpu}%</h2>
-            <h2>IP : {ip}</h2>
-
-        </div>
+        <CDBContainer>
+            <h3>CPU</h3>
+            <CDBProgress
+                value={cpu}
+                text={`${cpu}%`}
+                colors="danger"
+                height={20}
+            />
+            <h3>GPU</h3>
+            <CDBProgress
+                value={gpu}
+                text={`${gpu}%`}
+                colors="info"
+                height={20}
+            />
+            <h3>RAM</h3>
+            <CDBProgress
+                value={ram}
+                text={`${ram}%`}
+                colors="success"
+                height={20}
+            />
+          {/*<CDBProgress*/}
+          {/*  value={40}*/}
+          {/*  text={`${40}%`}*/}
+          {/*  colors="danger"*/}
+          {/*/>*/}
+          {/*<CDBProgress*/}
+          {/*  value={90}*/}
+          {/*  text={`${90}%`}*/}
+          {/*  colors="info"*/}
+          {/*/>*/}
+          {/*<CDBProgress*/}
+          {/*  value={60}*/}
+          {/*  text={`${60}%`}*/}
+          {/*  colors="warning"*/}
+          {/*/>*/}
+        </CDBContainer>
     );
 }
+
 export default VehicleStatus;

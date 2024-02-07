@@ -7,10 +7,9 @@ const ros = new ROSLIB.Ros({
   url : 'ws://localhost:9090'
 });
 
-function Simula(){
+export default function Simula(){
     useEffect(() => {
-
-        const viewer = new Viewer({
+        let viewer = new Viewer({
           divID : 'viewer',
           width: 1000,
           height: 400,
@@ -18,28 +17,26 @@ function Simula(){
           background : '#111111',
         });
 
-      viewer.addObject(new Grid());
+        viewer.addObject(new Grid());
 
-    const tfClient = new ROSLIB.TFClient({
-          ros : ros,
-          angularThres : 0.1,
-          transThres : 0.1,
-          rate : 10.0,
-          fixedFrame: '/velodyne',
-    });
-      const cloudClient = new PointCloud2({
-          ros : ros,
-          rootObject : viewer.scene,
-          tfClient : tfClient,
-          topic : '/velodyne_points',
-          material : {color: 0xff00ff, size: 0.05},
-          max_pts : 30000
-      });
+        const tfClient = new ROSLIB.TFClient({
+              ros : ros,
+              angularThres : 0.1,
+              transThres : 0.1,
+              rate : 10.0,
+              fixedFrame: '/velodyne'
+        });
+          const cloudClient = new PointCloud2({
+              ros : ros,
+              rootObject : viewer.scene,
+              tfClient : tfClient,
+              topic : '/velodyne_points',
+              material : {color: 0xff00ff, size: 0.05},
+              max_pts : 30000
+          });
     }, []);
 
-  return(
-      <div id="viewer"/>
-  );
+    return(
+        <div id="viewer"></div>
+    );
 }
-
-export default Simula;

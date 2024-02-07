@@ -39,8 +39,8 @@ function Kakaomap() {
         }}
         style={{
           // 지도의 크기
-          height: '50rem',
-          width: '80%',
+          height: '1034px',
+          width: '100%',
         }}
         level={3} // 지도의 확대 레벨
       >
@@ -50,7 +50,7 @@ function Kakaomap() {
             lng: long
           }}
           clickable={true} // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
-          onClick={() => navigateToExternalUrl("http://localhost:3000/visualize", true)}
+          onClick={() => navigateToExternalUrl("http://127.0.0.1:3000/visualize", true)}
           draggable={true} // 마커가 드래그 가능하도록 설정합니다
         >
         </MapMarker>

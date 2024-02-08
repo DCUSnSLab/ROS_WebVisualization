@@ -2,7 +2,10 @@ import './MainPage.css';
 import React, {useEffect, useState} from "react";
 import * as ROSLIB from "roslib";
 import LeftSideBar from "./LeftSideBar";
+import KakaomapLiveEditor from "../Component/kakaomap";
 import Kakaomap from "../Component/kakaomap";
+import AllTopicSub from "./AllTopicSub";
+// import Kakaomap, {KakaomapLiveEditor} from "../Component/kakaomap";
 
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -50,7 +53,8 @@ function MainPage(){
     return(
     <div id="container">
         <LeftSideBar/>
-        <Kakaomap id="kakao"/>
+        <Kakaomap/>
+        {/*<KakaomapLiveEditor/>*/}
     </div>
     );
 }

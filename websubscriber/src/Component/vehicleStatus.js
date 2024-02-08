@@ -40,8 +40,6 @@ const huntest = new ROSLIB.Topic({
     messageType : 'hunter_msgs/HunterStatus'
 })
 
-
-
 const VehicleStatus = () => {
 
     const [cpu, setCPU] = useState([]);

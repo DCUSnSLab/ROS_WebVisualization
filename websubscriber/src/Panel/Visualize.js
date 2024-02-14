@@ -25,7 +25,7 @@ export default function Visualize(){
                         </div>
                     </div>
                     <div style={{display: "table-row", width: "70%"}}>
-                        <VehicleReactChart/>
+                        {/*<VehicleReactChart/>*/}
                     </div>
                 </div>
             </div>

@@ -60,10 +60,10 @@ function Kakaomap() {
   return(
         <Map // 지도를 표시할 Container
             center={{
-              // lat: 35.9138,
-              // lng: 128.8036
-                lat: lat,
-                lng: lng
+              lat: 35.9138,
+              lng: 128.8036
+              //   lat: lat,
+              //   lng: lng
                 // maker onclickEvt
             }}
             style={{

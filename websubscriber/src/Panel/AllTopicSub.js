@@ -1,5 +1,6 @@
 import * as ROSLIB from "roslib";
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
+import CheckBoxState from "./CheckBoxState";
 
 
 const ros = new ROSLIB.Ros({
@@ -32,23 +33,43 @@ export default function AllTopicSub(){
         });
     }, []);
 
+    const [checked, setChecked] = useState([]);
+    const handleCheck = (event) => {
+        let updatedList = [...checked];
+        if (event.target.checked) {
+            updatedList = [...checked, event.target.value];
+        } else {
+            updatedList.splice(checked.indexOf(event.target.value), 1);
+        }
+        setChecked(updatedList);
+    };
+
+    const checkedItems = checked.length
+    ? checked.reduce((total, item) => {
+        return total + ", " + item;
+      })
+    : "";
+
 
     return(
         // 시각화
-        // <>
+        // <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
         //     {topicListUp.map((value, i) => (
-        //         <>
-        //             <p key={i}>{value.topic} : {value.type}</p>
+        //         <div>
+        //             <p key={i}>
+        //                 {/*<input value={value.topic} type="checkbox" onChange={handleCheck} width=""/>*/}
+        //                 <span>{value.topic} : {value.type}</span>
+        //             </p>
         //             {/*todo 각 토픽과 타입 옆에 체크박스 기능 구현 및 상태 관리 필요*/}
-        //             <label>
-        //                 {/*<input id={id} type="checkbox" checked={bChecked} onChange={(e) => checkHandled(e)}/>*/}
-        //             </label>
-        //         </>
+        //         </div>
         //     ))}
-        // </>
-        {/*todo 그냥 값만 주는 걸 어떻게 해야할까 체크박스하고 리턴하고 나눠야하나*/}
+        // </div>
         // topicListUp.map((value, i) => (
         //     [value.topic, value.type]
         // ))
+        <p>
+            {/*<input value={value.topic} type="checkbox" onChange={handleCheck} width=""/>*/}
+            <span>{topicListUp.topic} : {topicListUp.type}</span>
+        </p>
     )
 }

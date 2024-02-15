@@ -2,33 +2,36 @@
 import ImageLR from "../Component/ImageLR";
 import PCL from "../Component/PCL";
 import React, {useEffect, useRef, useState} from "react";
-import './Visualize.css';
 import VehicleReactChart from "../Component/VehicleReactChart";
 import AllTopicSub from "./AllTopicSub";
-
+import './Visualize.css';
+import {Box} from "@mui/material";
+import {Tab, Tabs} from "react-bootstrap";
+import CheckBoxState from "./CheckBoxState";
 
 export default function Visualize(){
 
+  const [value, setValue] = React.useState(0);
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
     return(
-        <div className="visualize_back"  style={{display: "table"}}>
-            <div style={{display: "table-cell-group"}}>
-                <div style={{display: "table-cell", width: "20%"}}>
-                    <AllTopicSub/>
-                </div>
-                <div style={{display: "table-row-group", width: "80%"}}>
-                    <div style={{display: 'table-cell-group'}}>
-                        <div style={{display: "table-cell", width: "auto"}}>
-                            <ImageLR/>
-                        </div>
-                        <div style={{display: "table-cell", width: "auto"}}>
-                            <PCL/>
-                        </div>
-                    </div>
-                    <div style={{display: "table-row", width: "70%"}}>
-                        {/*<VehicleReactChart/>*/}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <Tabs
+            id="controlledTab"
+            // activeKey={key}
+            // onSelect={(k) => setKey(k)}
+            className="mb3"
+        >
+            <Tab eventKey="AllTopic" title="AllTopic">
+                <CheckBoxState/>
+            </Tab>
+            <Tab eventKey="Camera" title="Camera">
+                <ImageLR/>
+            </Tab>
+            <Tab eventKey="PointCloud2" title="PointCloud2">
+                <PCL/>
+            </Tab>
+        </Tabs>
     );
 }

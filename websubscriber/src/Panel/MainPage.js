@@ -5,6 +5,8 @@ import LeftSideBar from "./LeftSideBar";
 import KakaomapLiveEditor from "../Component/kakaomap";
 import Kakaomap from "../Component/kakaomap";
 import AllTopicSub from "./AllTopicSub";
+import Visualize from "./Visualize";
+import { StyledEngineProvider } from '@mui/material/styles';
 // import Kakaomap, {KakaomapLiveEditor} from "../Component/kakaomap";
 
 const ros = new ROSLIB.Ros({
@@ -51,11 +53,12 @@ function MainPage(){
     }, []);
 
     return(
-    <div id="container">
-        <LeftSideBar/>
-        <Kakaomap/>
-        {/*<KakaomapLiveEditor/>*/}
-    </div>
+        <div id="container">
+            <LeftSideBar id="LeftSideBar"/>
+            <Kakaomap id="Kakaomap"/>
+            {/*<KakaomapLiveEditor/>*/}
+            <Visualize/>
+        </div>
     );
 }
 

@@ -13,8 +13,7 @@
   overflow: hidden;
 }
 
-#kakao,
-#vehiclebar
+#Kakaomap
 {
   display: flex;
   position: absolute;
@@ -29,3 +28,9 @@
   left: 0;
   top: 0;
 }
+
+#Visualize{
+  width: 40%;
+  height: 1024px;
+}
+

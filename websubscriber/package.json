@@ -5,7 +5,9 @@
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.15.7",
+    "@mui/icons-material": "5.11.0",
+    "@mui/material": "5.11.0",
+    "@mui/styles": "5.11.0",
     "@ramonak/react-progress-bar": "^5.2.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -65,8 +67,6 @@
   },
   "devDependencies": {
     "@kurkle/color": "^0.3.2",
-    "@mui/icons-material": "^5.15.0",
-    "@mui/system": "^5.15.0",
     "cdbreact": "^1.5.18",
     "flowbite-react": "^0.7.2",
     "luxon": "^3.4.4",

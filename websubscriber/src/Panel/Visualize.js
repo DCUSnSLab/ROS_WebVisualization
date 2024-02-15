@@ -3,11 +3,10 @@ import ImageLR from "../Component/ImageLR";
 import PCL from "../Component/PCL";
 import React, {useEffect, useRef, useState} from "react";
 import VehicleReactChart from "../Component/VehicleReactChart";
-import AllTopicSub from "./AllTopicSub";
+import AllTopicSub, { ParentComponent} from "./AllTopicSub";
 import './Visualize.css';
 import {Box} from "@mui/material";
 import {Tab, Tabs} from "react-bootstrap";
-import CheckBoxState from "./CheckBoxState";
 
 export default function Visualize(){
 
@@ -24,7 +23,7 @@ export default function Visualize(){
             className="mb3"
         >
             <Tab eventKey="AllTopic" title="AllTopic">
-                <CheckBoxState/>
+                <ParentComponent/>
             </Tab>
             <Tab eventKey="Camera" title="Camera">
                 <ImageLR/>

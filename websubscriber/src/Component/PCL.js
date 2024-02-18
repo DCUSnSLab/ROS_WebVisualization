@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from 'react';
 import {Viewer, Grid, PointCloud2} from 'ros3d';
 import * as ROSLIB from 'roslib';
-import * as ROS3D from 'ros3d';
 
 const ros = new ROSLIB.Ros({
   url : 'ws://localhost:9090'
 });
 
 export default function Simula(){
+
     useEffect(() => {
         let viewer = new Viewer({
-          divID : 'viewer',
-          width: 1000,
-          height: 400,
-          antialias : true,
-          background : '#111111',
+            divID : 'viewer',
+            width: window.innerWidth / 3,
+            height: window.innerHeight / 3,
+            antialias : true,
+            background : '#111111'
         });
 
         viewer.addObject(new Grid());

@@ -18,24 +18,20 @@ function ImageLR () {
 
   useEffect(() => {
     image_L_topic.subscribe(function(message) {
-      // if (f_flag < 5){
-      //   // console.log(f_flag);
-      //   f_flag += 1;
-      // }
-      // else{
+      if (f_flag < 5){
+        // console.log(f_flag);
+        f_flag += 1;
+      }
+      else{
         setLImg("data:image/jpg;base64," + message.data);
         f_flag = 0;
-      // }
+      }
     });
   }, []);
 
     return(
         <div>
-          {/*<h3>right</h3>*/}
-          {/*<img src={Rimg}></img>*/}
-          {/*<h3>{f_flag}</h3>*/}
-          <h2>left</h2>
-          <img src={Limg}></img>
+            <img src={Limg}></img>
         </div>
     );
 }

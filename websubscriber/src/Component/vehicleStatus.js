@@ -61,7 +61,7 @@ const VehicleStatus = () => {
             setIP(msg.data)
         })
         huntest.subscribe((msg)=> {
-            console.log(msg)
+            // console.log(msg)
             // 데이터가 나오지 않았던 이유 msg.data 속성으로 불러왔기 때문
             // 이미 JSON 타입으로 메세지 출판
         })

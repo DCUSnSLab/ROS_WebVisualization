@@ -31,7 +31,7 @@ function Kakaomap() {
 
   useEffect(() => {
     prevLatLngRef.current = [lat, lng]
-    console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
+    // console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
   }, [lat, lng]);
 
   // ref 객체를 통해 kakao.maps.drawng.DrawingManager 객체를 전달 받아 사용합니다.
@@ -52,7 +52,6 @@ function Kakaomap() {
           lng: point.x,
         }))
     }
-
 
   const navigateToExternalUrl = (url, shouldOpenNewTab) =>
     shouldOpenNewTab ? window.open(url, "_blank") : window.location.href = url;

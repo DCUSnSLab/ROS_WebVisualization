@@ -5,6 +5,8 @@ import ReactDOM from "react-dom/client";
 import Visualize from "./Panel/Visualize";
 import MainPage from "./Panel/MainPage";
 import { ProSidebarProvider } from "react-pro-sidebar";
+import {Provider} from "react-redux";
+import {store} from "./app/store";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
@@ -24,9 +26,13 @@ const router = createBrowserRouter([
 ]);
 
 root.render(
-  // <React.StrictMode> <-- re-render twice error
-    <ProSidebarProvider>
-        <RouterProvider router={router} />
-    </ProSidebarProvider>
-  // </React.StrictMode>
+    // <React.StrictMode> <-- re-render twice error
+
+    <Provider store={store}>
+        <ProSidebarProvider>
+            <RouterProvider router={router} />
+        </ProSidebarProvider>
+    </Provider>
+
+    // </React.StrictMode>
 );

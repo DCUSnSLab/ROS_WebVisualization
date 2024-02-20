@@ -3,9 +3,9 @@ import ImageLR from "../Component/ImageLR";
 import PCL from "../Component/PCL";
 import React, {useEffect, useRef, useState} from "react";
 import VehicleReactChart from "../Component/VehicleReactChart";
-import {ParentComponent} from "./AllTopicSub";
 import './Visualize.css';
 import {Tab, Tabs} from "react-bootstrap";
+import AllTopicSub from "./AllTopicSub";
 
 export default function Visualize(){
 
@@ -15,16 +15,17 @@ export default function Visualize(){
             // activeKey={key}
             // onSelect={(k) => setKey(k)}
             className="mb3"
+            style={{width: "window.innerWidth / 2"}}
         >
-            <Tab eventKey="AllTopic" title="AllTopic" style={{width: "window.innerWidth / 2"}}>
-                <ParentComponent/>
+            <Tab eventKey="Vehicle1" title="Vehicle1" style={{width: "window.innerWidth / 2"}}>
+                {/*<ImageLR/>*/}
+                {/*<PCL/>*/}
+                <AllTopicSub/>
             </Tab>
-            <Tab eventKey="Camera" title="Camera" style={{width: "window.innerWidth / 2"}}>
-                <ImageLR/>
-            </Tab>
-            <Tab eventKey="PointCloud2" title="PointCloud2" style={{width: "window.innerWidth / 2"}}>
-                <PCL/>
-            </Tab>
+            <Tabs eventKey="Vehicle2" title="Vehicle2" style={{width: "window.innerWidth / 2"}}>
+            </Tabs>
+            <Tabs eventKey="Vehicle3" title="Vehicle3" style={{width: "window.innerWidth / 2"}}>
+            </Tabs>
         </Tabs>
     );
 }

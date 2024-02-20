@@ -1,9 +1,9 @@
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-
 import {Menu, MenuItem, ProSidebarProvider, Sidebar, useProSidebar} from "react-pro-sidebar";
 import VehicleStatus from "../Component/vehicleStatus";
 import React from "react";
-
+import AllTopicSub from "./AllTopicSub";
+import CheckBoxState from "./CheckBoxState";
 
 function LeftSideBar(){
 
@@ -24,12 +24,12 @@ function LeftSideBar(){
             <h2>MENU</h2>
           </MenuItem>
         </Menu>
-          <div className="vehicle">
+            <div className="vehicle">
                 <VehicleStatus/>
             </div>
-          {/*<div className="topicAll">*/}
-          {/*      <AllTopicSub/>*/}
-          {/*  </div>*/}
+            {/*<div className="topicAll" style={{ marginTop: "10%"}}>*/}
+            {/*    <AllTopicSub/>*/}
+            {/*</div>*/}
       </Sidebar>
     </div>
     );

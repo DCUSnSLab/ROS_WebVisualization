@@ -6,6 +6,7 @@ import KakaomapLiveEditor from "../Component/kakaomap";
 import Kakaomap from "../Component/kakaomap";
 import Visualize from "./Visualize";
 import { StyledEngineProvider } from '@mui/material/styles';
+import {AddPostForm} from "../features/Post/AddPostForm";
 // import Kakaomap, {KakaomapLiveEditor} from "../Component/kakaomap";
 
 

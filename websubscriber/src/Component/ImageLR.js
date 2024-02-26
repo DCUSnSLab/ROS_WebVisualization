@@ -27,7 +27,7 @@ function ImageLR () {
         f_flag = 0;
       }
     });
-  }, []);
+  }, [image_L_topic]);
 
     return(
         <div>

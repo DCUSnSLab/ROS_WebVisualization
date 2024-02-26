@@ -6,12 +6,6 @@ const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
-const htClient = new ROSLIB.Topic({
-    ros : ros,
-    name : '/pubScvStatus',
-    messageType : 'std_msgs/Float32MultiArray'
-})
-
 const cpuClient = new ROSLIB.Topic({
     ros : ros,
     name : '/pubCpu',
@@ -34,11 +28,6 @@ const ipClient = new ROSLIB.Topic({
     messageType : 'std_msgs/String'
 })
 
-const huntest = new ROSLIB.Topic({
-    ros : ros,
-    name : '/hunter_status',
-    messageType : 'hunter_msgs/HunterStatus'
-})
 
 const VehicleStatus = () => {
 
@@ -59,11 +48,6 @@ const VehicleStatus = () => {
         })
         ipClient.subscribe((msg)=> {
             setIP(msg.data)
-        })
-        huntest.subscribe((msg)=> {
-            // console.log(msg)
-            // 데이터가 나오지 않았던 이유 msg.data 속성으로 불러왔기 때문
-            // 이미 JSON 타입으로 메세지 출판
         })
     }, []);
 

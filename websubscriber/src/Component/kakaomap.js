@@ -27,10 +27,10 @@ function Kakaomap() {
         setLat(message.latitude);
         setLng(message.longitude);
     })
+    prevLatLngRef.current = [lat, lng]
   }, );
 
   useEffect(() => {
-    prevLatLngRef.current = [lat, lng]
     // console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
   }, [lat, lng]);
 

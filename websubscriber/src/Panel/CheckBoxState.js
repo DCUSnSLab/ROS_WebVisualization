@@ -39,7 +39,7 @@ export default function CheckBoxState () {
                 {checked.map((value, index) => (
                     <div key={index}>
                         <p>
-                            {value.topic} : {getTopicList.find(topic => topic.topic === value.topic)?.type}
+                            {value.topic}
                         </p>
                     </div>
                 ))}

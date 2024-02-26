@@ -10,28 +10,27 @@ function LeftSideBar(){
     const { collapseSidebar } = useProSidebar();
 
     return(
-    <div id="app" style={({ height: "100vh" }, { display: "flex" })}>
-      <Sidebar style={{ height: "100vh" }}>
-        <Menu>
-          <MenuItem
-            onClick={() => {
-              collapseSidebar();
-            }}
-            icon={<MenuOutlinedIcon/>}
-            style={{ textAlign: "center" }}
-          >
-            {" "}
-            <h2>MENU</h2>
-          </MenuItem>
-        </Menu>
-            <div className="vehicle">
-                <VehicleStatus/>
-            </div>
-            {/*<div className="topicAll" style={{ marginTop: "10%"}}>*/}
-            {/*    <AllTopicSub/>*/}
-            {/*</div>*/}
-      </Sidebar>
-    </div>
+        <div id="app" style={{ height: "100vh", display: "flex"}}>
+          <Sidebar style={{ height: "100vh" }}>
+            <Menu>
+              <MenuItem
+                onClick={() => {
+                  collapseSidebar();
+                }}
+                icon={<MenuOutlinedIcon/>}
+                style={{ textAlign: "center" }}
+              >
+                {" "}
+                <h2>MENU</h2>
+              </MenuItem>
+            </Menu>
+                <div>
+                    <div className="vehicle">
+                        <VehicleStatus/>
+                    </div>
+                </div>
+            </Sidebar>
+        </div>
     );
 }
 

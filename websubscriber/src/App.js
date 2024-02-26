@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import MainPage from "./Panel/MainPage";
 import {ProSidebarProvider} from "react-pro-sidebar";
-import {Provider} from "react-redux";
+import {AddPostForm} from "./features/Post/AddPostForm";
+import DrivingVehicleList from "./Component/DrivingVehicleList";
 
 const App = () => {
     return (

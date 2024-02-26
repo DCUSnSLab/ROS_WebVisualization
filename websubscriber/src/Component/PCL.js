@@ -11,8 +11,8 @@ export default function Simula(){
     useEffect(() => {
         let viewer = new Viewer({
             divID : 'viewer',
-            width: window.innerWidth / 3,
-            height: window.innerHeight / 3,
+            width: window.innerWidth / 2,
+            height: window.innerHeight / 2,
             antialias : true,
             background : '#111111'
         });

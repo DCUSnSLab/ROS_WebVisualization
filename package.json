@@ -1,16 +1,19 @@
 {
   "dependencies": {
     "http-server": "^14.1.1",
+    "interactjs": "^1.10.26",
     "react": "^18.2.0",
     "react-client": "^1.0.1",
     "react-dom": "^17.0.2",
     "react-figma": "^0.30.0",
     "react-kakao-maps-sdk": "^1.1.24",
     "react-pro-sidebar": "^0.7.1",
+    "reactablejs": "^0.3.0",
     "save-dev": "^0.0.1-security",
     "styled-components": "^6.1.1"
   },
   "devDependencies": {
+    "@interactjs/types": "^1.10.26",
     "kakao.maps.d.ts": "^0.1.39",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"

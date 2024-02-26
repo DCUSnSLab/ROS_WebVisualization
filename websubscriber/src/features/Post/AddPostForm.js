@@ -1,15 +1,14 @@
 import * as ROSLIB from "roslib";
 import React, {useEffect, useState} from "react";
-import CheckBoxState from "./CheckBoxState";
 import { useSelector, useDispatch } from "react-redux";
-import {checkedTopic, updatedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
+import {checkedTopic, updatedTopic} from '../PublishedTopics/PublishedTopicSlice';
 
 // 부모 컴포넌트
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
-export default function AllTopicSub(){
+export function AddPostForm(){
     const [topicListUp, setTopicListUp] = useState();
     const [checked, setChecked] = useState([]);
 
@@ -46,7 +45,8 @@ export default function AllTopicSub(){
         console.log(topicList)
     }, [checked])
 
-
+    const checkbox = document.querySelector("#myCheckbox");
+    // props 값 받아오기
     const handleCheck = (event) => {
         setChecked(prevChecked => {
             let updatedTopicList = [...prevChecked];
@@ -61,19 +61,27 @@ export default function AllTopicSub(){
         dispatch(checkedTopic(checked))
     };
 
-
-    // props 값 받아오기
-    // return(
-    //    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", height: "100vh"}}>
-    //         <div>
-    //             <h5>All Topic : {topicList.length}</h5>
-    //             <p>{topicList.map((state, index) => (
-    //                 <div>
-    //                     <input value={state.topic} data-value2={state.type} id="myCheckbox" key={index} type="checkbox" onChange={handleCheck} width=""/>
-    //                     <p>{state.topic} : {state.type}</p>
-    //                 </div>
-    //             ))}</p>
-    //         </div>
-    //     </div>
-    // )
+    return(
+       <div style={{display: "grid", gridTemplateColumns: "1fr 1fr", height: "100vh"}}>
+            <div>
+                <h5>All Topic : {topicList.length}</h5>
+                <p>{topicList.map((state, index) => (
+                    <div>
+                        <input value={state.topic} data-value2={state.type} id="myCheckbox" key={index} type="checkbox" onChange={handleCheck} width=""/>
+                        <p>{state.topic} : {state.type}</p>
+                    </div>
+                ))}</p>
+            </div>
+            <div>
+                <h5>Checked : {checked.length}</h5>
+                {checked.map((value, index) => (
+                    <div key={index}>
+                        <p>
+                            {value}
+                        </p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
 }

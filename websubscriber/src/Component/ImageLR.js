@@ -7,12 +7,15 @@ const ros = new ROSLIB.Ros({
 
 let f_flag = 0;
 
-function ImageLR () {
+function ImageLR ({topic, width, height }) {
+
   const [Limg, setLImg] = useState();
+
+  const receivedTopic = topic
 
   const image_L_topic = new ROSLIB.Topic({
     ros: ros,
-    name: '/zed2/zed_node/left/image_rect_color/compressed',
+    name: receivedTopic,
     messageType: 'sensor_msgs/CompressedImage'
   });
 
@@ -27,10 +30,10 @@ function ImageLR () {
         f_flag = 0;
       }
     });
-  }, [image_L_topic]);
+  }, [receivedTopic]);
 
     return(
-        <div>
+        <div style={{ width: window.innerWidth / 4, height: window.innerHeight / 4}}>
             <img src={Limg}></img>
         </div>
     );

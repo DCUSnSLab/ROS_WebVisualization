@@ -7,18 +7,19 @@ import {checkedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
 import {useDispatch, useSelector} from "react-redux";
 import * as ROSLIB from "roslib";
 import AllTopicSub from "./AllTopicSub";
+import 'react-resizable/css/styles.css';
+import {Rnd} from "react-rnd";
+import ImageLR from "../Component/ImageLR";
+import PCL from "../Component/PCL";
 
+import { Resizable } from 're-resizable';
 
 // 부모 컴포넌트
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
-function VisualizationComponent({ topic }) {
-
-}
 
 export default function Visualize(){
-    const [topicListUp, setTopicListUp] = useState();
     const [checked, setChecked] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
@@ -26,44 +27,72 @@ export default function Visualize(){
     const selectedTopics = useSelector(state => state.TopicList.selectedTopics);  // store에서 선택된 토픽을 가져옴
 
     const dispatch = useDispatch();
+
     const [cards, setCards] = useState([]);
     const handleTopicSelect = (event) => {
         setSelectedTopic(event.target.value);
     };
 
-    const topicSelectList = () => {
+    const panelSelectList = (setSelectedPanel) => (
+        <select onChange={(event) => setSelectedPanel(event.target.value)}>
+            <option value="">Visualization Tools</option>
+            <option value="Image">Image</option>
+            <option value="PointCloud">PointCloud</option>
+            <option value="Chart">Chart</option>
+            <option value="RawMessage">RawMessage</option>
+        </select>
+    );
+
+    const VisualizationComponent = ({ panelType, topic, width, height }) => {
+        const commonProps = { width, height };
+
+        switch (panelType) {
+            case 'Image':
+                return <ImageLR topic={topic} {...commonProps}/>;
+            case 'PointCloud':
+                return <PCL topic={topic} {...commonProps}/>;
+            case 'Chart':
+                // return <Chart/>;
+            case 'RawMessage':
+                // return <RawMessageComponent topic={topic} />;
+            default:
+                return null;
+        }
+    };
+
+   const topicSelectList = (setSelectedTopic) => {
         return(
             <div>
                 <AllTopicSub/>
-                <h5>All Topic : {topicList.length}</h5>
-                <p>{topicList.map((state, index) => (
-                    <div key={index}>
-                        <input
-                            value={state.topic}
-                            type="radio"
-                            onChange={handleTopicSelect}
-                            name="topicSelect"
-                        />
-                        <label>{state.topic} : {state.type}</label>
-                    </div>
-                ))}</p>
+                <select onChange={(event) => setSelectedTopic(event.target.value)}>
+                    <option value="">Published Topic</option>
+                    {topicList.map((state, index) => (
+                        <option key={index} value={state.topic}>
+                            {state.topic}
+                        </option>
+                    ))}
+                </select>
             </div>
         )
     }
-    // 새로운 Card 추가 함수 정의
-    // 새로운 Card 추가 함수 정의
+
     const addCard = () => {
         const newCard = {
-            id: Date.now(),  // 현재 시간을 id로 사용
-            topics: [...checked],  // 현재 체크된 토픽들 복사
+            id: Date.now(),
+            topics: [...checked],
+            selectedTopic: topicList?.topic,
         };
 
-        newCard.setSelectedTopic = (topic) => {  // 토픽 선택 핸들러
-            dispatch(setSelectedTopic({id: newCard.id, topic}));  // 선택된 토픽을 store에 저장
+        newCard.setSelectedTopic = (topic) => {
+            newCard.selectedTopic = topic;
+        };
+
+        newCard.setSelectedPanel = (panel) => {
+            newCard.selectedPanel = panel;
         };
 
         newCard.component = (
-            <Card style={{ width: '18rem' }}>
+            <Card style={{ width: '10rem' }}>
                 <Button
                 variant="danger"
                 onClick={() => deleteCard(newCard.id)}
@@ -81,11 +110,10 @@ export default function Visualize(){
                 X
             </Button>
                 <Card.Body>
-                    <Card.Title>Card Title</Card.Title>
+                    <Card.Title>Visualization Tools</Card.Title>
                     <Card.Text>
                         {topicSelectList(newCard.setSelectedTopic)}
                     </Card.Text>
-                    {/* 토픽 선택 리스트 */}
                 </Card.Body>
             </Card>
         );
@@ -98,47 +126,56 @@ export default function Visualize(){
     };
 
     return(
-        <div style={{height: '50vh', width: '80vw'}}>
-            <div style={{height: "35px"}}>
-                <button>START</button>
-                <button>STOP</button>
-                <button>LOGGING</button>
+        <div style={{height: '100%', width: '80vw'}}>
+            <div id="threeBtn" style={{height: "60px"}}>
+                <Button variant="outline-dark">LOGGING</Button>
+                <Button variant="outline-success">START</Button>
+                <Button variant="outline-danger">STOP</Button>
             </div>
             <Tabs>
                 <Tab eventKey="Vehicle1" title="Vehicle1">
-                    <div style={{ overflow: "auto"}}>
-                        <Button variant="primary" onClick={addCard}>Add New Panel</Button>
+                    <div id="newPanelBtn" style={{display: "inline-block"}}>
+                        <Button variant="outline-primary" onClick={addCard}>
+                            Add New Panel
+                        </Button>
                         {cards.map((card, index) => (
-                          <Card key={index} style={{ width: '20vw', height: '30vh', position: 'relative',  overflow: "auto"}}>
-                            <Button
-                              variant="danger"
-                              onClick={() => deleteCard(card.id)}
-                              style={{
-                                position: 'absolute',
-                                top: '10px',
-                                right: '10px',
-                                padding: '5px',
-                                fontSize: '16px',
-                                lineHeight: '1',
-                                width: 'auto',
-                                height: 'auto',
-                              }}
+                            <Rnd
+                                default={{
+                                    x: 0,
+                                    y: 0,
+                                    width: 450,
+                                    height: 200,
+                                }}
+                                minWidth={450}
+                                minHeight={200}
+                                maxWidth={600}
+                                maxHeight={400}
+                                style={{backgroundColor: 'black', padding: "10px"}}
                             >
-                              X
-                            </Button>
-                            <Card.Body>
-                              <Card.Title>Card Title</Card.Title>
-                              {/* 토픽 선택 리스트 */}
-                              {topicSelectList(card.setSelectedTopic)}
-                              {/* 선택된 토픽에 대한 시각화 */}
-                              {selectedTopics[card.id] && <VisualizationComponent topic={selectedTopics[card.id]} />}
-                            </Card.Body>
-                          </Card>
+                                <Button
+                                    variant="danger"
+                                    onClick={() => deleteCard(card.id)}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '10px',
+                                        right: '10px',
+                                        padding: '5px',
+                                        fontSize: '16px',
+                                        lineHeight: '1',
+                                        width: 'auto',
+                                        height: 'auto',
+                                    }}
+                                >
+                                    X
+                                </Button>
+                                {panelSelectList(card.setSelectedPanel)}
+                                {topicSelectList(card.setSelectedTopic)}
+                                {card.selectedTopic && card.selectedPanel && <VisualizationComponent panelType={card.selectedPanel} topic={card.selectedTopic} />}
+                            </Rnd>
                         ))}
                       </div>
                 </Tab>
                     <Button variant="primary" onClick={addCard}>Add New Panel</Button>
-                {/* ... */}
             </Tabs>
         </div>
     );

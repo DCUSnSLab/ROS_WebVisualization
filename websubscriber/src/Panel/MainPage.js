@@ -7,15 +7,15 @@ import Kakaomap from "../Component/kakaomap";
 import Visualize from "./Visualize";
 import { StyledEngineProvider } from '@mui/material/styles';
 import {AddPostForm} from "../features/Post/AddPostForm";
-// import Kakaomap, {KakaomapLiveEditor} from "../Component/kakaomap";
+import VehicleStatus from "../Component/vehicleStatus";
 
 
 function MainPage(){
 
 
     return(
-        <div id="container">
-            <LeftSideBar id="LeftSideBar"/>
+        <div id="container" style={{display: "grid", gridTemplateColumns: "100px 50vw 50vw"}}>
+            <VehicleStatus/>
             <Kakaomap id="Kakaomap"/>
             {/*<KakaomapLiveEditor/>*/}
             <Visualize/>

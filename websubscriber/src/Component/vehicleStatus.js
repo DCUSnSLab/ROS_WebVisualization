@@ -53,26 +53,29 @@ const VehicleStatus = () => {
 
     return(
         <CDBContainer>
-            <h3>CPU</h3>
+            <h5 style={{textAlign: "center", margin: "10px"}}>CPU</h5>
             <CDBProgress
                 value={cpu}
                 text={`${cpu}%`}
                 colors="danger"
-                height={20}
+                height={5}
+                width={5}
             />
-            <h3>GPU</h3>
+            <h5 style={{textAlign: "center", margin: "10px"}}>GPU</h5>
             <CDBProgress
                 value={gpu}
                 text={`${gpu}%`}
                 colors="info"
-                height={20}
+                height={5}
+                width={5}
             />
-            <h3>RAM</h3>
+            <h5 style={{textAlign: "center", margin: "10px"}}>RAM</h5>
             <CDBProgress
                 value={ram}
                 text={`${ram}%`}
                 colors="success"
-                height={20}
+                height={5}
+                width={5}
             />
           {/*<CDBProgress*/}
           {/*  value={40}*/}

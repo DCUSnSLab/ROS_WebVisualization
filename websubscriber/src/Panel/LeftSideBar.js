@@ -7,29 +7,9 @@ import CheckBoxState from "./CheckBoxState";
 
 function LeftSideBar(){
 
-    const { collapseSidebar } = useProSidebar();
-
     return(
-        <div id="app" style={{ height: "100vh", display: "flex"}}>
-          <Sidebar style={{ height: "100vh" }}>
-            <Menu>
-              <MenuItem
-                onClick={() => {
-                  collapseSidebar();
-                }}
-                icon={<MenuOutlinedIcon/>}
-                style={{ textAlign: "center" }}
-              >
-                {" "}
-                <h2>MENU</h2>
-              </MenuItem>
-            </Menu>
-                <div>
-                    <div className="vehicle">
-                        <VehicleStatus/>
-                    </div>
-                </div>
-            </Sidebar>
+        <div id="app" style={{ height: "30vh", display: "flex", width: "20vw"}}>
+            <VehicleStatus/>
         </div>
     );
 }

@@ -12,3 +12,20 @@
 /*  overflow: auto;*/
 
 /*}*/
+
+
+#threeBtn > Button{
+    margin: 10px;
+    transition: all 0.3s ease;
+    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    font-size: larger;
+}
+
+#newPanelBtn > Button{
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    transition: all 0.3s ease;
+    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
+    font-size: larger;
+}

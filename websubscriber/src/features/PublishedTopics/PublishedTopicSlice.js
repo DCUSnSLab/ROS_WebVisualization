@@ -21,7 +21,7 @@ export const publishedTopicSlice = createSlice({
       checkedTopic: (state, action) => {
         state.checkedTopics.topic = action.payload;
       },
-      setSelectedTopic: (state, action) => {  // 새로운 action
+      setSelectedTopic: (state, action) => {
         state.selectedTopics[action.payload.id] = action.payload.topic;
       }
     }

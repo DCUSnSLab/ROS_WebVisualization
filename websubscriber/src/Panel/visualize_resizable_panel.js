@@ -11,14 +11,24 @@ import 'react-resizable/css/styles.css';
 import {Rnd} from "react-rnd";
 import ImageLR from "../Component/ImageLR";
 import PCL from "../Component/PCL";
+
 import RawMessageComponent from "../Component/RawMessageComponent";
+
+import {
+  getPanelElement,
+  getPanelGroupElement,
+  getResizeHandleElement,
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from "react-resizable-panels";
 
 // 부모 컴포넌트
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
-export default function Visualize(){
+export default function Visualize_resizable_panel(){
     const [checked, setChecked] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
@@ -94,8 +104,8 @@ export default function Visualize(){
         };
 
         newCard.component = (
-            <Card style={{ width: '10rem' }}>
-                <Button
+            <div>
+            <Button
                 variant="danger"
                 onClick={() => deleteCard(newCard.id)}
                 style={{
@@ -106,16 +116,9 @@ export default function Visualize(){
                     fontSize: '16px',
                     lineHeight: '1'
                 }}
-            >
-                X
-            </Button>
-                <Card.Body>
-                    <Card.Title>Visualization Tools</Card.Title>
-                    <Card.Text>
-                        {topicSelectList(newCard.setSelectedTopic)}
-                    </Card.Text>
-                </Card.Body>
-            </Card>
+            >X</Button>
+                {topicSelectList(newCard.setSelectedTopic)}
+            </div>
         );
 
         setCards(prevCards => [...prevCards, newCard]);
@@ -124,7 +127,22 @@ export default function Visualize(){
     const deleteCard = (id) => {
         setCards(prevCards => prevCards.filter(card => card.id !== id))
     };
+const refs = useRef();
 
+  useEffect(() => {
+    const groupElement = getPanelGroupElement("group");
+    const leftPanelElement = getPanelElement("left-panel");
+    const rightPanelElement = getPanelElement("right-panel");
+    const resizeHandleElement = getResizeHandleElement("resize-handle");
+
+    // If you want to, you can store them in a ref to pass around
+    refs.current = {
+      groupElement,
+      leftPanelElement,
+      rightPanelElement,
+      resizeHandleElement,
+    };
+  }, []);
 
     return(
         <div style={{height: '100%', width: '80vw'}}>
@@ -134,28 +152,13 @@ export default function Visualize(){
                 <Button variant="outline-danger">STOP</Button>
             </div>
             <Tabs>
-                <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{minHeight: "100vh"}}>
+                <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{height: "auto"}}>
                     <div id="newPanelBtn" style={{display: "inline-block"}}>
                         <Button variant="outline-primary" onClick={addCard}>
                             +
                         </Button>
                         {cards.map((card, index) => (
-                            <Rnd
-                                 cancel=".cancel"
-                                default={{
-                                    x: 0,
-                                    y: 0,
-                                    width: card.width,
-                                    height: card.height,
-                                }}
-                                enableUserSelectHack="true"
-                                minWidth={450}
-                                minHeight={200}
-                                style={{backgroundColor: 'white', padding: "10px"}}
-                                onResizeStop={(e, direction, ref) => {
-                                    card.setSize(ref.offsetWidth, ref.offsetHeight);
-                                }}
-                            >
+                            <div>
                                 <Button
                                     variant="danger"
                                     onClick={() => deleteCard(card.id)}
@@ -174,10 +177,8 @@ export default function Visualize(){
                                 </Button>
                                 {panelSelectList(card.setSelectedPanel)}
                                 {topicSelectList(card.setSelectedTopic)}
-                                <div className="cancel">
-                                {card.selectedTopic && card.selectedPanel && <VisualizationComponent panelType={card.selectedPanel} topic={card.selectedTopic} width={card.width} height={card.height} />}
-                                </div>
-                            </Rnd>
+                                {card.selectedTopic && card.selectedPanel && <VisualizationComponent panelType={card.selectedPanel} topic={card.selectedTopic} />}
+                            </div>
                         ))}
                       </div>
                 </Tab>

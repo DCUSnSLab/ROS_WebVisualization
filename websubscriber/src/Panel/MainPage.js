@@ -8,6 +8,7 @@ import Visualize from "./Visualize";
 import { StyledEngineProvider } from '@mui/material/styles';
 import {AddPostForm} from "../features/Post/AddPostForm";
 import VehicleStatus from "../Component/vehicleStatus";
+import Visualize_resizable_panel from "./visualize_resizable_panel";
 
 
 function MainPage(){

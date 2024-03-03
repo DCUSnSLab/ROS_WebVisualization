@@ -17,18 +17,19 @@ function Kakaomap() {
     messageType: "sensor_msgs/NavSatFix"
   });
 
-  // const [curLatLng, setLatLng] = useState([]);
-  const [lat, setLat] = useState();
-  const [lng, setLng] = useState();
-  const prevLatLngRef = useRef(null);
+    const mapRef = useRef(null);
+    const prevLatLngRef = useRef(null);
 
-  useEffect(() => {
-    listener.subscribe((message) => {
-        setLat(message.latitude);
-        setLng(message.longitude);
-    })
-    prevLatLngRef.current = [lat, lng]
-  }, );
+    const [lat, setLat] = useState();
+    const [lng, setLng] = useState();
+
+    useEffect(() => {
+        listener.subscribe((message) => {
+            setLat(message.latitude);
+            setLng(message.longitude);
+        })
+        prevLatLngRef.current = [lat, lng]
+    }, );
 
   useEffect(() => {
     // console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
@@ -56,13 +57,17 @@ function Kakaomap() {
   const navigateToExternalUrl = (url, shouldOpenNewTab) =>
     shouldOpenNewTab ? window.open(url, "_blank") : window.location.href = url;
 
+  const relayout = () => {
+    mapRef.current?.relayout()
+  }
+
   return(
         <Map // 지도를 표시할 Container
             center={{
               lat: 35.9138,
               lng: 128.8036
-              //   lat: lat,
-              //   lng: lng
+                // lat: lat,
+                // lng: lng
                 // maker onclickEvt
             }}
             style={{
@@ -71,6 +76,7 @@ function Kakaomap() {
             height: "100%",
             }}
             level={3} // 지도의 확대 레벨
+            ref={mapRef}
           >
             <DrawingManager
           ref={managerRef}
@@ -153,6 +159,7 @@ function Kakaomap() {
               onClick={() => navigateToExternalUrl("http://127.0.0.1:3000/visualize", true)}
               draggable={true} // 마커가 드래그 가능하도록 설정합니다
             />
+            {relayout}
         </Map>
   )
 }

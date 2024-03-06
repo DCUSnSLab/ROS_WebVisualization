@@ -8,6 +8,7 @@ const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
 });
 
+// panel 추가
 export function AddPostForm(){
     const [topicListUp, setTopicListUp] = useState();
     const [checked, setChecked] = useState([]);

@@ -1,7 +1,15 @@
 {
   "dependencies": {
+    "browserify-zlib": "^0.2.0",
+    "classlist.js": "^1.1.20150312",
+    "crypto-browserify": "^3.12.0",
+    "express": "^4.18.3",
     "http-server": "^14.1.1",
     "interactjs": "^1.10.26",
+    "os-browserify": "^0.3.0",
+    "path": "^0.12.7",
+    "path-browserify": "^1.0.1",
+    "querystring-es3": "^0.2.1",
     "re-resizable": "^6.9.11",
     "react": "^18.2.0",
     "react-client": "^1.0.1",
@@ -15,7 +23,10 @@
     "react-rnd": "^10.4.1",
     "reactablejs": "^0.3.0",
     "save-dev": "^0.0.1-security",
-    "styled-components": "^6.1.1"
+    "stream": "^0.0.2",
+    "stream-http": "^3.2.0",
+    "styled-components": "^6.1.1",
+    "tty-browserify": "^0.0.1"
   },
   "devDependencies": {
     "@interactjs/types": "^1.10.26",

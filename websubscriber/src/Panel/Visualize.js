@@ -13,6 +13,9 @@ import ImageLR from "../Component/ImageLR";
 import PCL from "../Component/PCL";
 import RawMessageComponent from "../Component/RawMessageComponent";
 
+import RosbagRecord from "./RosbagRecord";
+import {addPanel, deletePanel, PanelSlice} from "../features/Panel/PanelSlice";
+
 // 부모 컴포넌트
 const ros = new ROSLIB.Ros({
     url : 'ws://localhost:9090'
@@ -23,9 +26,10 @@ export default function Visualize(){
     const [selectedTopic, setSelectedTopic] = useState(null);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
      // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-    const selectedTopics = useSelector(state => state.TopicList.selectedTopics);  // store에서 선택된 토픽을 가져옴
 
     const dispatch = useDispatch();
+
+    const panelRedux = useSelector((state) => state.PanelList)
 
     const [cards, setCards] = useState([]);
 
@@ -118,18 +122,22 @@ export default function Visualize(){
             </Card>
         );
 
+        // setCards는 card 배열에 새로운 card를 addPanel 버튼을 누른 후에 넣는다.
         setCards(prevCards => [...prevCards, newCard]);
+        dispatch(addPanel(newCard));
+
+        console.log();
     };
 
     const deleteCard = (id) => {
-        setCards(prevCards => prevCards.filter(card => card.id !== id))
+        setCards(prevCards => prevCards.filter(card => card.id !== id));
+        dispatch(deletePanel(id))
     };
-
 
     return(
         <div style={{height: '100%', width: '80vw'}}>
             <div id="threeBtn" style={{height: "60px"}}>
-                <Button variant="outline-dark">LOGGING</Button>
+                <RosbagRecord/>
                 <Button variant="outline-success">START</Button>
                 <Button variant="outline-danger">STOP</Button>
             </div>

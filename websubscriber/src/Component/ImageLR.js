@@ -19,7 +19,12 @@ function ImageLR ({topic, width, height }) {
     messageType: 'sensor_msgs/CompressedImage'
   });
 
+    const [receivedH, setH]= useState(300)
+    const [receivedW, setW]= useState(300)
+
   useEffect(() => {
+    setH(height)
+    setW(width)
     image_L_topic.subscribe(function(message) {
       if (f_flag < 5){
         // console.log(f_flag);
@@ -33,8 +38,8 @@ function ImageLR ({topic, width, height }) {
   }, [receivedTopic]);
 
     return(
-        <div style={{ width: window.innerWidth / 4, height: window.innerHeight / 4}}>
-            <img src={Limg}></img>
+        <div>
+            <img src={Limg} style={{width: receivedW, height: receivedH}}></img>
         </div>
     );
 }

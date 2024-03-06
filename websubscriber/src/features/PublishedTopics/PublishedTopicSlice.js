@@ -12,7 +12,7 @@ export const publishedTopicSlice = createSlice({
       checkedTopics: {
         topic: []
       },
-      selectedTopics: {}
+      selectedTopics: {},
     },
     reducers: {
        updatedTopic: (state, action) => {

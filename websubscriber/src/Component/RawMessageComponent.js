@@ -1,13 +1,16 @@
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import * as ROSLIB from "roslib";
 import {useEffect, useRef, useState} from "react";
 
 
-const ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
-});
-
+    const ros = new ROSLIB.Ros({
+        url : 'ws://203.250.33.143:9090'
+    });
 export default function RawMessageComponent({topic, commonProps}){
+
+    // const ip = useSelector((state) => state.TopicList.serverIP);
+    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+
     let w, h = {commonProps};
     console.log(w, h)
     const receivedTopic = topic;

@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import {useSelector} from "react-redux";
 
 // reducer
 export const publishedTopicSlice = createSlice({
@@ -13,6 +12,7 @@ export const publishedTopicSlice = createSlice({
         topic: []
       },
       selectedTopics: {},
+      // serverIP : 'ws://localhost:9090'
     },
     reducers: {
        updatedTopic: (state, action) => {
@@ -23,11 +23,14 @@ export const publishedTopicSlice = createSlice({
       },
       setSelectedTopic: (state, action) => {
         state.selectedTopics[action.payload.id] = action.payload.topic;
-      }
+      },
+      // setServerIP: (state, action) => {
+      //    state.serverIP = action.payload
+      // }
     }
 })
 
 // action
-export const {checkedTopic, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
+export const {checkedTopic, setServerIP, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
 
 export default publishedTopicSlice.reducer

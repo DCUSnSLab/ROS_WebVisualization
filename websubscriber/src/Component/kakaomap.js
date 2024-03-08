@@ -3,13 +3,16 @@ import React, {useEffect, useRef, useState} from 'react';
 import * as ROSLIB from 'roslib';
 import {MapMarker, Map, Polyline, DrawingManager} from "react-kakao-maps-sdk";
 import {Navigate, useNavigate} from "react-router-dom";
-
-const ros = new ROSLIB.Ros({
-  url : 'ws://localhost:9090'
-});
+import {useSelector} from "react-redux";
 
 
+  const ros = new ROSLIB.Ros({
+    url : 'ws://203.250.33.143:9090'
+  });
 function Kakaomap() {
+
+  // const ip = useSelector((state) => state.TopicList.serverIP);
+  // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
 
   const listener = new ROSLIB.Topic({
     ros: ros,
@@ -31,9 +34,9 @@ function Kakaomap() {
         prevLatLngRef.current = [lat, lng]
     }, );
 
-  useEffect(() => {
+    useEffect(() => {
     // console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
-  }, [lat, lng]);
+    }, [lat, lng]);
 
   // ref 객체를 통해 kakao.maps.drawng.DrawingManager 객체를 전달 받아 사용합니다.
   const managerRef = useRef(null)

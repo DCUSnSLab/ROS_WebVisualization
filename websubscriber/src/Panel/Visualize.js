@@ -15,13 +15,10 @@ import RawMessageComponent from "../Component/RawMessageComponent";
 
 import RosbagRecord from "./RosbagRecord";
 import {addPanel, deletePanel, PanelSlice} from "../features/Panel/PanelSlice";
-
-// 부모 컴포넌트
-const ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
-});
+import VehicleControl from "./VehicleControl";
 
 export default function Visualize(){
+
     const [checked, setChecked] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
@@ -75,44 +72,45 @@ export default function Visualize(){
         )
     }
 
-    const addCard = () => {
-        const newCard = {
-            id: Date.now(),
-            topics: [...checked],
-            selectedTopic: topicList?.topic,
-            width: 400,
-            height: 200
-        };
 
-        newCard.setSelectedTopic = (topic) => {
-            newCard.selectedTopic = topic;
-        };
+     const addCard = () => {
+    const newCard = {
+        id: Date.now(),
+        topics: [...checked],
+        selectedTopic: topicList?.topic,
+        width: 400,
+        height: 200
+    };
 
-        newCard.setSize = (width, height) => {
-            newCard.width = width;
-            newCard.height = height;
-        };
+    newCard.setSelectedTopic = (topic) => {
+        newCard.selectedTopic = topic;
+    };
 
-        newCard.setSelectedPanel = (panel) => {
-            newCard.selectedPanel = panel;
-        };
+    newCard.setSize = (width, height) => {
+        newCard.width = width;
+        newCard.height = height;
+    };
+
+    newCard.setSelectedPanel = (panel) => {
+        newCard.selectedPanel = panel;
+    };
 
         newCard.component = (
             <Card style={{ width: '10rem' }}>
                 <Button
-                variant="danger"
-                onClick={() => deleteCard(newCard.id)}
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    right: '10px',
-                    padding: '5px',
-                    fontSize: '16px',
-                    lineHeight: '1'
-                }}
-            >
-                X
-            </Button>
+                    variant="danger"
+                    onClick={() => deleteCard(newCard.id)}
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        padding: '5px',
+                        fontSize: '16px',
+                        lineHeight: '1'
+                    }}
+                >
+                    X
+                </Button>
                 <Card.Body>
                     <Card.Title>Visualization Tools</Card.Title>
                     <Card.Text>
@@ -122,29 +120,25 @@ export default function Visualize(){
             </Card>
         );
 
-        // setCards는 card 배열에 새로운 card를 addPanel 버튼을 누른 후에 넣는다.
         setCards(prevCards => [...prevCards, newCard]);
-        dispatch(addPanel(newCard));
-
-        console.log();
     };
 
-    const deleteCard = (id) => {
-        setCards(prevCards => prevCards.filter(card => card.id !== id));
-        dispatch(deletePanel(id))
-    };
+
+        const deleteCard = (id) => {
+            setCards(prevCards => prevCards.filter(card => card.id !== id));
+            dispatch(deletePanel(id))
+        };
 
     return(
         <div style={{height: '100%', width: '80vw'}}>
-            <div id="threeBtn" style={{height: "60px"}}>
-                <RosbagRecord/>
-                <Button variant="outline-success">START</Button>
-                <Button variant="outline-danger">STOP</Button>
-            </div>
+                <div id="threeBtn" style={{height: "80px", display: "block"}}>
+                    <RosbagRecord/>
+                    <VehicleControl/>
+                </div>
             <Tabs>
                 <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{minHeight: "100vh"}}>
                     <div id="newPanelBtn" style={{display: "inline-block"}}>
-                        <Button variant="outline-primary" onClick={addCard}>
+                        <Button variant="primary" onClick={addCard}>
                             +
                         </Button>
                         {cards.map((card, index) => (

@@ -28,14 +28,18 @@ Chart.register(
     Legend
 );
 
-const ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
-});
- const listener = new ROSLIB.Topic({
-    ros: ros,
-    name: "/zed2/zed_node/pose",
-    messageType: "geometry_msgs/PoseStamped"
-});
+    // const ip = useSelector((state) => state.TopicList.serverIP);
+    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+
+    const ros = new ROSLIB.Ros({
+        url : 'ws://203.250.33.143:9090'
+    });
+    
+    const listener = new ROSLIB.Topic({
+        ros: ros,
+        name: "/zed2/zed_node/pose",
+        messageType: "geometry_msgs/PoseStamped"
+    });
 
 function VehicleReactChart() {
     const [Pose, setPose] = useState([]);

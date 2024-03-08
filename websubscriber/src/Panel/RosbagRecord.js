@@ -1,37 +1,40 @@
 import React, {useEffect, useState} from "react";
 import {Button} from "react-bootstrap";
 import * as ROSLIB from "roslib";
+import {useSelector} from "react-redux";
 
 export default function RosbagRecord(){
 
     const [logging, setLogging] = useState(false);
 
-    const ros = new ROSLIB.Ros({
-        url : 'ws://localhost:9090'
-    });
+    // const ip = useSelector((state) => state.TopicList.serverIP);
+    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
 
-    let addTwoInts = new ROSLIB.Service({
+    const ros = new ROSLIB.Ros({
+        url : 'ws://203.250.33.143:9090'
+    });
+    let LoggingRequest = new ROSLIB.Service({
       ros : ros,
       name : '/logging',
       serviceType : 'Logging'
     });
 
     let requestStart = new ROSLIB.ServiceRequest({
-      isLogging : "Start"
+      isLogging : "LoggingStart"
     });
 
     let requestStop = new ROSLIB.ServiceRequest({
-      isLogging : "Stop"
+      isLogging : "LoggingStop"
     });
 
     useEffect(() => {
         if(logging === true){
-            addTwoInts.callService(requestStart, function(result) {
+            LoggingRequest.callService(requestStart, function(result) {
                 console.log(result)
             });
         }
         else if (logging === false){
-            addTwoInts.callService(requestStop, function(result) {
+            LoggingRequest.callService(requestStop, function(result) {
                 console.log(result)
             });
         }
@@ -44,10 +47,8 @@ export default function RosbagRecord(){
     };
 
     return(
-        <div>
-            <Button onClick={handleLoggingClick}>
-                {logging ? 'LOGGING STOP' : 'LOGGING START'}
-            </Button>
-        </div>
+        <Button variant="warning" style={{color: "white"}} onClick={handleLoggingClick}>
+            {logging ? 'LOGGING STOP' : 'LOGGING START'}
+        </Button>
     )
 }

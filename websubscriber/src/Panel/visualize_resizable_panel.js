@@ -23,12 +23,16 @@ import {
   PanelResizeHandle,
 } from "react-resizable-panels";
 
-// 부모 컴포넌트
-const ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
-});
 
 export default function Visualize_resizable_panel(){
+
+    // const ip = useSelector((state) => state.TopicList.serverIP);
+    // // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+    //
+    // const ros = new ROSLIB.Ros({
+    //     url : ip
+    // });
+    
     const [checked, setChecked] = useState([]);
     const [selectedTopic, setSelectedTopic] = useState(null);
     const topicList = useSelector((state) => state.TopicList.topics.topic);

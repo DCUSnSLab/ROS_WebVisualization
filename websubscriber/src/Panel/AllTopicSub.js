@@ -6,7 +6,7 @@ import {checkedTopic, updatedTopic} from "../features/PublishedTopics/PublishedT
 
 // 부모 컴포넌트
 const ros = new ROSLIB.Ros({
-    url : 'ws://localhost:9090'
+    url : 'ws://203.250.33.143:9090'
 });
 
 export default function AllTopicSub(){

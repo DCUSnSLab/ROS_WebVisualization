@@ -9,6 +9,7 @@ import { StyledEngineProvider } from '@mui/material/styles';
 import {AddPostForm} from "../features/Panel/AddPostForm";
 import VehicleStatus from "../Component/vehicleStatus";
 import Visualize_resizable_panel from "./visualize_resizable_panel";
+import DrivingVehicleList from "../Component/DrivingVehicleList";
 
 
 function MainPage(){
@@ -17,7 +18,6 @@ function MainPage(){
         <div id="container" style={{display: "grid", gridTemplateColumns: "100px 50vw 50vw"}}>
             <VehicleStatus/>
             <Kakaomap id="Kakaomap"/>
-            {/*<KakaomapLiveEditor/>*/}
             <Visualize/>
         </div>
     );

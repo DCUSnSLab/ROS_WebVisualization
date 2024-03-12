@@ -1,7 +1,7 @@
 'use client';
 import React, {useEffect, useRef, useState} from "react";
 import './Visualize.css';
-import {Button, Tab, Tabs} from "react-bootstrap";
+import { Button, Col, Row, Tab, Tabs } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
 import {checkedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
 import {useDispatch, useSelector} from "react-redux";
@@ -137,13 +137,14 @@ export default function Visualize(){
         <Tabs>
             <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{ minHeight: "100vh" }}>
                 <div id="newPanelBtn" style={{ display: "inline-block" }}>
-                    <Button variant="primary" onClick={addCard} style={{ position: 'fixed', top: '55px', right: '10px'}}>
-                        +
-                    </Button>
-                    <div id="threeBtn" style={{ marginLeft: 'auto', height: "80px", display: "inline-block"}}>
+
+                    <div id="threeBtn" style={{ marginLeft: 'auto', height: "50px", display: "grid", gridTemplateColumns: "1fr 100px 100px 1fr 1fr 1fr"}}>
                         <RosbagRecord />
                         <VehicleControl />
-                        <VehicleStatus/>
+                        <VehicleStatus />
+                        <Button variant="primary" onClick={addCard} style={{ position: 'fixed', top: '55px', right: '10px'}}>
+                            +
+                        </Button>
                     </div>
                     {cards.map((card, index) => (
                         <Rnd

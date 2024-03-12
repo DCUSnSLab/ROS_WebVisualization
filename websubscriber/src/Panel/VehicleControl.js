@@ -68,7 +68,7 @@ export default function VehicleControl(){
     return(
         <>
             <Button variant="success" value={"START"} onClick={() => setControl(true)}>START</Button>
-             <Button variant="danger" value={"STOP"} onClick={() => setControl(false)}>STOP</Button>
+            <Button variant="danger" value={"STOP"} onClick={() => setControl(false)}>STOP</Button>
          </>
     )
 }

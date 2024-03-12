@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import * as ROSLIB from 'roslib';
 import {CDBContainer, CDBProgress} from "cdbreact";
 import {useDispatch, useSelector} from "react-redux";
+import {Col, Row} from "react-bootstrap";
 
 
 // ros를 VehicleStatus 안에 넣으면 client 수가 최소 252명까지 증가. 이유불명
@@ -58,35 +59,35 @@ const VehicleStatus = () => {
     }, []);
 
     return(
-        <div style={{position: "block", display: "grid", gridTemplateColumns: "70px 70px 70px"}}>
-            <div style={{margin: "10px"}}>
-                <h5 style={{textAlign: "center"}}>CPU</h5>
+        <div style={{display: "grid", gridTemplateColumns: "1fr 1fr 1fr"}}>
+            <div style={{textAlign: "center", margin: "10px"}}>
+                <h5>CPU</h5>
                 <CDBProgress
                     value={cpu}
                     text={`${cpu}%`}
                     colors="danger"
                     height={5}
-                    width={5}
+                    width={7}
                 />
             </div>
-            <div style={{margin: "10px"}}>
-                <h5 style={{textAlign: "center"}}>GPU</h5>
+            <div style={{textAlign: "center", margin: "10px"}}>
+                <h5>GPU</h5>
                 <CDBProgress
                     value={gpu}
                     text={`${gpu}%`}
                     colors="info"
                     height={5}
-                    width={5}
+                    width={7}
                 />
             </div>
-            <div style={{margin: "10px"}}>
-                <h5 style={{textAlign: "center"}}>RAM</h5>
+            <div style={{textAlign: "center", margin: "10px"}}>
+                <h5>RAM</h5>
                 <CDBProgress
                     value={ram}
                     text={`${ram}%`}
                     colors="success"
                     height={5}
-                    width={5}
+                    width={7}
                 />
             </div>
        </div>

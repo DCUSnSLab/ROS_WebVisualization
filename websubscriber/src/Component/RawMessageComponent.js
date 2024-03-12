@@ -1,59 +1,48 @@
-import {useSelector} from "react-redux";
+// Import the necessary modules and components
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import * as ROSLIB from "roslib";
-import {useEffect, useRef, useState} from "react";
 
+// Define the ROS instance (assuming it's declared somewhere in your code)
+const ros = new ROSLIB.Ros({
+  url: 'ws://203.250.33.143:9090'
+});
 
-    const ros = new ROSLIB.Ros({
-        url : 'ws://203.250.33.143:9090'
-    });
-export default function RawMessageComponent({topic, commonProps}){
+// Define the RawMessageComponent
+export default function RawMessageComponent({ topic }) {
+      const receivedTopic = topic;
+      const [receivedType, setReceivedType] = useState();
+      const topicList = useSelector((state) => state.TopicList.topics.topic);
+      const typeList = useSelector((state) => state.TopicList.topics.type);
+      const [msg, setMsg] = useState();
 
-    // const ip = useSelector((state) => state.TopicList.serverIP);
-    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+      useEffect(() => {
+          setReceivedType(
+            topicList.findIndex((value) => value === receivedTopic)
+          );
 
-    let w, h = {commonProps};
-    console.log(w, h)
-    const receivedTopic = topic;
-    const [receivedType, setReceivedType] = useState();
-    const topicList = useSelector((state) => state.TopicList.topics.topic);
-    const typeList = useSelector((state) => state.TopicList.topics.type);
-    const [msg, setMsg] = useState();
-
-    useEffect(() => {
-        console.log("RawMessageComponent")
-        setReceivedType(topicList.find((value, index) => {
-            console.log(value, index)
-            if(value === receivedTopic){
-                return index
-            }
-        }))
-
-        const listener = new ROSLIB.Topic({
+          const listener = new ROSLIB.Topic({
             ros: ros,
             name: receivedTopic,
-            messageType: typeList[receivedType]
-        });
-
-        listener.subscribe((message) => {
-            setMsg(message);
-        })
-        var topic = new ROSLIB.Topic({
-            ros : ros,
-            name: '/com/endpoint/example', // use a sensible namespace
-            messageType: 'std_msgs/String'
+            messageType: typeList[receivedType],
           });
 
-        function publishEncoded(topic, obj) {
-              var msg = new ROSLIB.Message({
-                data: JSON.stringify(obj)
-              });
-              topic.publish(msg);
-            }
-        }, []);
+          listener.subscribe((message) => {
+            setMsg(message);
+          });
+
+          // Additional ROS topic definition (not sure if it's needed in your use case)
+          const exampleTopic = new ROSLIB.Topic({
+            ros: ros,
+            name: '/com/endpoint/example',
+            messageType: 'std_msgs/String',
+          });
+
+    }, [receivedTopic, receivedType, topicList, typeList]);
 
     return (
-      <div style={{overflow: "auto"}}>
-        {JSON.stringify(msg)}
-      </div>
-    )
+        <div style={{ overflow: "scroll", height: "auto" }}>
+          {JSON.stringify(msg, null, '\n')}
+        </div>
+    );
 }

@@ -16,6 +16,9 @@ import RawMessageComponent from "../Component/RawMessageComponent";
 import RosbagRecord from "./RosbagRecord";
 import {addPanel, deletePanel, PanelSlice} from "../features/Panel/PanelSlice";
 import VehicleControl from "./VehicleControl";
+import LeftSideBar from "./LeftSideBar";
+import DrivingVehicleList from "../Component/DrivingVehicleList";
+import VehicleStatus from "../Component/vehicleStatus";
 
 export default function Visualize(){
 
@@ -56,7 +59,7 @@ export default function Visualize(){
         }
     };
 
-   const topicSelectList = (setSelectedTopic) => {
+    const topicSelectList = (setSelectedTopic) => {
         return(
             <div>
                 <AllTopicSub/>
@@ -73,118 +76,121 @@ export default function Visualize(){
     }
 
 
-     const addCard = () => {
-    const newCard = {
-        id: Date.now(),
-        topics: [...checked],
-        selectedTopic: topicList?.topic,
-        width: 400,
-        height: 200
-    };
+    const addCard = () => {
+        const newCard = {
+          id: Date.now(),
+          topics: [...checked],
+          selectedTopic: topicList?.topic,
+          width: 400,
+          height: "auto"
+        };
 
-    newCard.setSelectedTopic = (topic) => {
-        newCard.selectedTopic = topic;
-    };
+        newCard.setSelectedTopic = (topic) => {
+            newCard.selectedTopic = topic;
+        };
 
-    newCard.setSize = (width, height) => {
-        newCard.width = width;
-        newCard.height = height;
-    };
+        newCard.setSize = (width, height) => {
+            newCard.width = width;
+            newCard.height = height;
+        };
 
-    newCard.setSelectedPanel = (panel) => {
-        newCard.selectedPanel = panel;
-    };
+        newCard.setSelectedPanel = (panel) => {
+            newCard.selectedPanel = panel;
+        };
 
         newCard.component = (
-            <Card style={{ width: '10rem' }}>
-                <Button
-                    variant="danger"
-                    onClick={() => deleteCard(newCard.id)}
-                    style={{
-                        position: 'absolute',
-                        top: '10px',
-                        right: '10px',
-                        padding: '5px',
-                        fontSize: '16px',
-                        lineHeight: '1'
-                    }}
-                >
-                    X
-                </Button>
-                <Card.Body>
-                    <Card.Title>Visualization Tools</Card.Title>
-                    <Card.Text>
-                        {topicSelectList(newCard.setSelectedTopic)}
-                    </Card.Text>
-                </Card.Body>
-            </Card>
+          <Card style={{ height: newCard.height }}>
+            <Button
+              variant="danger"
+              onClick={() => deleteCard(newCard.id)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                padding: '5px',
+                fontSize: '16px',
+                lineHeight: '1'
+              }}
+            >
+              X
+            </Button>
+            <Card.Body style={{ width: "100%", height: newCard.height }}>
+              <Card.Title>Visualization Tools</Card.Title>
+              <Card.Text style={{ width: "100%", height: newCard.height }}>
+                {topicSelectList(newCard.setSelectedTopic)}
+              </Card.Text>
+            </Card.Body>
+          </Card>
         );
-
         setCards(prevCards => [...prevCards, newCard]);
-    };
-
+        };
 
         const deleteCard = (id) => {
-            setCards(prevCards => prevCards.filter(card => card.id !== id));
-            dispatch(deletePanel(id))
+            setCards((prevCards) => {
+            const updatedCards = prevCards.filter((card) => card.id !== id);
+                return updatedCards;
+            });
         };
 
     return(
-        <div style={{height: '100%', width: '80vw'}}>
-                <div id="threeBtn" style={{height: "80px", display: "block"}}>
-                    <RosbagRecord/>
-                    <VehicleControl/>
-                </div>
-            <Tabs>
-                <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{minHeight: "100vh"}}>
-                    <div id="newPanelBtn" style={{display: "inline-block"}}>
-                        <Button variant="primary" onClick={addCard}>
-                            +
-                        </Button>
-                        {cards.map((card, index) => (
-                            <Rnd
-                                 cancel=".cancel"
-                                default={{
-                                    x: 0,
-                                    y: 0,
-                                    width: card.width,
-                                    height: card.height,
-                                }}
-                                enableUserSelectHack="true"
-                                minWidth={450}
-                                minHeight={200}
-                                style={{backgroundColor: 'white', padding: "10px"}}
-                                onResizeStop={(e, direction, ref) => {
-                                    card.setSize(ref.offsetWidth, ref.offsetHeight);
+        <div style={{ height: '100%', width: '80vw' }}>
+        <Tabs>
+            <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{ minHeight: "100vh" }}>
+                <div id="newPanelBtn" style={{ display: "inline-block" }}>
+                    <Button variant="primary" onClick={addCard} style={{ position: 'fixed', top: '55px', right: '10px'}}>
+                        +
+                    </Button>
+                    <div id="threeBtn" style={{ marginLeft: 'auto', height: "80px", display: "inline-block"}}>
+                        <RosbagRecord />
+                        <VehicleControl />
+                        <VehicleStatus/>
+                    </div>
+                    {cards.map((card, index) => (
+                        <Rnd
+                            key={card.id}
+                            cancel=".cancel"
+                            default={{
+                              x: 15,
+                              y: 75,
+                              width: card.width,
+                              height: card.height,
+                            }}
+                            enableUserSelectHack="true"
+                            minWidth={450}
+                            minHeight={100}
+                            maxHeight={700}
+                            style={{ backgroundColor: 'white', padding: "10px" }}
+                            onResizeStop={(e, direction, ref) => {
+                              card.setSize(ref.offsetWidth, ref.offsetHeight);
+                            }}
+                        >
+                            <Button
+                                variant="danger"
+                                onClick={() => deleteCard(card.id)}
+                                style={{
+                                    position: 'absolute',
+                                    top: '10px',
+                                    right: '10px',
+                                    padding: '5px',
+                                    fontSize: '16px',
+                                    lineHeight: '1',
+                                    width: 'auto',
+                                    height: 'auto',
                                 }}
                             >
-                                <Button
-                                    variant="danger"
-                                    onClick={() => deleteCard(card.id)}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '10px',
-                                        right: '10px',
-                                        padding: '5px',
-                                        fontSize: '16px',
-                                        lineHeight: '1',
-                                        width: 'auto',
-                                        height: 'auto',
-                                    }}
-                                >
-                                    X
-                                </Button>
-                                {panelSelectList(card.setSelectedPanel)}
-                                {topicSelectList(card.setSelectedTopic)}
-                                <div className="cancel">
+                              X
+                            </Button>
+                            {panelSelectList(card.setSelectedPanel)}
+                            {topicSelectList(card.setSelectedTopic)}
+                            <div className="cancel">
                                 {card.selectedTopic && card.selectedPanel && <VisualizationComponent panelType={card.selectedPanel} topic={card.selectedTopic} width={card.width} height={card.height} />}
-                                </div>
-                            </Rnd>
-                        ))}
-                      </div>
-                </Tab>
-                    <Button variant="primary" onClick={addCard}>Add New Panel</Button>
-            </Tabs>
-        </div>
+                            </div>
+                        </Rnd>
+                    ))}
+                </div>
+            </Tab>
+            <Button variant="primary" onClick={addCard}>Add New Panel</Button>
+        </Tabs>
+    </div>
     );
 }

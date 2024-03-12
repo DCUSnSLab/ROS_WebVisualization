@@ -15,8 +15,7 @@ import DrivingVehicleList from "../Component/DrivingVehicleList";
 function MainPage(){
 
     return(
-        <div id="container" style={{display: "grid", gridTemplateColumns: "100px 50vw 50vw"}}>
-            <VehicleStatus/>
+        <div id="container" style={{display: "grid", gridTemplateColumns: "50vw 50vw"}}>
             <Kakaomap id="Kakaomap"/>
             <Visualize/>
         </div>

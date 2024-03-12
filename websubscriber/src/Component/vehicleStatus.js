@@ -30,7 +30,7 @@ const VehicleStatus = () => {
         name : '/pubGpu',
         messageType : 'std_msgs/Float64'
     })
-    //
+
     // const ipClient = new ROSLIB.Topic({
     //     ros : ros,
     //     name : '/pubScvIP',
@@ -58,47 +58,38 @@ const VehicleStatus = () => {
     }, []);
 
     return(
-        <CDBContainer>
-            <h5 style={{textAlign: "center", margin: "10px"}}>CPU</h5>
-            <CDBProgress
-                value={cpu}
-                text={`${cpu}%`}
-                colors="danger"
-                height={5}
-                width={5}
-            />
-            <h5 style={{textAlign: "center", margin: "10px"}}>GPU</h5>
-            <CDBProgress
-                value={gpu}
-                text={`${gpu}%`}
-                colors="info"
-                height={5}
-                width={5}
-            />
-            <h5 style={{textAlign: "center", margin: "10px"}}>RAM</h5>
-            <CDBProgress
-                value={ram}
-                text={`${ram}%`}
-                colors="success"
-                height={5}
-                width={5}
-            />
-          {/*<CDBProgress*/}
-          {/*  value={40}*/}
-          {/*  text={`${40}%`}*/}
-          {/*  colors="danger"*/}
-          {/*/>*/}
-          {/*<CDBProgress*/}
-          {/*  value={90}*/}
-          {/*  text={`${90}%`}*/}
-          {/*  colors="info"*/}
-          {/*/>*/}
-          {/*<CDBProgress*/}
-          {/*  value={60}*/}
-          {/*  text={`${60}%`}*/}
-          {/*  colors="warning"*/}
-          {/*/>*/}
-        </CDBContainer>
+        <div style={{position: "block", display: "grid", gridTemplateColumns: "70px 70px 70px"}}>
+            <div style={{margin: "10px"}}>
+                <h5 style={{textAlign: "center"}}>CPU</h5>
+                <CDBProgress
+                    value={cpu}
+                    text={`${cpu}%`}
+                    colors="danger"
+                    height={5}
+                    width={5}
+                />
+            </div>
+            <div style={{margin: "10px"}}>
+                <h5 style={{textAlign: "center"}}>GPU</h5>
+                <CDBProgress
+                    value={gpu}
+                    text={`${gpu}%`}
+                    colors="info"
+                    height={5}
+                    width={5}
+                />
+            </div>
+            <div style={{margin: "10px"}}>
+                <h5 style={{textAlign: "center"}}>RAM</h5>
+                <CDBProgress
+                    value={ram}
+                    text={`${ram}%`}
+                    colors="success"
+                    height={5}
+                    width={5}
+                />
+            </div>
+       </div>
     );
 }
 

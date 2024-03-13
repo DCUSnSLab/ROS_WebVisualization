@@ -21,25 +21,25 @@
     font-size: larger;
 }
 
-#newPanelBtn > Button{
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    transition: all 0.3s ease;
-    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
-    font-size: larger;
-}
+/*#newPanelBtn > Button{*/
+/*    position: fixed;*/
+/*    top: 10px;*/
+/*    right: 10px;*/
+/*    transition: all 0.3s ease;*/
+/*    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;*/
+/*    font-size: larger;*/
+/*}*/
 
-.nav-tabs .nav-link {
-    background-color: #FFECEE !important;
-    color: #bc8393 !important;
-    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
-    font-size: larger;
-    font-weight: bold;
-    border-top: none !important;
-    border-left: none !important;
-    border-right: none !important;
-}
+/*.nav-tabs .nav-link {*/
+/*    background-color: #FFECEE !important;*/
+/*    color: #bc8393 !important;*/
+/*    font-family: 'Consolas', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', monospace;*/
+/*    font-size: larger;*/
+/*    font-weight: bold;*/
+/*    border-top: none !important;*/
+/*    border-left: none !important;*/
+/*    border-right: none !important;*/
+/*}*/
 
 .coloredTab {
   background-color: #FFECEE;

@@ -3,8 +3,8 @@ import React, {useEffect, useRef, useState} from "react";
 import './Visualize.css';
 import { Button, Col, Row, Tab, Tabs } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
-import {checkedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from 'react-redux';
+
 import * as ROSLIB from "roslib";
 import AllTopicSub from "./AllTopicSub";
 import 'react-resizable/css/styles.css';
@@ -19,6 +19,14 @@ import VehicleControl from "./VehicleControl";
 import LeftSideBar from "./LeftSideBar";
 import DrivingVehicleList from "../Component/DrivingVehicleList";
 import VehicleStatus from "../Component/vehicleStatus";
+import {Map, MapMarker} from "react-kakao-maps-sdk";
+
+
+
+const ros = new ROSLIB.Ros({
+    url : 'ws://203.250.33.143:9090'
+});
+
 
 export default function Visualize(){
 
@@ -26,8 +34,6 @@ export default function Visualize(){
     const [selectedTopic, setSelectedTopic] = useState(null);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
      // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-
-    const dispatch = useDispatch();
 
     const panelRedux = useSelector((state) => state.PanelList)
 
@@ -77,6 +83,7 @@ export default function Visualize(){
 
 
     const addCard = () => {
+
         const newCard = {
           id: Date.now(),
           topics: [...checked],
@@ -132,18 +139,104 @@ export default function Visualize(){
             });
         };
 
-    return(
-        <div style={{ height: '100%', width: '80vw' }}>
-        <Tabs>
-            <Tab className="coloredTab" eventKey="Vehicle1" title="Vehicle1" style={{ minHeight: "100vh" }}>
-                <div id="newPanelBtn" style={{ display: "inline-block" }}>
+    const ip_topic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/pubScvIP',
+        messageType: 'std_msgs/Float64'
+    });
 
-                    <div id="threeBtn" style={{ marginLeft: 'auto', height: "50px", display: "grid", gridTemplateColumns: "1fr 100px 100px 1fr 1fr 1fr"}}>
+    const [vehicleIP, setVehicleIP] = useState([]);
+
+    useEffect(() => {
+        ip_topic.subscribe((msg) => {
+            setVehicleIP(msg)
+            console.log(msg)
+        })
+    }, []);
+
+    const [mapMarkerClicked, setMapMarkerClicked] = useState(false);
+
+    const listener = new ROSLIB.Topic({
+        ros: ros,
+        name: "/ublox/fix",
+        messageType: "sensor_msgs/NavSatFix"
+    });
+
+    const mapRef = useRef(null);
+    const prevLatLngRef = useRef(null);
+
+    const [lat, setLat] = useState();
+    const [lng, setLng] = useState();
+
+    useEffect(() => {
+        listener.subscribe((message) => {
+            setLat(message.latitude);
+            setLng(message.longitude);
+        })
+        prevLatLngRef.current = [lat, lng]
+    }, );
+
+    const [tabs, setTabs] = useState([
+        { id: 1, title: "Tab 1" },
+        { id: 2, title: "Tab 2" }
+    ]);
+
+    const handleAddTab = () => {
+        const newTab = { id: Date.now(), title: `Tab ${tabs.length + 1}` };
+        setTabs(prevTabs => [...prevTabs, newTab]);
+    };
+
+    const handleRemoveTab = (id) => {
+        setTabs(prevTabs => prevTabs.filter(tab => tab.id !== id));
+        setMapMarkerClicked(true);
+    };
+
+    return(
+        <div id="container" style={{display: "grid", gridTemplateColumns: "50vw 50vw"}}>
+            <Map // 지도를 표시할 Container
+                center={{
+                  lat: 35.9138,
+                  lng: 128.8036
+                    // lat: lat,
+                    // lng: lng
+                    // maker onclickEvt
+                }}
+                style={{
+                  // 지도의 크기
+                width: "100%",
+                height: "100%",
+                }}
+                level={3} // 지도의 확대 레벨
+                ref={mapRef}
+            >
+                <MapMarker // 마커를 생성합니다
+                    position={{
+                        lat: lat,
+                        lng: lng
+                    }}
+                    clickable={true} // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
+                    draggable={true} // 마커가 드래그 가능하도록 설정합니다
+                />
+            </Map>
+        <div style={{ height: '100%', width: '80vw' }}>
+            <Tabs>
+            {tabs.map(tab => (
+                <Tab key={tab.id} eventKey={tab.id.toString()} title={tab.title}>
+                    <div id="threeBtn" style={{ marginLeft: 'auto', height: "30px", display: "grid", gridTemplateColumns: "200px 100px 100px 200px", alignContent: "space-between"
+                    , justifyContent: "start"}}>
                         <RosbagRecord />
                         <VehicleControl />
                         <VehicleStatus />
-                        <Button variant="primary" onClick={addCard} style={{ position: 'fixed', top: '55px', right: '10px'}}>
-                            +
+                    </div>
+                    <Button variant="primary" onClick={addCard} style={{ position: 'absolute',top: 70, right: 10 }}>
+                        +
+                    </Button>
+                    <div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>
+                        <Button variant="primary" onClick={handleAddTab} style={{ position: 'absolute', top: 10, right: 10 }}>
+                            AddTab
+                        </Button>
+                        <Button variant="danger" onClick={() => handleRemoveTab(tab.id)} style={{ position: 'absolute', top: '10px', right: '10px' }}>
+                            RemoveTab
                         </Button>
                     </div>
                     {cards.map((card, index) => (
@@ -188,10 +281,10 @@ export default function Visualize(){
                             </div>
                         </Rnd>
                     ))}
-                </div>
-            </Tab>
-            <Button variant="primary" onClick={addCard}>Add New Panel</Button>
-        </Tabs>
-    </div>
+                </Tab>
+                ))}
+            </Tabs>
+        </div>
+        </div>
     );
 }

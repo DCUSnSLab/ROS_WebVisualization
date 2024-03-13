@@ -11,8 +11,7 @@ export const publishedTopicSlice = createSlice({
       checkedTopics: {
         topic: []
       },
-      selectedTopics: {},
-      // serverIP : 'ws://localhost:9090'
+      selectedTopics: {}
     },
     reducers: {
        updatedTopic: (state, action) => {
@@ -21,16 +20,13 @@ export const publishedTopicSlice = createSlice({
       checkedTopic: (state, action) => {
         state.checkedTopics.topic = action.payload;
       },
-      setSelectedTopic: (state, action) => {
-        state.selectedTopics[action.payload.id] = action.payload.topic;
-      },
-      // setServerIP: (state, action) => {
-      //    state.serverIP = action.payload
-      // }
+      addServer: (state, action) => {
+        state.servers.push(action.payload);
+      }
     }
 })
 
 // action
-export const {checkedTopic, setServerIP, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
+export const {checkedTopic, addServer, setCurrentServerId, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
 
 export default publishedTopicSlice.reducer

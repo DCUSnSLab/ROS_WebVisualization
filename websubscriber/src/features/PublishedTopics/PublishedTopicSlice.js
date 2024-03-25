@@ -14,7 +14,6 @@ export const publishedTopicSlice = createSlice({
       chartData: [],
       selectedTopics: {},
       vehicleMovingStatus : '',
-      loggingStatus: '',
       webPageStatus: false
     },
     reducers: {
@@ -24,17 +23,11 @@ export const publishedTopicSlice = createSlice({
       checkedTopic: (state, action) => {
         state.checkedTopics.topic = action.payload;
       },
-      updateVehicleMovingStatus: (state, action) => {
-         state.vehicleMovingStatus = action.payload;
-      },
-      updateLoggingStatus: (state, action) => {
-         state.loggingStatus = action.payload;
-      },
       updateWebPageStatus: (state, action) => {
          state.loggingStatus = action.payload;
       }
     }
 })
-export const {updateWebPageStatus, updateLoggingStatus, updateVehicleMovingStatus, checkedTopic, addServer, setCurrentServerId, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
+export const {updateWebPageStatus, checkedTopic, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
 
 export default publishedTopicSlice.reducer

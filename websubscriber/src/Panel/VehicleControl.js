@@ -51,20 +51,19 @@ export default function VehicleControl(){
 
     useEffect(() => {
         let timeoutID;
-
         const publishMessage = () => {
-              if (control) {
+            if (control) {
                 cmdVel.publish(startTwist);
                 timeoutID = setTimeout(publishMessage, 1); // 시간 간격 전달
-              }
-              else if(webPageStatus === true){
-                    cmdVel.publish(stopTwist);
-                    dispatch(updateWebPageStatus(false))
-                    console.log(webPageStatus)
-              }
-              else {
-                    cmdVel.publish(stopTwist);
-              }
+            }
+            else if(webPageStatus === true){
+                cmdVel.publish(stopTwist);
+                dispatch(updateWebPageStatus(false));
+                console.log(webPageStatus);
+            }
+            else {
+                cmdVel.publish(stopTwist);
+            }
         };
 
         publishMessage();
@@ -72,6 +71,7 @@ export default function VehicleControl(){
         return () => {
           clearTimeout(timeoutID); // 타임아웃 ID 전달하여 정리
         };
+
     }, [control]);
 
     return(

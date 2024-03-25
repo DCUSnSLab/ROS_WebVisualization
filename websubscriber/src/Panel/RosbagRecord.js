@@ -32,6 +32,7 @@ export default function RosbagRecord(){
 
 
     useEffect(() => {
+        console.log(webPageStatus)
         // logging 하는중
         if(logging === true){
             LoggingRequest.callService(requestStart, function(result) {
@@ -43,9 +44,10 @@ export default function RosbagRecord(){
         else if (logging === false || webPageStatus === true){
             LoggingRequest.callService(requestStop, function(result) {
                 console.log(result)
-                console.log(webPageStatus)
-                dispatch(updateWebPageStatus(false))
             });
+            console.log(webPageStatus)
+            dispatch(updateWebPageStatus(false))
+            console.log(webPageStatus)
         }
         else{
             LoggingRequest.callService(requestStop, function(result) {

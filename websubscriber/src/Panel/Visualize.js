@@ -18,13 +18,8 @@ export default function Visualize(){
 
     const [checked, setChecked] = useState([]);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
-     // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
 
     const [cards, setCards] = useState([]);
-
-    const [rosClients, setRosClients] = useState({});
-
-
 
     const panelSelectList = (setSelectedPanel) => (
         <select onChange={(event) => setSelectedPanel(event.target.value)}>
@@ -126,49 +121,17 @@ export default function Visualize(){
             });
         };
 
-    const [tabs, setTabs] = useState([
-        { id: 1, title: "Tab 1" },
-        { id: 2, title: "Tab 2" }
-    ]);
-
-    const handleAddTab = () => {
-        const newTab = { id: Date.now(), title: `Tab ${tabs.length + 1}` };
-        setTabs(prevTabs => [...prevTabs, newTab]);
-    };
-
-    const handleRemoveTab = (id) => {
-        setTabs(prevTabs => prevTabs.filter(tab => tab.id !== id));
-    };
-
-    const [activeTab, setActiveTab] = useState(1);
-
-    const handleTabSelect = (tabId) => {
-        setActiveTab(tabId);
-    };
-
     return(
         <div style={{ height: '100%', width: '80vw' }}>
-            <Tabs activeKey={activeTab} onSelect={handleTabSelect}>
-            {tabs.map(tab => (
-                <Tab key={tab.id} eventKey={tab.id.toString()} title={tab.title}>
-                    <h3>Tab{tab.id}</h3>
-                    <div id="threeBtn" style={{ marginLeft: 'auto', height: "30px", display: "grid", gridTemplateColumns: "200px 100px 100px 200px", alignContent: "space-between"
+                <div id="threeBtn" style={{ height: "100vh", backgroundColor: "#FFEBEE", marginLeft: 'auto', display: "grid", gridTemplateColumns: "200px 100px 100px 200px", alignContent: "space-between"
                     , justifyContent: "start"}}>
                         <RosbagRecord />
                         <VehicleControl />
                         <VehicleStatus />
                     </div>
-                    <Button variant="primary" onClick={addCard} style={{ position: 'absolute',top: 70, right: 10 }}>
+                    <Button variant="primary" onClick={addCard} style={{ position: 'absolute',top: 20, right: 20 }}>
                         +
                     </Button>
-                    {/*<div style={{display: "grid", gridTemplateColumns: "1fr 1fr"}}>*/}
-                    {/*    <Button variant="primary" onClick={handleAddTab} style={{ position: 'absolute', top: "10px", right: "140px" }}>*/}
-                    {/*        AddTab*/}
-                    {/*    </Button>*/}
-                    {/*    <Button variant="danger" onClick={() => handleRemoveTab(tab.id)} style={{ position: 'absolute', top: '10px', right: '10px' }}>*/}
-                    {/*        RemoveTab*/}
-                    {/*    </Button>*/}
-                    {/*</div>*/}
                     {cards.map((card, index) => (
                         <Rnd
                             key={card.id}
@@ -211,9 +174,6 @@ export default function Visualize(){
                             </div>
                         </Rnd>
                     ))}
-                </Tab>
-                ))}
-            </Tabs>
         </div>
     );
 }

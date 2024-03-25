@@ -10,18 +10,19 @@ import {useDispatch} from "react-redux";
 
 const App = () => {
     const dispatch = useDispatch()
+
     useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = '';
-      dispatch(updateWebPageStatus(true));
-    };
+        const handleBeforeUnload = (e) => {
+          e.preventDefault();
+          e.returnValue = '';
+          dispatch(updateWebPageStatus(true));
+        };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('beforeunload', handleBeforeUnload);
 
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
   }, []);
     return (
     <div>

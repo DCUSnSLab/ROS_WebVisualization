@@ -2,18 +2,17 @@ import React, {useEffect, useRef, useState} from 'react';
 import * as ROSLIB from 'roslib';
 import {useSelector} from "react-redux";
 
-
-let f_flag = 0;
-
 const ros = new ROSLIB.Ros({
       url : 'ws://203.250.33.143:9090'
 });
 
 function ImageLR ({topic, width, height }) {
 
-  const ip = useSelector((state) => state.TopicList.serverIP);
-  // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-
+  // const webvizNodeAddress = useSelector((state) => state.VisualizeSystemAddress);
+  // console.log(webvizNodeAddress)
+  // const rosClient = new ROSLIB.Ros({
+  //   url: webvizNodeAddress
+  // });
   const [Limg, setLImg] = useState();
 
   const receivedTopic = topic
@@ -24,7 +23,7 @@ function ImageLR ({topic, width, height }) {
     messageType: 'sensor_msgs/CompressedImage'
   });
 
-
+  let f_flag = 0;
   useEffect(() => {
     image_L_topic.subscribe(function(message) {
       if (f_flag < 5){

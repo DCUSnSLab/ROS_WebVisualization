@@ -27,8 +27,8 @@ export default function AllTopicSub(){
 
     useEffect(() => {
         const request = new ROSLIB.ServiceRequest();
-        topicsClient.callService(request, function(result) {
-            // result shape -> string[] topics / string[] types
+            topicsClient.callService(request, function(result) {
+                // result shape -> string[] topics / string[] types
             let topics = result.topics
             let types = result.types
             const updatedTopicList = topics.map((topic, index) => ({
@@ -46,7 +46,6 @@ export default function AllTopicSub(){
         console.log(topicList)
     }, [checked])
 
-
     const handleCheck = (event) => {
         setChecked(prevChecked => {
             let updatedTopicList = [...prevChecked];
@@ -60,7 +59,6 @@ export default function AllTopicSub(){
         });
         dispatch(checkedTopic(checked))
     };
-
 
     // props 값 받아오기
     // return(

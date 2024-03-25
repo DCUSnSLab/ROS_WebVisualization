@@ -7,8 +7,9 @@ import {useSelector} from "react-redux";
 
 
 const ros = new ROSLIB.Ros({
-url : 'ws://203.250.33.143:9090'
+    url : 'ws://203.250.33.143:9090'
 });
+
 function Kakaomap() {
 
   // const ip = useSelector((state) => state.TopicList.serverIP);
@@ -38,6 +39,8 @@ function Kakaomap() {
     // console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
     }, [lat, lng]);
 
+  // ref 객체를 통해 kakao.maps.drawng.DrawingManager 객체를 전달 받아 사용합니다.
+  const managerRef = useRef(null)
 
   return(
         <Map // 지도를 표시할 Container

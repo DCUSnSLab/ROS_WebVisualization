@@ -43,11 +43,11 @@ export default function PCL({topic}){
               tfClient : tfClient,
               topic : receivedTopic,
               material : {color: 0xff00ff, size: 0.05},
-              max_pts : 30000
+              max_pts : 50000
           });
     }, []);
 
     return(
-        <div id="viewer"></div>
+        <div id="viewer"/>
     );
 }

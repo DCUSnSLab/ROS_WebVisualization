@@ -11,15 +11,29 @@ import {useDispatch} from "react-redux";
 const App = () => {
     const dispatch = useDispatch()
 
+    const ros = new ROSLIB.Ros({
+        url : 'ws://203.250.33.143:9090'
+    });
+
+    let LoggingRequest = new ROSLIB.Service({
+      ros : ros,
+      name : '/logging',
+      serviceType : 'Logging'
+    });
+
+    let requestStop = new ROSLIB.ServiceRequest({
+      isLogging : "LoggingStop"
+    });
+
     useEffect(() => {
         const handleBeforeUnload = (e) => {
-          e.preventDefault();
-          e.returnValue = '';
-          dispatch(updateWebPageStatus(true));
+            dispatch(updateWebPageStatus(true));
+            e.preventDefault();
+            LoggingRequest.callService(requestStop, function(result) {
+                console.log(result)
+            });
         };
-
         window.addEventListener('beforeunload', handleBeforeUnload);
-
         return () => {
           window.removeEventListener('beforeunload', handleBeforeUnload);
         };

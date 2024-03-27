@@ -4,12 +4,15 @@ import CheckBoxState from "./CheckBoxState";
 import { useSelector, useDispatch } from "react-redux";
 import {checkedTopic, updatedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
 
-// 부모 컴포넌트
-const ros = new ROSLIB.Ros({
-    url : 'ws://203.250.33.143:9090'
-});
 
 export default function AllTopicSub(){
+
+    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+    let ros;
+    ros = new ROSLIB.Ros({
+        url : ReduxRos
+    });
+
     const [topicListUp, setTopicListUp] = useState();
     const [checked, setChecked] = useState([]);
 

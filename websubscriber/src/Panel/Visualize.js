@@ -18,7 +18,6 @@ export default function Visualize(){
 
     const [checked, setChecked] = useState([]);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
-
     const [cards, setCards] = useState([]);
 
     const panelSelectList = (setSelectedPanel) => (

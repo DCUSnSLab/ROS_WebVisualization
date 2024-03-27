@@ -5,25 +5,27 @@ import {TextField} from "@mui/material";
 import {useSelector} from "react-redux";
 
 
-  const ros = new ROSLIB.Ros({
-        url : 'ws://203.250.33.143:9090'
-  });
 
 
 export default function PCL({topic}){
 
+    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
 
-  // const ip = useSelector((state) => state.TopicList.serverIP);
-  // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+
+    // const ip = useSelector((state) => state.TopicList.serverIP);
+    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
 
     useEffect(() => {
-
+        let ros;
+        ros = new ROSLIB.Ros({
+            url : ReduxRos
+        });
         const receivedTopic = topic
 
         let viewer = new Viewer({
             divID : 'viewer',
             width: 400,
-            height: 200,
+            height: 400,
             antialias : true,
             background : '#111111'
         });

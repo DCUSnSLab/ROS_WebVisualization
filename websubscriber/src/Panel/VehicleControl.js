@@ -5,18 +5,17 @@ import {useDispatch, useSelector} from "react-redux";
 import { useWorker, WORKER_STATUS } from "@koale/useworker";
 import {updateWebPageStatus} from "../features/PublishedTopics/PublishedTopicSlice";
 
-const ros = new ROSLIB.Ros({
-    url : 'ws://203.250.33.143:9090'
-});
 
 export default function VehicleControl(){
 
-    const [control, setControl] = useState(false);
-    const webPageStatus = useSelector((state) => state.TopicList.webPageStatus);
-    const dispatch = useDispatch()
 
-    // const ip = useSelector((state) => state.TopicList.serverIP);
-    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+    let ros;
+    ros = new ROSLIB.Ros({
+        url : ReduxRos
+    });
+
+    const [control, setControl] = useState(false);
 
      const cmdVel = new ROSLIB.Topic({
         ros : ros,
@@ -55,11 +54,6 @@ export default function VehicleControl(){
             if (control) {
                 cmdVel.publish(startTwist);
                 timeoutID = setTimeout(publishMessage, 1); // 시간 간격 전달
-            }
-            else if(webPageStatus === true){
-                cmdVel.publish(stopTwist);
-                dispatch(updateWebPageStatus(false));
-                console.log(webPageStatus);
             }
             else {
                 cmdVel.publish(stopTwist);

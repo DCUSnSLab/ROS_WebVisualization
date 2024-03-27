@@ -3,10 +3,11 @@ import {createBrowserRouter, RouterProvider} from 'react-router-dom';
 import React from "react";
 import ReactDOM from "react-dom/client";
 import Visualize from "./Panel/Visualize";
-import MainPage from "./Panel/MainPage";
 import { ProSidebarProvider } from "react-pro-sidebar";
 import {Provider} from "react-redux";
 import {store} from "./app/store";
+import IpInputPage from "./Panel/ipInputPage";
+import MainPage from "./Panel/MainPage";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
@@ -15,10 +16,10 @@ const root = ReactDOM.createRoot(
 const router = createBrowserRouter([
 	{
 		path: "/",
-		element: <App />
+		element: <IpInputPage />
 	},{
     path: "/main",
-        element: <MainPage/>
+        element: <App/>
     },{
     path: "visualize",
         element: <Visualize/>

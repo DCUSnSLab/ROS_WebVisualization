@@ -1,14 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit'
+import * as ROSLIB from "roslib";
 
 // reducer
+
+
 export const IpServer = createSlice({
-  name: 'IpServer',
+    name: 'IpServer',
     initialState: {
-      VisualizeSystemAddress: 'ws://203.250.33.143:9090'
+      // VisualizeSystemAddress: 'ws://203.250.33.143:9090'
+      VisualizeSystemAddress: ''
     },
     reducers: {
-      addServer: (state, action) => {
-        state.VisualizeSystemAddress.push(action.payload);
+        addServer: (state, action) => {
+          state.VisualizeSystemAddress = action.payload;
       }
     }
 })

@@ -2,11 +2,15 @@ import React, {useEffect, useRef, useState} from 'react';
 import * as ROSLIB from 'roslib';
 import {useSelector} from "react-redux";
 
-const ros = new ROSLIB.Ros({
-      url : 'ws://203.250.33.143:9090'
-});
 
 function ImageLR ({topic, width, height }) {
+
+
+    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+    let ros;
+    ros = new ROSLIB.Ros({
+        url : ReduxRos
+    });
 
   // const webvizNodeAddress = useSelector((state) => state.VisualizeSystemAddress);
   // console.log(webvizNodeAddress)

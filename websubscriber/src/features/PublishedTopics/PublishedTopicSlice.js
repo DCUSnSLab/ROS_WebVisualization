@@ -13,8 +13,7 @@ export const publishedTopicSlice = createSlice({
       },
       chartData: [],
       selectedTopics: {},
-      vehicleMovingStatus : '',
-      webPageStatus: false
+      vehicleMovingStatus : ''
     },
     reducers: {
        updatedTopic: (state, action) => {

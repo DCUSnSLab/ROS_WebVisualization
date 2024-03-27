@@ -5,12 +5,15 @@ import {useDispatch, useSelector} from "react-redux";
 import {Col, Row} from "react-bootstrap";
 
 
-// ros를 VehicleStatus 안에 넣으면 client 수가 최소 252명까지 증가. 이유불명
-const ros = new ROSLIB.Ros({
-    url : 'ws://203.250.33.143:9090'
-});
 
 const VehicleStatus = () => {
+
+
+    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+    let ros;
+    ros = new ROSLIB.Ros({
+        url : ReduxRos
+    });
 
     // const ip = useSelector((state) => state.TopicList.serverIP);
     // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅

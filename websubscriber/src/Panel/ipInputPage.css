@@ -1,0 +1,33 @@
+.center {
+    text-align: center;
+}
+
+.center {
+    display: flex;
+    flex-direction: column;    /* Stack children vertically */
+    justify-content: center;  /* Center vertically */
+    align-items: center;      /* Center horizontally */
+    height: 60vh;             /* Adjust the height as needed */
+    width: 100%;              /* Take full width of its parent */
+    transform: translate(-50% , -50%);
+}
+
+.center_text{
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50% , -50%);
+    font-size: 30px;
+    text-align: center;
+}
+
+.middle{
+    font-size: 25px;
+}
+
+#ip1,
+#ip2,
+#ip3,
+#ip4{
+    width: 10%;
+}

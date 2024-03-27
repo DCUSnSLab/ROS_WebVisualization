@@ -6,20 +6,23 @@ import {Navigate, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
 
 
-const ros = new ROSLIB.Ros({
-    url : 'ws://203.250.33.143:9090'
-});
-
 function Kakaomap() {
 
   // const ip = useSelector((state) => state.TopicList.serverIP);
   // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
 
-  const listener = new ROSLIB.Topic({
-    ros: ros,
-    name: "/ublox/fix",
-    messageType: "sensor_msgs/NavSatFix"
-  });
+
+    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+    let ros;
+    ros = new ROSLIB.Ros({
+        url : ReduxRos
+    });
+
+    const listener = new ROSLIB.Topic({
+        ros: ros,
+        name: "/ublox/fix",
+        messageType: "sensor_msgs/NavSatFix"
+    });
 
     const mapRef = useRef(null);
     const prevLatLngRef = useRef(null);

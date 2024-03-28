@@ -3,15 +3,10 @@ import * as ROSLIB from 'roslib';
 import {object} from "prop-types";
 import {useSelector} from "react-redux";
 import GaugeChart from 'react-gauge-chart'
-
-const ros = new ROSLIB.Ros({
-    url : 'ws://203.250.33.143:9090'
-});
+import {useROS} from "../ROSContext";
 
 export default function DrivingVehicleList(){
-
-    // const ip = useSelector((state) => state.TopicList.serverIP);
-     // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+    const ros = useROS();
 
     const HunterStatus = new ROSLIB.Topic({
       ros: ros,

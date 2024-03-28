@@ -4,17 +4,12 @@ import * as ROSLIB from "roslib";
 import {useDispatch, useSelector} from "react-redux";
 import { useWorker, WORKER_STATUS } from "@koale/useworker";
 import {updateWebPageStatus} from "../features/PublishedTopics/PublishedTopicSlice";
+import {useROS} from "../ROSContext";
 
 
 export default function VehicleControl(){
 
-
-    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
-    let ros;
-    ros = new ROSLIB.Ros({
-        url : ReduxRos
-    });
-
+    const ros = useROS();
     const [control, setControl] = useState(false);
 
      const cmdVel = new ROSLIB.Topic({

@@ -6,14 +6,12 @@ import Visualize from "./Panel/Visualize";
 import ErrorBoundary from "./Panel/ErrorBoundary";
 import {updateWebPageStatus} from "./features/PublishedTopics/PublishedTopicSlice";
 import {useDispatch} from "react-redux";
+import {ROSProvider, useROS} from "./ROSContext";
 
 
 const App = () => {
-    const dispatch = useDispatch()
 
-    const ros = new ROSLIB.Ros({
-        url : 'ws://203.250.33.143:9090'
-    });
+    const ros = useROS();
 
     let LoggingRequest = new ROSLIB.Service({
       ros : ros,
@@ -27,7 +25,6 @@ const App = () => {
 
     useEffect(() => {
         const handleBeforeUnload = (e) => {
-            dispatch(updateWebPageStatus(true));
             e.preventDefault();
             LoggingRequest.callService(requestStop, function(result) {
                 console.log(result)
@@ -39,12 +36,11 @@ const App = () => {
         };
   }, []);
     return (
-    <div>
-        <ErrorBoundary>
+    <ErrorBoundary>
+        <ROSProvider>
             <MainPage/>
-        </ErrorBoundary>
-    </div>
-
+        </ROSProvider>
+    </ErrorBoundary>
   );
 }
 

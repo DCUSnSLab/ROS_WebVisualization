@@ -1,22 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import * as ROSLIB from 'roslib';
 import {useSelector} from "react-redux";
+import {useROS} from "../ROSContext";
 
 
 function ImageLR ({topic, width, height }) {
 
-
-    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
-    let ros;
-    ros = new ROSLIB.Ros({
-        url : ReduxRos
-    });
-
-  // const webvizNodeAddress = useSelector((state) => state.VisualizeSystemAddress);
-  // console.log(webvizNodeAddress)
-  // const rosClient = new ROSLIB.Ros({
-  //   url: webvizNodeAddress
-  // });
+    const ros = useROS();
   const [Limg, setLImg] = useState();
 
   const receivedTopic = topic

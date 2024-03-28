@@ -4,20 +4,14 @@ import * as ROSLIB from 'roslib';
 import {MapMarker, Map, Polyline, DrawingManager} from "react-kakao-maps-sdk";
 import {Navigate, useNavigate} from "react-router-dom";
 import {useSelector} from "react-redux";
+import {useROS} from "../ROSContext";
 
 
 function Kakaomap() {
 
   // const ip = useSelector((state) => state.TopicList.serverIP);
   // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-
-
-    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
-    let ros;
-    ros = new ROSLIB.Ros({
-        url : ReduxRos
-    });
-
+    const ros = useROS();
     const listener = new ROSLIB.Topic({
         ros: ros,
         name: "/ublox/fix",
@@ -70,7 +64,7 @@ function Kakaomap() {
               clickable={true} // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
               draggable={true} // 마커가 드래그 가능하도록 설정합니다
             />
-        </Map>
+    </Map>
   )
 }
 

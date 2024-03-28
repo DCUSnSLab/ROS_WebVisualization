@@ -3,21 +3,10 @@ import * as ROSLIB from 'roslib';
 import {CDBContainer, CDBProgress} from "cdbreact";
 import {useDispatch, useSelector} from "react-redux";
 import {Col, Row} from "react-bootstrap";
-
-
+import {useROS} from "../ROSContext";
 
 const VehicleStatus = () => {
-
-
-    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
-    let ros;
-    ros = new ROSLIB.Ros({
-        url : ReduxRos
-    });
-
-    // const ip = useSelector((state) => state.TopicList.serverIP);
-    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-    const dispatch = useDispatch()
+    const ros = useROS();
 
     const cpuClient = new ROSLIB.Topic({
         ros : ros,
@@ -34,12 +23,6 @@ const VehicleStatus = () => {
         name : '/pubGpu',
         messageType : 'std_msgs/Float64'
     })
-
-    // const ipClient = new ROSLIB.Topic({
-    //     ros : ros,
-    //     name : '/pubScvIP',
-    //     messageType : 'std_msgs/String'
-    // })
 
     const [cpu, setCPU] = useState([]);
     const [ram, setRAM] = useState([]);

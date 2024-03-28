@@ -8,6 +8,7 @@ import {Provider} from "react-redux";
 import {store} from "./app/store";
 import IpInputPage from "./Panel/ipInputPage";
 import MainPage from "./Panel/MainPage";
+import {ROSProvider} from "./ROSContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
@@ -18,22 +19,20 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <IpInputPage />
 	},{
-    path: "/main",
+        path: "/main",
         element: <App/>
     },{
-    path: "visualize",
+        path: "visualize",
         element: <Visualize/>
     }
 ]);
 
 root.render(
     // <React.StrictMode> <-- re-render twice error
-
     <Provider store={store}>
-        <ProSidebarProvider>
+        <ROSProvider>
             <RouterProvider router={router} />
-        </ProSidebarProvider>
+        </ROSProvider>
     </Provider>
-
     // </React.StrictMode>
 );

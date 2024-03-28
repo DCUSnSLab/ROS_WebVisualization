@@ -1,9 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import * as ROSLIB from "roslib";
 
-// reducer
-
-
 export const IpServer = createSlice({
     name: 'IpServer',
     initialState: {

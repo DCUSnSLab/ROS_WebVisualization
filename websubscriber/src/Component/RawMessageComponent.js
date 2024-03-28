@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import * as ROSLIB from "roslib";
+import {useROS} from "../ROSContext";
 
 export default function RawMessageComponent({ topic }) {
 
@@ -10,14 +11,10 @@ export default function RawMessageComponent({ topic }) {
     const topicList = useSelector((state) => state.TopicList.topics.topic);
     const typeList = useSelector((state) => state.TopicList.topics.type);
     const [msg, setMsg] = useState();
-    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+
+    const ros = useROS();
 
     useEffect(() => {
-
-        let ros;
-        ros = new ROSLIB.Ros({
-            url : ReduxRos
-        });
 
         setReceivedType(
             topicList.findIndex((value) => value === receivedTopic)

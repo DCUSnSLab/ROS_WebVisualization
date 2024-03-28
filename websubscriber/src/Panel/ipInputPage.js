@@ -3,15 +3,12 @@ import React, {useEffect, useState} from 'react';
 import * as ROSLIB from "roslib";
 import {useDispatch, useSelector} from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {addServer} from "../features/IPserver/IpServer";
+import {useROS} from "../ROSContext";
+
 export default function IpInputPage(){
-    let distach = useDispatch();
+
     let navigate = useNavigate();
-    let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
-    let ros;
-    ros = new ROSLIB.Ros({
-        url : ReduxRos
-    });
+    const ros = useROS();
 
     const [ip1, setIp1] = useState('');
     const [ip2, setIp2] = useState('');
@@ -21,7 +18,6 @@ export default function IpInputPage(){
     console.log(ros)
 
     // 아이피 입력받은거 연결되는지 확인
-    // dispatch로 store에 저장
 
     const ipConnectionCheck = () => {
 
@@ -34,7 +30,6 @@ export default function IpInputPage(){
 
         ros.on('connection', function() {
             document.getElementById("status").innerHTML = "Connected";
-            distach(addServer(ip))
             alert("connect!")
             navigate("/main")
         });

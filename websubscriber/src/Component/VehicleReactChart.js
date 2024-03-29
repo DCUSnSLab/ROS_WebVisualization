@@ -32,15 +32,12 @@ Chart.register(
     // const ip = useSelector((state) => state.TopicList.serverIP);
     // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
 
-    const ros = new ROSLIB.Ros({
-        url : 'ws://203.250.33.143:9090'
-    });
     
-    const listener = new ROSLIB.Topic({
-        ros: ros,
-        name: "/zed2/zed_node/pose",
-        messageType: "geometry_msgs/PoseStamped"
-    });
+    // const listener = new ROSLIB.Topic({
+    //     ros: ros,
+    //     name: "/zed2/zed_node/pose",
+    //     messageType: "geometry_msgs/PoseStamped"
+    // });
 
 function VehicleReactChart() {
     const [Pose, setPose] = useState([]);
@@ -79,12 +76,12 @@ function VehicleReactChart() {
         return() => clearInterval(interval)
     }, 1000)
 
-    useEffect(() => {
-        listener.subscribe((message) => {
-            setPose([...Pose, message.pose.position.x, message.pose.position.y, message.pose.position.z])
-        })
-        return () => {listener.unsubscribe();}
-    }, [listener]); // Add listener to the dependency array
+    // useEffect(() => {
+    //     listener.subscribe((message) => {
+    //         setPose([...Pose, message.pose.position.x, message.pose.position.y, message.pose.position.z])
+    //     })
+    //     return () => {listener.unsubscribe();}
+    // }, [listener]); // Add listener to the dependency array
 
     return (
     <div>

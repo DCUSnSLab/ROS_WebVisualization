@@ -10,6 +10,8 @@ class ErrorBoundary extends Component {
     // 에러 로깅 또는 에러 리포팅 서비스에 보고
     console.error('Uncaught error:', error, errorInfo);
     this.setState({ hasError: true });
+        console.log("ErrorBoundary")
+
   }
 
   render() {

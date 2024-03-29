@@ -1,9 +1,9 @@
 'use client';
 import React, {useEffect, useRef, useState} from "react";
 import './Visualize.css';
-import { Button, Tab, Tabs } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import Card from 'react-bootstrap/Card';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import AllTopicSub from "./AllTopicSub";
 import 'react-resizable/css/styles.css';
 import {Rnd} from "react-rnd";

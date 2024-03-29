@@ -7,6 +7,6 @@ export const store = configureStore({
   reducer: {
     TopicList: publishedTopicSlice.reducer,
     PanelList: PanelSlice.reducer,
-    ipServer: IpServer.reducer
+    ipServerReducer: IpServer.reducer
   }
 })

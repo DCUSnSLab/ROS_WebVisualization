@@ -5,44 +5,19 @@ import * as ROSLIB from "roslib";
 import Visualize from "./Panel/Visualize";
 import ErrorBoundary from "./Panel/ErrorBoundary";
 import {updateWebPageStatus} from "./features/PublishedTopics/PublishedTopicSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {ROSProvider, useROS} from "./ROSContext";
 
 
 const App = () => {
 
-    const ros = useROS();
-
-    let LoggingRequest = new ROSLIB.Service({
-      ros : ros,
-      name : '/logging',
-      serviceType : 'Logging'
-    });
-
-    let requestStop = new ROSLIB.ServiceRequest({
-      isLogging : "LoggingStop"
-    });
-
-    useEffect(() => {
-        const handleBeforeUnload = (e) => {
-            e.preventDefault();
-            LoggingRequest.callService(requestStop, function(result) {
-                console.log(result)
-            });
-        };
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-  }, []);
     return (
-    <ErrorBoundary>
-        <ROSProvider>
+        <ErrorBoundary>
             <MainPage/>
-        </ROSProvider>
-    </ErrorBoundary>
-  );
+        </ErrorBoundary>
+    );
 }
 
 
 export default App;
+

@@ -3,10 +3,14 @@ import React, {useContext, useEffect, useState} from "react";
 import CheckBoxState from "./CheckBoxState";
 import { useSelector, useDispatch } from "react-redux";
 import {checkedTopic, updatedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
+import {ROSContext, useROS} from "../ROSContext";
 
 
 export default function AllTopicSub(){
 
+    // let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
+
+    const [topicListUp, setTopicListUp] = useState();
     const [checked, setChecked] = useState([]);
 
     const topicList = useSelector((state) => state.TopicList.topics.topic);
@@ -19,13 +23,27 @@ export default function AllTopicSub(){
 
     useEffect(() => {
 
-        const ros_const = new ROSLIB.Ros({
+        const ros = new ROSLIB.Ros({
             url: ip
         });
 
         console.log("AllTopicSub")
 
-        ros_const.getTopics(function(result) {
+        // const request = new ROSLIB.ServiceRequest();
+        //     topicsClient.callService(request, function(result) {
+        //         // result shape -> string[] topics / string[] types
+        //     let topics = result.topics
+        //     let types = result.types
+        //     const updatedTopicList = topics.map((topic, index) => ({
+        //         topic: topics[index],
+        //         type: types[index]
+        //       }))
+        //     dispatch(updatedTopic(updatedTopicList))
+        //     console.log(dispatch(updatedTopic(updatedTopicList)))
+        //     setTopicListUp(updatedTopicList);
+        // });
+
+        ros.getTopics(function(result) {
             console.log(result)
 
             let topics = result.topics
@@ -39,6 +57,9 @@ export default function AllTopicSub(){
             dispatch(updatedTopic(updatedTopicList))
             console.log(updatedTopicList)
         })
+        return () => {
+            ros.close();
+        };
     },[]);
 
 

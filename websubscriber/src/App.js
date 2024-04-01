@@ -3,6 +3,7 @@ import MainPage from "./Panel/MainPage";
 import 'react-resizable/css/styles.css';
 import * as ROSLIB from 'roslib';
 import {useSelector} from "react-redux";
+import ErrorBoundary from "./Panel/ErrorBoundary";
 
 const App = () => {
 
@@ -39,10 +40,10 @@ const App = () => {
 
   }, []);
     return (
-        <MainPage/>
+        <ErrorBoundary>
+            <MainPage/>
+        </ErrorBoundary>
     );
 }
 
-
 export default App;
-

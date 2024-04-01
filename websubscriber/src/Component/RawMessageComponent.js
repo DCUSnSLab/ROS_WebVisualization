@@ -12,9 +12,14 @@ export default function RawMessageComponent({ topic }) {
     const typeList = useSelector((state) => state.TopicList.topics.type);
     const [msg, setMsg] = useState();
 
-    const ros = useROS();
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+
 
     useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
 
         setReceivedType(
             topicList.findIndex((value) => value === receivedTopic)
@@ -37,7 +42,7 @@ export default function RawMessageComponent({ topic }) {
             messageType: 'std_msgs/String',
         });
 
-    }, [receivedTopic, receivedType, topicList, typeList]);
+    }, []);
 
     return (
         <div style={{ overflow: "scroll", height: "auto" }}>

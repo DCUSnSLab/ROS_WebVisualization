@@ -2,16 +2,11 @@ import React, {useEffect, useState} from "react";
 import {Button} from "react-bootstrap";
 import * as ROSLIB from "roslib";
 import {useDispatch, useSelector} from "react-redux";
+import {updateWebPageStatus} from "../features/PublishedTopics/PublishedTopicSlice";
+import {useROS} from "../ROSContext";
 
 export default function RosbagRecord(){
     const [logging, setLogging] = useState(false);
-    const ros = useROS();
-
-    let LoggingRequest = new ROSLIB.Service({
-      ros : ros,
-      name : '/logging',
-      serviceType : 'Logging'
-    });
 
     let requestStart = new ROSLIB.ServiceRequest({
       isLogging : "LoggingStart"
@@ -21,8 +16,20 @@ export default function RosbagRecord(){
       isLogging : "LoggingStop"
     });
 
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
 
     useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
+
+        let LoggingRequest = new ROSLIB.Service({
+          ros : ros,
+          name : '/logging',
+          serviceType : 'Logging'
+        });
+
         // logging 하는중
         if(logging === true){
             LoggingRequest.callService(requestStart, function(result) {
@@ -34,6 +41,9 @@ export default function RosbagRecord(){
                 console.log(result)
             });
         }
+        return () => {
+            ros.close();
+        };
     }, [logging]);
 
 

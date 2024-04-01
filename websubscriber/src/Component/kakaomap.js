@@ -9,14 +9,6 @@ import {useROS} from "../ROSContext";
 
 function Kakaomap() {
 
-  // const ip = useSelector((state) => state.TopicList.serverIP);
-  // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-    const ros = useROS();
-    const listener = new ROSLIB.Topic({
-        ros: ros,
-        name: "/ublox/fix",
-        messageType: "sensor_msgs/NavSatFix"
-    });
 
     const mapRef = useRef(null);
     const prevLatLngRef = useRef(null);
@@ -24,20 +16,29 @@ function Kakaomap() {
     const [lat, setLat] = useState();
     const [lng, setLng] = useState();
 
+  // const ip = useSelector((state) => state.TopicList.serverIP);
+  // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+
     useEffect(() => {
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
+        const listener = new ROSLIB.Topic({
+            ros: ros,
+            name: "/ublox/fix",
+            messageType: "sensor_msgs/NavSatFix"
+        });
         listener.subscribe((message) => {
+            setLat(message.latitude);
             setLat(message.latitude);
             setLng(message.longitude);
         })
-        prevLatLngRef.current = [lat, lng]
-    }, );
 
-    useEffect(() => {
-    // console.log( "previous : " + prevLatLngRef.current + "\n" + "current : ");
-    }, [lat, lng]);
-
-  // ref 객체를 통해 kakao.maps.drawng.DrawingManager 객체를 전달 받아 사용합니다.
-  const managerRef = useRef(null)
+        return () => {
+            ros.close();
+        };
+    }, []);
 
   return(
         <Map // 지도를 표시할 Container
@@ -54,7 +55,6 @@ function Kakaomap() {
             height: "100%",
             }}
             level={3} // 지도의 확대 레벨
-            ref={mapRef}
           >
             <MapMarker // 마커를 생성합니다
               position={{

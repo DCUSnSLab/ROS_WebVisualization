@@ -6,23 +6,7 @@ import {Col, Row} from "react-bootstrap";
 import {useROS} from "../ROSContext";
 
 const VehicleStatus = () => {
-    const ros = useROS();
-
-    const cpuClient = new ROSLIB.Topic({
-        ros : ros,
-        name : '/pubCpu',
-        messageType : 'std_msgs/Float64'
-    })
-    const ramClient = new ROSLIB.Topic({
-        ros : ros,
-        name : '/pubRam',
-        messageType : 'std_msgs/Float64'
-    })
-    const gpuClient = new ROSLIB.Topic({
-        ros : ros,
-        name : '/pubGpu',
-        messageType : 'std_msgs/Float64'
-    })
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
 
     const [cpu, setCPU] = useState([]);
     const [ram, setRAM] = useState([]);
@@ -30,6 +14,27 @@ const VehicleStatus = () => {
     const [vehicleIP, setVehicleIP] = useState([]);
 
     useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
+        
+        const cpuClient = new ROSLIB.Topic({
+            ros : ros,
+            name : '/pubCpu',
+            messageType : 'std_msgs/Float64'
+        })
+        const ramClient = new ROSLIB.Topic({
+            ros : ros,
+            name : '/pubRam',
+            messageType : 'std_msgs/Float64'
+        })
+        const gpuClient = new ROSLIB.Topic({
+            ros : ros,
+            name : '/pubGpu',
+            messageType : 'std_msgs/Float64'
+        })
+
         cpuClient.subscribe((msg)=> {
             setCPU(msg.data)
         })
@@ -42,6 +47,9 @@ const VehicleStatus = () => {
         // ipClient.subscribe((msg)=> {
         //     setVehicleIP(msg.data)
         // })
+        return () => {
+            ros.close();
+        };
     }, []);
 
     return(

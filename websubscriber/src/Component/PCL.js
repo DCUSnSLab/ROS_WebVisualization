@@ -1,15 +1,22 @@
 import React, {useEffect, useState} from 'react';
 import {Viewer, Grid, PointCloud2} from 'ros3d';
 import * as ROSLIB from 'roslib';
+import {TextField} from "@mui/material";
 import {useSelector} from "react-redux";
+import { useROS } from '../ROSContext';
 
 export default function PCL({topic}){
 
     // const ip = useSelector((state) => state.TopicList.serverIP);
     // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-    const ros = useROS();
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+
 
     useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
 
         let viewer = new Viewer({
             divID : 'viewer',
@@ -36,6 +43,10 @@ export default function PCL({topic}){
               material : {color: 0xff00ff, size: 0.05},
               max_pts : 50000
           });
+
+        return () => {
+            ros.close();
+        };
     }, []);
 
     return(

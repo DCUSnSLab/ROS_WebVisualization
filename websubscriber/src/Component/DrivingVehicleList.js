@@ -6,13 +6,8 @@ import GaugeChart from 'react-gauge-chart'
 import {useROS} from "../ROSContext";
 
 export default function DrivingVehicleList(){
-    const ros = useROS();
 
-    const HunterStatus = new ROSLIB.Topic({
-      ros: ros,
-      name: '/hunter_status',
-      messageType: 'hunter_msgs/HunterStatus'
-    });
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
 
     const [vehicle, setVehicle] = useState({
         current: '',
@@ -29,6 +24,17 @@ export default function DrivingVehicleList(){
     const [steeringToRadian, setSteeringToRadian] = useState([]);
 
     useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
+
+        const HunterStatus = new ROSLIB.Topic({
+          ros: ros,
+          name: '/hunter_status',
+          messageType: 'hunter_msgs/HunterStatus'
+        });
+
         HunterStatus.subscribe((data) => {
             console.log(data)
             let vehicle = Object.values(data)

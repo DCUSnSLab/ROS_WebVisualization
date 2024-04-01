@@ -9,14 +9,7 @@ import {useROS} from "../ROSContext";
 
 export default function VehicleControl(){
 
-    const ros = useROS();
     const [control, setControl] = useState(false);
-
-     const cmdVel = new ROSLIB.Topic({
-        ros : ros,
-        name : '/cmd_vel',
-        messageType : 'geometry_msgs/Twist'
-    });
 
     let startTwist = new ROSLIB.Message({
         linear : {
@@ -43,7 +36,20 @@ export default function VehicleControl(){
         }
     });
 
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+
     useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
+
+         const cmdVel = new ROSLIB.Topic({
+            ros : ros,
+            name : '/cmd_vel',
+            messageType : 'geometry_msgs/Twist'
+        });
+
         let timeoutID;
         const publishMessage = () => {
             if (control) {
@@ -58,7 +64,8 @@ export default function VehicleControl(){
         publishMessage();
 
         return () => {
-          clearTimeout(timeoutID); // 타임아웃 ID 전달하여 정리
+            clearTimeout(timeoutID); // 타임아웃 ID 전달하여 정리\
+            ros.close();
         };
 
     }, [control]);

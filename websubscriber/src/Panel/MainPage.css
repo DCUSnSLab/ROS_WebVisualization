@@ -23,7 +23,7 @@
   align-items: flex-start;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
+    width: 100%;
   height: 1024px;
   left: 0;
   top: 0;
@@ -31,15 +31,17 @@
 
 #Visualize{
   width: 40%;
+  height: 1024px;
 }
 
 #container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    height: 100vh;
-    width: 100%;
+    grid-template-columns: 1fr 1fr; /* Two equal columns */
+    height: 100vh; /* Full viewport height */
+    width: 100%; /* Full width */
 }
 
 #container > div {
-  height: 100%;
+    height: 100%; /* Full height for each grid item */
+    /* Add other styles as needed */
 }

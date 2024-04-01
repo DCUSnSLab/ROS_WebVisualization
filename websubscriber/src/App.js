@@ -1,20 +1,45 @@
 import React, {useEffect, useState} from 'react';
 import MainPage from "./Panel/MainPage";
 import 'react-resizable/css/styles.css';
-import * as ROSLIB from "roslib";
-import Visualize from "./Panel/Visualize";
-import ErrorBoundary from "./Panel/ErrorBoundary";
-import {updateWebPageStatus} from "./features/PublishedTopics/PublishedTopicSlice";
-import {useDispatch, useSelector} from "react-redux";
-import {ROSProvider, useROS} from "./ROSContext";
-
+import * as ROSLIB from 'roslib';
+import {useSelector} from "react-redux";
 
 const App = () => {
 
+    let requestStop = new ROSLIB.ServiceRequest({
+      isLogging : "LoggingStop"
+    });
+
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+
+    useEffect(() => {
+
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
+
+        let LoggingRequest = new ROSLIB.Service({
+            ros : ros,
+            name : '/logging',
+            serviceType : 'Logging'
+        });
+        const handleBeforeUnload = (e) => {
+            e.preventDefault();
+            LoggingRequest.callService(requestStop, function(result) {
+                console.log(result)
+            });
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+
+        };
+
+  }, []);
     return (
-        <ErrorBoundary>
-            <MainPage/>
-        </ErrorBoundary>
+        <MainPage/>
     );
 }
 

@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Viewer, Grid, PointCloud2} from 'ros3d';
 import * as ROSLIB from 'roslib';
-import {TextField} from "@mui/material";
 import {useSelector} from "react-redux";
-import { useROS } from '../ROSContext';
 
 export default function PCL({topic}){
 

@@ -2,8 +2,6 @@ import React, {useEffect, useState} from "react";
 import {Button} from "react-bootstrap";
 import * as ROSLIB from "roslib";
 import {useDispatch, useSelector} from "react-redux";
-import {updateWebPageStatus} from "../features/PublishedTopics/PublishedTopicSlice";
-import {useROS} from "../ROSContext";
 
 export default function RosbagRecord(){
     const [logging, setLogging] = useState(false);

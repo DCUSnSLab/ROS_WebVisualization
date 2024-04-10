@@ -21,7 +21,6 @@ function ImageLR ({topic}) {
           messageType: 'sensor_msgs/CompressedImage'
         });
 
-        console.log("ImageLR")
         image_L_topic.subscribe(function(message) {
         if (f_flag < 5){
           // console.log(f_flag);
@@ -39,7 +38,7 @@ function ImageLR ({topic}) {
     }, [receivedTopic]);
 
     return(
-        <img src={Limg} style={{width: "400", height: "200"}}></img>
+        <img style={{width: "430px", height: "250px"}} src={Limg}></img>
     );
 }
 

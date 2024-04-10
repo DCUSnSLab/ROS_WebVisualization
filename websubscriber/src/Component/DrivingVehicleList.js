@@ -36,8 +36,6 @@ export default function DrivingVehicleList(){
         });
 
         HunterStatus.subscribe((data) => {
-            console.log(data)
-            let vehicle = Object.values(data)
 
             // setFront_motor(v[8][0])
 
@@ -56,12 +54,13 @@ export default function DrivingVehicleList(){
             // })
 
             // battery voltage
-            setBatteryPercent(vehicle.battery_voltage / 27.9 * 100)
-
+            let b = data.battery_voltage
+            setBatteryPercent( (b / 27.9) / 100);
 
             // max linear velocity : 1.5 m/s ( 5.4km/h )
             // 속도 -> 게이지바
             setMToKmVelocity((vehicle.linear_velocity * 3.6).toFixed(4))
+
 
             // steering angle + : 왼쪽, - : 오른쪽
             // 최대 각도 - ~ + 찾아보기 -> 헌터스팩 2.0 찾아보기
@@ -73,8 +72,7 @@ export default function DrivingVehicleList(){
         const timer = setTimeout(() => {
             setCurrentPercent(batteryPercent);
             setArcs([0.1, 0.3, 0.6])
-            console.log(batteryPercent)
-        },5000);
+        },1000);
 
         return () => {
             clearTimeout(timer);

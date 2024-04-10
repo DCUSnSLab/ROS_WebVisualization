@@ -1,43 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {
-    CategoryScale,
-    Chart,
-    Legend,
-    LinearScale,
-    LineElement,
-    PointElement,
-    Title,
-    Tooltip,
-} from 'chart.js';
-import { RealTimeScale, StreamingPlugin } from 'chartjs-plugin-streaming';
-import { Line } from 'react-chartjs-2';
-import 'chartjs-adapter-luxon';
 import * as ROSLIB from "roslib";
-import ZoomPlugin from 'chartjs-plugin-zoom';
-import { updateChartData } from '../features/PublishedTopics/PublishedTopicSlice';
+import {useSelector} from "react-redux";
 
-Chart.register(
-    ZoomPlugin,
-    StreamingPlugin,
-    RealTimeScale,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-);
+import { Line } from "react-chartjs-2";
+import Chart from "chart.js/auto";
+import "chartjs-adapter-luxon";
+import ChartStreaming from "chartjs-plugin-streaming";
 
-    // const ip = useSelector((state) => state.TopicList.serverIP);
-    // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
-
-    
-    // const listener = new ROSLIB.Topic({
-    //     ros: ros,
-    //     name: "/zed2/zed_node/pose",
-    //     messageType: "geometry_msgs/PoseStamped"
-    // });
 
 function VehicleReactChart() {
     const [Pose, setPose] = useState([]);
@@ -45,43 +14,47 @@ function VehicleReactChart() {
     const [PoseY, setPoseY] = useState([]);
     const [PoseZ, setPoseZ] = useState([]);
 
+  //   useEffect(() => {
+  //       const fetchData = () => {
+  //         // Fetch data from stream (e.g., WebSocket)
+  //         // Update chart data using Redux action
+  //         const newData = {PoseX}
+  //         updateChartData(newData);
+  //   };
+  //
+  //   const interval = setInterval(fetchData, 1000);
+  //
+  //   return () => clearInterval(interval);
+  // }, [updateChartData]);
+
+    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+
     useEffect(() => {
-        const fetchData = () => {
-          // Fetch data from stream (e.g., WebSocket)
-          // Update chart data using Redux action
-          const newData = {PoseX}
-          updateChartData(newData);
-    };
 
-    const interval = setInterval(fetchData, 1000);
+        const ros = new ROSLIB.Ros({
+            url: ip
+        });
 
-    return () => clearInterval(interval);
-  }, [updateChartData]);
+        const listener = new ROSLIB.Topic({
+          ros: ros,
+          name: '/zed2/zed_node/pose',
+          messageType: 'geometry_msgs/PoseStamped'
+        });
 
-    // useEffect(() => {
-    //     listener.subscribe((message) => {
-    //
-    //
-    //         setPoseX((PoseX) => [...PoseX, {x: Date.now(), y: message.pose.position.x}]);
-    //         setPoseY((PoseY) => [...PoseY, {x: Date.now(), y: message.pose.position.y}]);
-    //         setPoseZ((PoseZ) => [...PoseZ, {x: Date.now(), y: message.pose.position.z}]);
-    //     })
-    //     return () => {listener.unsubscribe();}
-    // }, [listener]); // Add listener to the dependency array
+        listener.subscribe((message) => {
+            setPoseX((PoseX) => [...PoseX, {x: Date.now(), y: message.pose.position.x}]);
+            setPoseY((PoseY) => [...PoseY, {x: Date.now(), y: message.pose.position.y}]);
+            setPoseZ((PoseZ) => [...PoseZ, {x: Date.now(), y: message.pose.position.z}]);
+        })
+        return () => {listener.unsubscribe();}
+    }, []); // Add listener to the dependency array
 
-    const interval = setInterval(() => {
-        setPoseX((PoseX) => [...PoseX, {x: Date.now(), y: Pose[0]}]);
-        setPoseY((PoseY) => [...PoseY, {x: Date.now(), y: Pose[1]}]);
-        setPoseZ((PoseZ) => [...PoseZ, {x: Date.now(), y: Pose[2]}]);
-        return() => clearInterval(interval)
-    }, 1000)
-
-    // useEffect(() => {
-    //     listener.subscribe((message) => {
-    //         setPose([...Pose, message.pose.position.x, message.pose.position.y, message.pose.position.z])
-    //     })
-    //     return () => {listener.unsubscribe();}
-    // }, [listener]); // Add listener to the dependency array
+    // const interval = setInterval(() => {
+    //     setPoseX((PoseX) => [...PoseX, {x: Date.now(), y: Pose[0]}]);
+    //     setPoseY((PoseY) => [...PoseY, {x: Date.now(), y: Pose[1]}]);
+    //     setPoseZ((PoseZ) => [...PoseZ, {x: Date.now(), y: Pose[2]}]);
+    //     return() => clearInterval(interval)
+    // }, 1000)
 
     return (
     <div>
@@ -117,46 +90,44 @@ function VehicleReactChart() {
             }}
             options={{
                 animation: false,  // disable animations
-            scales: {
-                x: {
-                type: 'realtime',
-                    realtime: {
-                        delay: 0
-                    }},
-                y: {
-                    // min: -600,
-                    // max: 600
-                }
-            },
-            interaction: {
-                intersect: false
-            },
-            plugins: {
-                streaming: {
-                    frameRate: 1   // chart is drawn 5 times every second
+                scales: {
+                    x: {
+                        type: 'realtime',
+                    },
+                    y: {
+                        min: -600,
+                        max: 600
+                    }
                 },
-              zoom: {
-                  pan: {
-                      enabled: true,
-                      mode: 'y'
-                  },
+                interaction: {
+                    intersect: false
+                },
+                plugins: {
+                    streaming: {
+                        frameRate: 1
+                    },
                   zoom: {
-                      pinch: {
-                          enabled: true
+                      pan: {
+                          enabled: true,
+                          mode: 'y'
                       },
-                      wheel: {
-                          enabled: true
+                      zoom: {
+                          pinch: {
+                              enabled: true
+                          },
+                          wheel: {
+                              enabled: true
+                          },
+                          mode: 'y'
                       },
-                      mode: 'y'
-                  },
-                  limits: {
-                      x: {
-                          // minDelay: -4000,
-                          // maxDelay: 4000,
-                          // minDuration: 1000,
-                          // maxDuration: 20000
-                      }
-                  }}
+                      limits: {
+                          x: {
+                              minDelay: -4000,
+                              maxDelay: 4000,
+                              minDuration: 1000,
+                              maxDuration: 20000
+                          }
+                      }}
             }}}
         /> : null}
     </div>

@@ -21,7 +21,7 @@ export default function IpInputPage(){
 
     const ipConnectionCheck = () => {
 
-        const ip = "ws://" + ip1 + "." + ip2 + "." + ip3  + "." + ip4 + ":9090";
+        const ip = "ws://" + ip1 + ":9090";
 
         let ros = new ROSLIB.Ros({
             url : ip
@@ -46,13 +46,7 @@ export default function IpInputPage(){
             <h1>Enter IP Address</h1>
             <h5>Connection status: <span id="status"></span></h5>
             <div className="parent-container">
-                <input type="url" id="ip1" onChange={e => setIp1(e.target.value)} value={ip1}/>
-                <h3>.</h3>
-                <input type="url" id="ip2" value={ip2} onChange={e => setIp2(e.target.value)}/>
-                <h3>.</h3>
-                <input type="url" id="ip3" value={ip3} onChange={e => setIp3(e.target.value)}/>
-                <h3>.</h3>
-                <input type="url" id="ip4" value={ip4} onChange={e => setIp4(e.target.value)}/>
+                <input type="url" id="ip1" style={{width: "40rem"}} onChange={e => setIp1(e.target.value)} value={ip1}/>
             </div>
             <div className="button-container">
                 <button type="submit" onClick={ipConnectionCheck}>Connect</button>

@@ -2,22 +2,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import * as ROSLIB from 'roslib';
 import {MapMarker, Map, Polyline, DrawingManager} from "react-kakao-maps-sdk";
-import {Navigate, useNavigate} from "react-router-dom";
-import {useSelector} from "react-redux";
-import {useROS} from "../ROSContext";
-
+import {useDispatch, useSelector} from "react-redux";
 
 function Kakaomap() {
-
-
-    const mapRef = useRef(null);
-    const prevLatLngRef = useRef(null);
 
     const [lat, setLat] = useState();
     const [lng, setLng] = useState();
 
-  // const ip = useSelector((state) => state.TopicList.serverIP);
-  // useSelector : publishedTopicSlice에 있는 값을 가져오는 훅
+    const [waypoints, setWaypoints] = useState([]); // Add a state to store the waypoints
+
     const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
 
     useEffect(() => {
@@ -31,16 +24,16 @@ function Kakaomap() {
         });
         listener.subscribe((message) => {
             setLat(message.latitude);
-            setLat(message.latitude);
             setLng(message.longitude);
+            setWaypoints((oldWaypoints) => [...oldWaypoints, { lat: message.latitude, lng: message.longitude }]);
         })
-
         return () => {
             ros.close();
         };
     }, []);
 
   return(
+      <div>
         <Map // 지도를 표시할 Container
             center={{
               lat: 35.9138,
@@ -51,20 +44,28 @@ function Kakaomap() {
             }}
             style={{
               // 지도의 크기
-            width: "100%",
-            height: "100%",
+                width: "50vw",
+                height: "100vh",
             }}
             level={3} // 지도의 확대 레벨
           >
             <MapMarker // 마커를 생성합니다
-              position={{
+                position={{
                 lat: lat,
                 lng: lng
-              }}
-              clickable={true} // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
-              draggable={true} // 마커가 드래그 가능하도록 설정합니다
+                }}
+                clickable={true} // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
+                draggable={true} // 마커가 드래그 가능하도록 설정합니다
+            />
+            <Polyline // Draw polyline connecting waypoints
+                path={waypoints}
+                strokeWeight={3} // set the strokeWeight
+                strokeColor={'#FF0000'} // set the strokeColor
+                strokeOpacity={0.8} // set the strokeOpacity
+                strokeStyle={'solid'} // set the strokeStyle
             />
     </Map>
+      </div>
   )
 }
 

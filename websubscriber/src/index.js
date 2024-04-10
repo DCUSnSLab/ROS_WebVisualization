@@ -9,6 +9,7 @@ import {store} from "./app/store";
 import IpInputPage from "./Panel/ipInputPage";
 import MainPage from "./Panel/MainPage";
 import {ROSProvider} from "./ROSContext";
+import Kakaomap from "./Component/kakaomap";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
@@ -19,11 +20,14 @@ const router = createBrowserRouter([
 		path: "/",
 		element: <IpInputPage />
 	},{
-        path: "/main",
+        path: "main",
         element: <App/>
     },{
         path: "visualize",
         element: <Visualize/>
+    },{
+        path: "kakaomap",
+        element: <Kakaomap/>
     }
 ]);
 

@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Viewer, Grid, PointCloud2} from 'ros3d';
 import * as ROSLIB from 'roslib';
-import {TextField} from "@mui/material";
 import {useSelector} from "react-redux";
-import { useROS } from '../ROSContext';
 
 export default function PCL({topic}){
 
@@ -20,8 +18,8 @@ export default function PCL({topic}){
 
         let viewer = new Viewer({
             divID : 'viewer',
-            width: 400,
-            height: 400,
+            width: 430,
+            height: 250,
             antialias : true,
             background : '#111111'
         });

@@ -13,6 +13,9 @@ import RawMessageComponent from "../Component/RawMessageComponent";
 import RosbagRecord from "./RosbagRecord";
 import VehicleControl from "./VehicleControl";
 import VehicleStatus from "../Component/vehicleStatus";
+import VehicleReactChart from "../Component/VehicleReactChart";
+import Stream from "../Component/StreamChart";
+import DrivingVehicleList from "../Component/DrivingVehicleList";
 
 export default function Visualize(){
 
@@ -25,7 +28,7 @@ export default function Visualize(){
             <option value="">Visualization Tools</option>
             <option value="Image">Image</option>
             <option value="PointCloud">PointCloud</option>
-            <option value="Chart">Chart</option>
+            <option value="Plot">Plot</option>
             <option value="RawMessage">RawMessage</option>
         </select>
     );
@@ -37,8 +40,8 @@ export default function Visualize(){
                 return <ImageLR topic={topic}/>;
             case 'PointCloud':
                 return <PCL className="cancel" topic={topic}/>;
-            case 'Chart':
-                // return <Chart/>;
+            case 'Plot':
+                return <Stream/>;
             case 'RawMessage':
                 return <RawMessageComponent topic={topic}/>;
             default:
@@ -69,8 +72,8 @@ export default function Visualize(){
           id: Date.now(),
           topics: [...checked],
           selectedTopic: topicList?.topic,
-          width: 400,
-          height: "auto"
+          width: 500,
+          height: 300
         };
 
         newCard.setSelectedTopic = (topic) => {
@@ -121,8 +124,8 @@ export default function Visualize(){
         };
 
     return(
-        <div style={{ height: '100%', width: '80vw' }}>
-                <div id="threeBtn" style={{ height: "100vh", backgroundColor: "#FFEBEE", marginLeft: 'auto', display: "grid", gridTemplateColumns: "200px 100px 100px 200px", alignContent: "space-between"
+        <div>
+                <div id="threeBtn" style={{ height: "100vh", backgroundColor: "#f1f3f5", marginLeft: 'auto', display: "grid", gridTemplateColumns: "200px 100px 100px 200px", alignContent: "space-between"
                     , justifyContent: "start"}}>
                         <RosbagRecord />
                         <VehicleControl />

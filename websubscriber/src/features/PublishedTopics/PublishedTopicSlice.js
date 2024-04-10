@@ -13,7 +13,7 @@ export const publishedTopicSlice = createSlice({
       },
       chartData: [],
       selectedTopics: {},
-      vehicleMovingStatus : ''
+      vehicleMovingStatus : '',
     },
     reducers: {
        updatedTopic: (state, action) => {
@@ -27,6 +27,10 @@ export const publishedTopicSlice = createSlice({
       }
     }
 })
-export const {updateWebPageStatus, checkedTopic, updatedTopic, setSelectedTopic} = publishedTopicSlice.actions;
+export const {
+  updateWebPageStatus,
+  checkedTopic,
+  updatedTopic
+  } = publishedTopicSlice.actions;
 
 export default publishedTopicSlice.reducer

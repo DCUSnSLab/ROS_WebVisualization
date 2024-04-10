@@ -18,7 +18,7 @@ const VehicleStatus = () => {
         const ros = new ROSLIB.Ros({
             url: ip
         });
-        
+
         const cpuClient = new ROSLIB.Topic({
             ros : ros,
             name : '/pubCpu',

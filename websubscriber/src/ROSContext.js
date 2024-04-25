@@ -10,7 +10,7 @@ export const ROSProvider = ({ children }) => {
 
     useEffect(() => {
         const newRos = new ROSLIB.Ros({
-            url: 'ws://203.250.33.143:9090'
+            url: ''
         });
         if (newRos && newRos.idCounter) {
           // Safe to use object.idCounter

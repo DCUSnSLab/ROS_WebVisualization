@@ -6,13 +6,9 @@ import Visualize from "./Visualize";
 function MainPage(){
 
     return(
-        <div id="container" style={{width: "100vw", height: "100vh"}}>
-            <div style={{width: "50vw", height: "100vh"}}>
-                <Kakaomap/>
-            </div>
-            <div style={{width: "50vw", height: "100vh"}}>
-                <Visualize/>
-            </div>
+        <div id="container">
+            <Kakaomap/>
+            <Visualize/>
         </div>
     );
 }

@@ -18,8 +18,8 @@ export default function PCL({topic}){
 
         let viewer = new Viewer({
             divID : 'viewer',
-            width: 430,
-            height: 250,
+            width: 630,
+            height: 450,
             antialias : true,
             background : '#111111'
         });

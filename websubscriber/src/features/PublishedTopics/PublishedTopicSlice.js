@@ -6,7 +6,8 @@ export const publishedTopicSlice = createSlice({
     initialState: {
       topics: {
         topic: [],
-        type: []
+        type: [],
+        gps: ''
       },
       checkedTopics: {
         topic: []

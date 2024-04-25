@@ -65,7 +65,7 @@ export default function Stream() {
           x: {
             type: "realtime",
             realtime: {
-              delay: 1000,
+              delay: 5000,
               onRefresh: (chart) => {
                 chart.data.datasets.forEach((dataset) => {
                 });

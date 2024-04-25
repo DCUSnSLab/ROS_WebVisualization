@@ -2,23 +2,18 @@ import * as ROSLIB from "roslib";
 import React, {useContext, useEffect, useState} from "react";
 import CheckBoxState from "./CheckBoxState";
 import { useSelector, useDispatch } from "react-redux";
-import {checkedTopic, updatedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
+import {checkedTopic, updatedGPS, updatedTopic} from "../features/PublishedTopics/PublishedTopicSlice";
 import {ROSContext, useROS} from "../ROSContext";
 
 
 export default function AllTopicSub(){
 
-    // let ReduxRos = useSelector((state) => state.ipServer.VisualizeSystemAddress)
-
-    const [topicListUp, setTopicListUp] = useState();
     const [checked, setChecked] = useState([]);
 
     const topicList = useSelector((state) => state.TopicList.topics.topic);
 
     const dispatch = useDispatch();
-    // store에 값을 업데이트 시켜달라고 요청하는 훅
 
-    const [result, setResult] = useState();
     const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
 
     useEffect(() => {
@@ -29,25 +24,8 @@ export default function AllTopicSub(){
 
         console.log("AllTopicSub")
 
-        // const request = new ROSLIB.ServiceRequest();
-        //     topicsClient.callService(request, function(result) {
-        //         // result shape -> string[] topics / string[] types
-        //     let topics = result.topics
-        //     let types = result.types
-        //     const updatedTopicList = topics.map((topic, index) => ({
-        //         topic: topics[index],
-        //         type: types[index]
-        //       }))
-        //     dispatch(updatedTopic(updatedTopicList))
-        //     console.log(dispatch(updatedTopic(updatedTopicList)))
-        //     setTopicListUp(updatedTopicList);
-        // });
-
         ros.getTopics(function(result) {
-            console.log(result)
-
             let topics = result.topics
-
             let types = result.types
 
             const updatedTopicList = topics.map((topic, index) => ({

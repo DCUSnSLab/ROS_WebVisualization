@@ -38,7 +38,7 @@ function ImageLR ({topic}) {
     }, [receivedTopic]);
 
     return(
-        <img style={{width: "430px", height: "250px"}} src={Limg}></img>
+        <img style={{width: "630px", height: "450px"}} src={Limg}></img>
     );
 }
 

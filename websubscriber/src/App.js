@@ -4,6 +4,7 @@ import 'react-resizable/css/styles.css';
 import * as ROSLIB from 'roslib';
 import {useSelector} from "react-redux";
 import ErrorBoundary from "./Panel/ErrorBoundary";
+import Visualize from "./Panel/Visualize";
 
 const App = () => {
 
@@ -42,6 +43,7 @@ const App = () => {
     return (
         <ErrorBoundary>
             <MainPage/>
+            {/*<Visualize/>*/}
         </ErrorBoundary>
     );
 }

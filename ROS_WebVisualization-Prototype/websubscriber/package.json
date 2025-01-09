@@ -1,0 +1,109 @@
+{
+  "name": "websubscriber",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.11.3",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "5.11.0",
+    "@mui/material": "5.11.0",
+    "@mui/styles": "5.11.0",
+    "@ramonak/react-progress-bar": "^5.2.0",
+    "@reduxjs/toolkit": "^2.2.1",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "bootstrap": "^5.3.2",
+    "browserify-zlib": "^0.2.0",
+    "canvas": "2.11.2",
+    "chart.js": "3.7.1",
+    "chartjs-adapter-luxon": "1.1.0",
+    "chartjs-plugin-annotation": "^3.0.1",
+    "chartjs-plugin-streaming": "2.0.0",
+    "d3-shape": "^3.2.0",
+    "dist": "^0.1.2",
+    "express": "^4.18.3",
+    "i": "^0.3.7",
+    "interactjs": "^1.10.26",
+    "luxon": "^3.4.4",
+    "npm": "^10.4.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "prop-types": "^15.8.1",
+    "react": "^17.0.0 || ^18.0.0",
+    "react-chartjs-2": "^4.1.0",
+    "react-dom": "^17.0.0 || ^18.0.0",
+    "react-draggable": "^4.4.6",
+    "react-gauge-chart": "^0.4.1",
+    "react-icons": "^4.12.0",
+    "react-kakao-maps-sdk": "^1.1.24",
+    "react-native-paper": "^5.12.3",
+    "react-pro-sidebar": "^1.1.0",
+    "react-redux": "^9.1.0",
+    "react-resizable-panels": "^2.0.3",
+    "react-resizable-rotatable-draggable": "^0.2.0",
+    "react-router": "^6.22.0",
+    "react-router-dom": "^6.28.1",
+    "react-scripts": "^5.0.1",
+    "reactablejs": "^0.3.0",
+    "redux": "^5.0.1",
+    "resizable-panels-react": "^2.0.8",
+    "ros3d": "^1.1.0",
+    "roslib": "^1.3.0",
+    "smart-webcomponents-react": "^18.0.2",
+    "stream-browserify": "^3.0.0",
+    "styled-components": "^6.1.8",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@interactjs/types": "^1.10.26",
+    "@koale/useworker": "^4.0.2",
+    "@kurkle/color": "^0.3.2",
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "cdbreact": "^1.5.18",
+    "crypto-browserify": "^3.12.0",
+    "date-fns": "^3.3.1",
+    "flowbite-react": "^0.7.2",
+    "https-browserify": "^1.0.0",
+    "jpeg-js": "^0.4.4",
+    "luxon": "^3.4.4",
+    "moment": "^2.30.1",
+    "os-browserify": "^0.3.0",
+    "process": "^0.11.10",
+    "react-app-rewired": "^2.2.1",
+    "react-bootstrap": "^2.10.0",
+    "react-percent-bar": "^0.0.2",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.0"
+  },
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0"
+  }
+}

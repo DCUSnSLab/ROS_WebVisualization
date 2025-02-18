@@ -125,7 +125,7 @@ const Kakaomap = () => {
             <li key={ip} style={{ fontWeight: selectedIP === ip ? "bold" : "normal", color: selectedIP === ip ? "red" : "black" }}>
               <h5>
                 {name} ({ip})
-                <button onClick={() => removeVehicle(ip)} style={{ marginLeft: "10px" }}>
+                <button onClick={() => removeVehicle(ip) } style={{ marginLeft: "10px" }}>
                   Remove
                 </button>
               </h5>

@@ -45,7 +45,6 @@ export default function RosbagRecord(){
         };
     }, [logging]);
 
-
     // 로깅 버튼 클릭 이벤트 핸들러
     const handleLoggingClick = () => {
         setLogging(!logging);

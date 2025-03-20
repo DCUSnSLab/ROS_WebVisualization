@@ -1,8 +1,8 @@
 FROM node:20.9.0
 
-WORKDIR /EunViZ
+WORKDIR /ROS_WebVisualization-AutonomousMonitor/ROS_WebVisualization-Prototype
 
-RUN npm install -g npm@10.5.2
+RUN npm install -g npm@10.8.2
 
 COPY ./package.json .
 
@@ -12,8 +12,10 @@ COPY ./websubscriber/package.json .
 
 RUN npm install --legacy-peer-deps
 
-COPY . /EunViZ
+COPY . /ROS_WebVisualization-AutonomousMonitor/ROS_WebVisualization-Prototype
 
-WORKDIR /EunViZ/websubscriber
+WORKDIR /ROS_WebVisualization-AutonomousMonitor/ROS_WebVisualization-Prototype/websubscriber
 
 CMD ["npm", "start"]
+
+EXPOSE 3000

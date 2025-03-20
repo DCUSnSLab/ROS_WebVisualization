@@ -13,57 +13,147 @@ const Kakaomap = () => {
   const [userIP, setUserIP] = useState("");
   const [newVehicleName, setNewVehicleName] = useState("");
   const [selectedIP, setSelectedIP] = useState(null); // 선택한 차량 IP
+  const [hunterData, setHunterData] = useState(null);
+
+  // useEffect(() => {
+  //   const rosConnections = {};
+  //
+  //   vehicles.forEach(({ ip, name }) => {
+  //     if (rosConnections[ip]) return;
+  //
+  //     const ros = new ROSLIB.Ros({ url: ip });
+  //
+  //     ros.on("connection", () => {
+  //       console.log(`Connected to WebSocket server at ${ip}`);
+  //     });
+  //
+  //     ros.on("error", (error) => {
+  //       console.error(`Error connecting to WebSocket server at ${ip}`, error);
+  //     });
+  //
+  //     ros.on("close", () => {
+  //       console.log(`Connection to WebSocket server at ${ip} closed.`);
+  //     });
+  //
+  //     const topic = new ROSLIB.Topic({
+  //       ros: ros,
+  //       name: "/ublox/fix",
+  //       messageType: "sensor_msgs/NavSatFix",
+  //     });
+  //
+  //     const hunter_status = new ROSLIB.Topic({
+  //       ros: ros,
+  //       name: "/hunter_status",
+  //       messageType: "hunter_msgs/HunterStatus",
+  //     });
+  //
+  //     topic.subscribe((message) => {
+  //       setVehiclesData((prevData) => {
+  //         const currentWaypoints = prevData[ip]?.waypoints || [];
+  //         const newWaypoint = { lat: message.latitude, lng: message.longitude };
+  //
+  //         return {
+  //           ...prevData,
+  //           [ip]: {
+  //             lat: message.latitude,
+  //             lng: message.longitude,
+  //             waypoints: [...currentWaypoints, newWaypoint],
+  //             name,
+  //           },
+  //         };
+  //       });
+  //     });
+  //
+  //     hunter_status.subscribe((message) => {
+  //       // console.log(message.battery_voltage);
+  //       setHunterData(message);
+  //     })
+  //     rosConnections[ip] = { ros, topic };
+  //   });
+  //
+  //   return () => {
+  //     Object.entries(rosConnections).forEach(([ip, { ros, topic }]) => {
+  //       console.log(`Unsubscribing from ${ip}`);
+  //       topic.unsubscribe();
+  //       ros.close();
+  //     });
+  //   };
+  // }, [vehicles]);
 
   useEffect(() => {
-    const rosConnections = {};
+  const rosConnections = {};
 
-    vehicles.forEach(({ ip, name }) => {
-      if (rosConnections[ip]) return;
+  vehicles.forEach(({ ip, name }) => {
+    if (rosConnections[ip]) return;
 
-      const ros = new ROSLIB.Ros({ url: ip });
+    const ros = new ROSLIB.Ros({ url: ip });
 
-      ros.on("connection", () => {
-        console.log(`Connected to WebSocket server at ${ip}`);
+    ros.on("connection", () => {
+      console.log(`Connected to WebSocket server at ${ip}`);
+
+      ros.getTopics((topics) => {
+        const topicNames = topics.topics;
+
+        const gpsTopicName = topicNames.includes("/ublox_gps/fix")
+          ? "/ublox_gps/fix"
+          : topicNames.includes("/ublox/fix")
+          ? "/ublox/fix"
+          : null;
+
+        if (gpsTopicName) {
+          const gpsTopic = new ROSLIB.Topic({
+            ros: ros,
+            name: gpsTopicName,
+            messageType: "sensor_msgs/NavSatFix",
+          });
+
+          gpsTopic.subscribe((message) => {
+            setVehiclesData((prevData) => {
+              const currentWaypoints = prevData[ip]?.waypoints || [];
+              const newWaypoint = { lat: message.latitude, lng: message.longitude };
+
+              return {
+                ...prevData,
+                [ip]: {
+                  lat: message.latitude,
+                  lng: message.longitude,
+                  waypoints: [...currentWaypoints, newWaypoint],
+                  name,
+                },
+              };
+            });
+          });
+
+          rosConnections[ip] = { ros, gpsTopic };
+        } else {
+          console.warn(`No valid GPS topic found for ${ip}`);
+        }
       });
-
-      ros.on("error", (error) => {
-        console.error(`Error connecting to WebSocket server at ${ip}`, error);
-      });
-
-      ros.on("close", () => {
-        console.log(`Connection to WebSocket server at ${ip} closed.`);
-      });
-
-      const topic = new ROSLIB.Topic({
-        ros: ros,
-        name: "/ublox/fix",
-        messageType: "sensor_msgs/NavSatFix",
-      });
-
-      topic.subscribe((message) => {
-        setVehiclesData((prevData) => {
-          const currentWaypoints = prevData[ip]?.waypoints || [];
-          const newWaypoint = { lat: message.latitude, lng: message.longitude };
-
-          return {
-            ...prevData,
-            [ip]: {
-              lat: message.latitude,
-              lng: message.longitude,
-              waypoints: [...currentWaypoints, newWaypoint],
-              name,
-            },
-          };
-        });
-      });
-
-      rosConnections[ip] = { ros, topic };
     });
 
+    ros.on("error", (error) => {
+      console.error(`Error connecting to WebSocket server at ${ip}`, error);
+    });
+
+    ros.on("close", () => {
+      console.log(`Connection to WebSocket server at ${ip} closed.`);
+    });
+
+    const hunter_status = new ROSLIB.Topic({
+      ros: ros,
+      name: "/hunter_status",
+      messageType: "hunter_msgs/HunterStatus",
+    });
+
+    hunter_status.subscribe((message) => {
+      setHunterData(message);
+    });
+  });
+
     return () => {
-      Object.entries(rosConnections).forEach(([ip, { ros, topic }]) => {
+      Object.entries(rosConnections).forEach(([ip, { ros, gpsTopic }]) => {
         console.log(`Unsubscribing from ${ip}`);
-        topic.unsubscribe();
+        if (gpsTopic) gpsTopic.unsubscribe();
         ros.close();
       });
     };
@@ -99,6 +189,8 @@ const Kakaomap = () => {
     setSelectedIP(ip);
     alert(`선택된 차량 IP: ${ip}`);
   };
+
+  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div>
@@ -142,17 +234,55 @@ const Kakaomap = () => {
               clickable={true}
               title={`Vehicle: ${data.name}`}
               onClick={() => handleMarkerClick(ip)}
-            />
-            {openInfoWindows[ip] && (
-              <MapInfoWindow position={{ lat: data.lat, lng: data.lng }} removable={true} onCloseClick={() => toggleInfoWindow(ip)}>
-                <div style={{ padding: "10px", width: "200px" }}>
-                  <h4 style={{ margin: "0 0 10px 0" }}>{data.name}</h4>
-                  <p>IP: {ip}</p>
-                  <p>Lat: {data.lat.toFixed(6)}</p>
-                  <p>Lng: {data.lng.toFixed(6)}</p>
-                </div>
-              </MapInfoWindow>
-            )}
+              clickable={true} // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
+                // 마커에 마우스오버 이벤트를 등록합니다
+              onMouseOver={
+                  // 마커에 마우스오버 이벤트가 발생하면 인포윈도우를 마커위에 표시합니다
+                () => setIsOpen(true)
+              }
+                // 마커에 마우스아웃 이벤트를 등록합니다
+              onMouseOut={
+                  // 마커에 마우스아웃 이벤트가 발생하면 인포윈도우를 제거합니다
+                () => setIsOpen(false)
+              }>
+              {isOpen &&
+                  <div style={{padding: "10px", width: "200px"}}>
+                    <h4 style={{margin: "0 0 10px 0"}}>{data.name}</h4>
+                    <p>IP: {ip}</p>
+                    {/*<p>Lat: {data.lat.toFixed(6)}</p>*/}
+                    {/*<p>Lng: {data.lng.toFixed(6)}</p>*/}
+                     {hunterData ? (
+                         <div>
+                           {/*<p>운행상태: 정상/경고/오류</p>*/}
+                           {/*<p>운행모드: 자율주행/수동/원격제어</p>*/}
+                           <p>배터리: {hunterData.battery_voltage.toFixed(1)}%</p>
+                           <p>속도: {hunterData.linear_velocity.toFixed(1)}m/s</p>
+                           {/*<p>Steering Angle: {hunterData.steering_angle}</p>*/}
+                           {/*<h4>Motor States</h4>*/}
+                           {/*{hunterData.motor_states.map((motor, index) => (*/}
+                           {/*    <div key={index}>*/}
+                           {/*      <p>*/}
+                           {/*        Motor {index + 1} - Current: {motor.current.toFixed(3)}, RPM: {motor.rpm.toFixed(3)}*/}
+                           {/*      </p>*/}
+                           {/*    </div>*/}
+                           {/*))}*/}
+                           <h4>Driver States</h4>
+                           {hunterData.driver_states.map((driver, index) => (
+                               <div key={index}>
+                                 <p>
+                                   Driver {index + 1}<br/>
+                                   배터리: {driver.driver_voltage.toFixed(1)}%,
+                                   온도: {driver.driver_temperature}
+                                 </p>
+                               </div>
+                           ))}
+                         </div>
+                     ) : (
+                         <p>Loading...</p>
+                      )}
+                    </div>
+              }
+            </MapMarker>
             <Polyline path={data.waypoints} strokeWeight={3} strokeColor="#FF0000" strokeOpacity={0.8} strokeStyle="solid" />
           </React.Fragment>
         ))}

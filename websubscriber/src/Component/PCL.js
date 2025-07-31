@@ -33,14 +33,47 @@ export default function PCL({topic}){
               rate : 10.0,
               fixedFrame: '/velodyne'
         });
-          const cloudClient = new PointCloud2({
-              ros : ros,
-              rootObject : viewer.scene,
-              tfClient : tfClient,
-              topic : topic,
-              material : {color: 0xff00ff, size: 0.05},
-              max_pts : 50000
-          });
+
+        // TF가 없는 경우 사용
+        const fakeTFClient = {
+            subscribe: (frame, cb) => {
+                cb({
+                    translation: { x: 0, y: 0, z: 0 },
+                    rotation: { x: 0, y: 0, z: 0, w: 1 }
+                });
+            },
+            unsubscribe: () => {}
+        };
+
+        let tfAvailable = false;
+
+        const tfChecker = new ROSLIB.Topic({
+            ros: ros,
+            name: '/tf',
+            messageType: 'tf2_msgs/TFMessage'
+        });
+
+        tfChecker.subscribe((msg) => {
+            if (msg.transforms.some(t =>
+                t.header.frame_id.includes('velodyne') ||
+                t.child_frame_id.includes('velodyne')
+            )) {
+                tfAvailable = true;
+            }
+        });
+
+        setTimeout(() => {
+            const cloudClient = new PointCloud2({
+                ros: ros,
+                rootObject: viewer.scene,
+                tfClient: tfAvailable ? tfClient : fakeTFClient,
+                topic: topic,
+                material: { color: 0xff00ff, size: 0.05 },
+                max_pts: 50000
+            });
+
+            tfChecker.unsubscribe();
+        }, 2000);
 
         return () => {
             ros.close();

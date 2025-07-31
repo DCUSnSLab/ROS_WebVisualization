@@ -8,11 +8,11 @@ COPY ./package.json .
 
 RUN npm install --legacy-peer-deps
 
-COPY ./websubscriber/package.json .
+COPY package.json .
 
 RUN npm install --legacy-peer-deps
 
-COPY . /ROS_WebVisualization-AutonomousMonitor/ROS_WebVisualization-Prototype
+COPY ../ROS_WebVisualization-Prototype /ROS_WebVisualization-AutonomousMonitor/ROS_WebVisualization-Prototype
 
 WORKDIR /ROS_WebVisualization-AutonomousMonitor/ROS_WebVisualization-Prototype/websubscriber
 

@@ -94,10 +94,10 @@ const Kakaomap = () => {
       ros.getTopics((topics) => {
         const topicNames = topics.topics;
 
-        const gpsTopicName = topicNames.includes("/ublox_gps/fix")
+        const gpsTopicName = topicNames.includes("/ublox_gps_node/fix")
+          ? "/ublox_gps_node/fix"
+          : topicNames.includes("/ublox_gps/fix")
           ? "/ublox_gps/fix"
-          : topicNames.includes("/ublox/fix")
-          ? "/ublox/fix"
           : null;
 
         if (gpsTopicName) {

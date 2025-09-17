@@ -1,0 +1,29 @@
+@import url('https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css');
+
+.header-bar{
+    background-color: #1B1F3B;
+    max-height: 50px;
+}
+
+.bar-title{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.font{
+    font-family: Galmuri11;
+    font-size: 15px;
+    color: white;
+    align-items: center;
+}
+
+.content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    background: white;
+    box-shadow: 0 4px 5px 0 #00000026;
+}
+

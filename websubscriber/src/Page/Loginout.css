@@ -1,0 +1,93 @@
+@import url('https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css');
+
+.background{
+    width: 100vw;
+    height: 100vh;
+    background-color: #1B1F3B;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Galmuri11;
+}
+
+.vertical-box{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 12px;
+}
+
+.id-box{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 100px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    margin: 40px;
+}
+
+.central_placement{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.font-title{
+    color: white;
+    font-size: 50px;
+    margin: 10px 0  0 20px;
+}
+
+.font-content{
+    color: white;
+    font-size: 15px;
+    align-self: flex-start;
+    margin: 10px 0  0 20px;
+}
+
+.input{
+    background: #B0BEC54D;
+    outline: none;
+    border: none;
+    margin: 5px;
+    width: 587px;
+    padding: 10px;
+    border-radius: 6px;
+
+    color: white;
+}
+
+.input::placeholder{
+    color: #9E9E9E;
+}
+
+.button{
+    background: #57676E;
+    margin: 20px;
+    width: 587px;
+}
+
+.button-send{
+    background: #57676E;
+    margin: 0 0 0 25px;
+    width: 150px;
+    font-size: clamp(10px, 2vw, 14px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.forgot-text {
+    margin-top: 20px;
+    color: white;
+    font-size: 18px;
+}
+
+.link {
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 18px;
+}

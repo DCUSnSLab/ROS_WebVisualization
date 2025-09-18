@@ -1,3 +1,5 @@
+// 조회한 아이디 확인하는 페이지
+
 import React from "react";
 import './Loginout.css';
 import {useNavigate} from "react-router-dom";

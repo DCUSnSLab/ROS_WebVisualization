@@ -1,3 +1,5 @@
+// 대시보드 페이지
+
 import React from "react";
 import './bashboard.css';
 import DashboardTile from "../Component/DashboardTile";

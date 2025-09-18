@@ -1,3 +1,5 @@
+// 비밀번호 재설정 페이지
+
 import React from "react";
 import './Loginout.css';
 import {useNavigate} from "react-router-dom";
@@ -22,7 +24,5 @@ function RePassword(){
         </div>
     );
 }
-
-// 비밀번호가 변경되었습니다. 팝업창 추가
 
 export default RePassword;

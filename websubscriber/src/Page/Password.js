@@ -1,3 +1,5 @@
+// 비밀번호 재설정을 위한 조회 페이지
+
 import {Link} from "react-router-dom";
 import React from "react";
 

@@ -1,3 +1,5 @@
+// 메인 화면 틀 레이아웃
+
 import {FaAngleDown} from "react-icons/fa";
 import React from "react";
 import './MainLayout.css';

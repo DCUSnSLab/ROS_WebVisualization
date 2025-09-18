@@ -1,3 +1,5 @@
+// 아이디 조회 페이지
+
 import React from "react";
 import './Loginout.css';
 

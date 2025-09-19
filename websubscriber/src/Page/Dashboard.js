@@ -10,7 +10,7 @@ function Dashboard() {
     return(
         <div className='dashboard'>
             <h1 className="header">Dashboard</h1>
-            <Link to='/test' className='next'>Next ></Link>
+            <Link to='/main' className='next'>Next ></Link>
 
 
             <DashboardTile>User

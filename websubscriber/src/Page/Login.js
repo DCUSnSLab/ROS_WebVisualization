@@ -15,11 +15,11 @@ function Login(){
 
                 <p className='forgot-text'>
                     Forgot your{" "}
-                    <Link to='/view_password' className='link'>
+                    <Link to='/password' className='link'>
                         Password
                     </Link>{" "}
                     or{" "}
-                    <Link to='/find_id' className='link'>
+                    <Link to='/id' className='link'>
                         ID
                     </Link>
                     ? | {" "}

@@ -6,13 +6,6 @@ import Visualize from "./Panel/Visualize";
 import { ProSidebarProvider } from "react-pro-sidebar";
 import {Provider} from "react-redux";
 import {store} from "./app/store";
-import IpInputPage from "./Panel/ipInputPage";
-import MainPage from "./Panel/MainPage";
-import {ROSProvider} from "./ROSContext";
-import Kakaomap from "./Component/kakaomap";
-import LabTabs from "./main";
-import Combined from "./Panel/combined";
-import MainLayout from "./layouts/MainLayout";
 import Login from "./Page/Login";
 import SignUp from "./Page/SignUp";
 import Password from "./Page/Password";
@@ -20,6 +13,9 @@ import RePassword from "./Page/RePassword";
 import ID from "./Page/ID";
 import CheckID from "./Page/CheckID";
 import Dashboard from "./Page/Dashboard";
+import Start from "./Page/Start";
+import MainPg from "./Page/MainPg";
+import MainPgGroup from "./Page/MainPgGroup";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
@@ -27,44 +23,35 @@ const root = ReactDOM.createRoot(
 
 const router = createBrowserRouter([
 	{
-		path: "/",
-		element: <IpInputPage />
-    },{
-        path: "main",
-        element: <MainPage/>
-    },{
-        path: "visualize",
-        element: <Visualize/>
-    },{
-        path: "kakaomap",
-        element: <Kakaomap/>
-    },{
-        path: "Combined",
-        element: <Combined/>
-    },{
-        path: "login",
-        element: <Login/>
+        path: "/",
+        element: <Start/>
     },{
         path: "sign_up",
         element: <SignUp/>
+    }, {
+        path: "login",
+        element: <Login/>
     },{
-        path: "view_password",
+        path: "password",
         element: <Password/>
     },{
-        path: "view_password/reset_password",
+        path: "reset_password",
         element: <RePassword/>
     },{
-        path: "find_id",
+        path: "id",
         element: <ID/>
     },{
-        path: "find_id/check_id",
+        path: "check_id",
         element: <CheckID/>
     },{
         path: "dashboard",
         element: <Dashboard/>
     },{
-        path: "test",
-        element: <MainLayout/>
+        path: "main",
+        element: <MainPg/>
+    },{
+        path: "group/main",
+        element: <MainPgGroup/>
     },
 
 ]);
@@ -76,3 +63,21 @@ root.render(
     </Provider>
     // </React.StrictMode>
 );
+
+
+// 이전페이지
+// 	path: "/",
+// 	element: <IpInputPage />
+// },{
+//     path: "main",
+//     element: <MainPage/>
+// },{
+//     path: "visualize",
+//     element: <Visualize/>
+// },{
+//     path: "kakaomap",
+//     element: <Kakaomap/>
+// },{
+//     path: "Combined",
+//     element: <Combined/>
+// },{

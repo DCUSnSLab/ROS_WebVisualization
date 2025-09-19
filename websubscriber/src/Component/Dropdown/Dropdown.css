@@ -1,0 +1,22 @@
+.drop-pg{
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    align-items: center;
+    background: #DEDEDE;
+    padding: 5px;
+}
+
+.drop-link{
+    font-size: 15px;
+    color: #1B1F3B;
+    text-decoration: none;
+    font-family: Galmuri11;
+    cursor: pointer;
+}
+
+.drop-btn{
+    background: #DEDEDE;
+    font-size: 15px;
+    border: none;
+}

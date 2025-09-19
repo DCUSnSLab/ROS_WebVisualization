@@ -1,30 +1,125 @@
-@import url('https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css');
+/*MainLayout*/
+.layout{
+    padding-top: 40px;
+}
 
-.header-bar{
+.main{
+    height: calc(100vh - 40px - 80px);
+}
+
+.main-grid{
+    display: grid;
+    height: 100%;
+    grid-template-columns: 350px 1fr;
+}
+
+.side-bar-grid{
+    display: grid;
+    height: 100%;
+    grid-template-rows: 1fr 1fr;
+}
+
+.side-bar-topic{
     background-color: #1B1F3B;
-    /*max-height: 50px;*/
-    /*padding: 5px;*/
 }
 
-.bar-title{
-    display: flex;
-    justify-content: space-between;
-}
-
-
-
-.font-content{
-    font-size: 15px;
-    color: white;
-    align-items: center;
+.side-bar-vehicle{
+    background-color: #57676E;
 }
 
 .content {
-    display: none;
-    position: absolute;
-    width: 100%;
-    left: 0;
-    background: white;
-    box-shadow: 0 4px 5px 0 #00000026;
+    background: rgba(255,255,255,0.05);
+    padding: 16px;
+    color: #fff;
 }
 
+.side-title{
+    color: #fff;
+    font-family: Galmuri11;
+    margin: 10px 0  0 5px;
+
+    border-bottom: 1px solid white;
+    padding-bottom: 6px;
+}
+
+/*MainHeader*/
+.header-bar{
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: #1B1F3B;
+    color: white;
+    font-size: 15px;
+    font-family: Galmuri11;
+}
+
+.header-contents{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 100px 0 0 ;
+}
+
+.font-title{
+    color: white;
+}
+
+.font-content{
+    display: flex;
+    list-style: none;
+}
+
+.dropdown-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 160px;
+    background: #1b1f3b;
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    z-index: 2000;
+}
+
+/*MainFooter*/
+.footer-bar {
+    height: 80px;
+    margin-top: auto;
+    background-color: #1B1F3B;
+}
+
+.footer-button {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.logging-btn {
+    grid-column: 3;
+    justify-self: end;
+    color: white;
+    background: transparent;
+    border: 1px solid white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: Galmuri11;
+}
+
+.footer-contents {
+    grid-column: 2;
+    text-align: center;
+}
+
+.footer-play {
+    font-size: 20px;
+}

@@ -1,6 +1,6 @@
 // 메인 화면 레이아웃
 import React from "react";
-import './MainLayout.css';
+import '../../css/MainLayout.css';
 import Header from './MainHeader';
 import Footer from './MainFooter';
 

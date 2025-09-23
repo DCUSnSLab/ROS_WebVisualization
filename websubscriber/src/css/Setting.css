@@ -1,0 +1,75 @@
+.tab-top{
+    background-color: #1B1F3B;
+    padding: 5px;
+    flex-direction: row;
+    color: white;
+    font-family: Galmuri11;
+
+}
+
+.tab-exit{
+    background-color: #1B1F3B;
+    color: white;
+    float: right;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.tab{
+    background: #8B8B8B;
+}
+
+.tab-btn{
+    color: #1b1f3b;
+    border: none;
+    background: #8B8B8B;
+    font-size: 20px;
+    padding: 10px 20px;
+    font-family: Galmuri11;
+}
+
+.tab-btn.active {
+    background: white;
+}
+
+.setting-content{
+    font-family: Galmuri11;
+}
+
+.setting-btn{
+    background: #57676E;
+    border: none;
+    color: white;
+    padding: 2px 20px;
+}
+
+.unsubscribe-btn{
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    background: #95B2BF;
+    border: none;
+    color: white;
+    padding: 2px 20px;
+}
+
+.setting-input{
+    width: 30vw;
+    background: #B0BEC54D;
+    outline: none;
+    padding: 10px;
+    border-radius: 6px;
+    color: #1b1f3b;
+}
+
+.setting-textarea{
+    width: 70vw;
+    height: 50vh;
+    background: #B0BEC54D;
+    outline: none;
+    padding: 10px;
+    border-radius: 6px;
+    color: #1b1f3b;
+    resize: vertical;
+    text-align: left;
+}

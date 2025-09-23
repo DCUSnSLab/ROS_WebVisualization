@@ -1,6 +1,6 @@
 // 시작페이지
 import React from "react";
-import './Loginout.css';
+import '../css/Loginout.css';
 import {useNavigate} from "react-router-dom";
 
 function Start() {

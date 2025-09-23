@@ -1,26 +1,62 @@
 // 개인 페이지 드롭다운
-
-import React, {useState} from "react";
-import './Dropdown.css';
-import Modal from '../Modal/Modal';
-import { Route, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import "../../css/Dropdown.css";
+import Modal from "../Modal/Modal";
+import {Link, useNavigate} from "react-router-dom";
 
 function DropdownPg() {
     const [open, setOpen] = useState(false);
+    const [createOpen, setCreateOpen] = useState(false);
+    const navigate = useNavigate();
+
+    const goGroupMain = () => navigate("/group/main");
 
     return (
-        <div className='drop-pg'>
+        <div className="drop-pg" onClick={(e) => e.stopPropagation()}>
             <Link to="/setting" className="drop-link">Setting</Link>
-            <Link onClick={() => setOpen(true)} className="drop-link">Group</Link>
+
+            <button
+                type="button"
+                className="drop-link"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setOpen(true);
+                }}
+            >Group
+            </button>
+
             <Link to="/qna" className="drop-link">Q&A</Link>
             <Link to="/" className="drop-link">Logout</Link>
 
-            <Modal isOpen={open} onClose={() => setOpen(true)}>
-                <div>
-                    <p>이 항목을 삭제하시겠습니까?</p>
-                    <div>
-                        <button>삭제</button>
+            <Modal isOpen={open} onClose={() => setOpen(false)}>
+                <h3 className='modal-title'>Group List
+                    <button className='modal-btn' style={{float: 'right', fontSize: '20px'}}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setCreateOpen(true);
+                    }}>+Create</button>
+                </h3>
+                <div className='modal-content'>
+                    <p className='modal-text'>생성된 그룹명</p>
+                    <button className='modal-btn' onClick={goGroupMain}>Enter</button>
+                </div>
+            </Modal>
+
+            <Modal isOpen={createOpen} onClose={() => setCreateOpen(false)}>
+                <h3 className='modal-title'>Group Creation
+                    <button className='modal-btn' style={{float: 'right', fontSize: '20px'}}
+                            onClick={goGroupMain}
+                            >Create</button>
+                </h3>
+                <div className='modal-content'>
+                    <div className='modal-group'>
+                        <h5>name*</h5>
+                        <input className='input'/>
+                        <h5>Description</h5>
+                        <textarea className='input-desc'/>
                     </div>
+
+
                 </div>
             </Modal>
         </div>

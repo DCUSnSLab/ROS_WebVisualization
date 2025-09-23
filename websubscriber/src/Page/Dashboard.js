@@ -1,10 +1,10 @@
 // 대시보드 페이지
 
 import React from "react";
-import './bashboard.css';
-import DashboardTile from "../Component/DashboardTile";
+import '../css/bashboard.css';
+import DashboardTile from "../Component/Dashboard/DashboardTile";
 import {Link} from "react-router-dom";
-import DashboardChart from "../Component/DashboardChart";
+import DashboardChart from "../Component/Dashboard/DashboardChart";
 
 function Dashboard() {
     return(

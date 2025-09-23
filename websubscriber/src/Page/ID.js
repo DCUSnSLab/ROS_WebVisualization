@@ -1,7 +1,7 @@
 // 아이디 조회 페이지
 
 import React from "react";
-import './Loginout.css';
+import '../css/Loginout.css';
 
 function ID(){
     return(

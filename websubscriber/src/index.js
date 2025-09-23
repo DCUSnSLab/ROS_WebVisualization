@@ -16,6 +16,9 @@ import Dashboard from "./Page/Dashboard";
 import Start from "./Page/Start";
 import MainPg from "./Page/MainPg";
 import MainPgGroup from "./Page/MainPgGroup";
+import SettingTab from "./Component/Setting/SettingTab";
+import Setting from "./Page/Setting";
+import SettingGroup from "./Page/SettingGroup";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root')
@@ -52,6 +55,12 @@ const router = createBrowserRouter([
     },{
         path: "group/main",
         element: <MainPgGroup/>
+    },{
+        path: "/setting",
+        element: <Setting/>
+    },{
+        path: "/group/setting",
+        element: <SettingGroup/>
     },
 
 ]);

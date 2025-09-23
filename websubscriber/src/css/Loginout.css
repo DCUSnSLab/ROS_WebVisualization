@@ -68,6 +68,11 @@
     background: #57676E;
     margin: 20px;
     width: 587px;
+    height: 40px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+
 }
 
 .button-send{
@@ -77,6 +82,10 @@
     font-size: clamp(10px, 2vw, 14px);
     white-space: nowrap;
     text-overflow: ellipsis;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    height: 40px;
 }
 
 .forgot-text {

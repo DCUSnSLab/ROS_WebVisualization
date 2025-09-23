@@ -5,6 +5,7 @@
     align-items: center;
     background: #DEDEDE;
     padding: 5px;
+
 }
 
 .drop-link{
@@ -13,6 +14,8 @@
     text-decoration: none;
     font-family: Galmuri11;
     cursor: pointer;
+    border: none;
+    background: #DEDEDE;
 }
 
 .drop-btn{

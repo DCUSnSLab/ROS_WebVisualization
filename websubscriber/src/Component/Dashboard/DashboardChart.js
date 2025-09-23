@@ -1,6 +1,6 @@
 // 대시보드 차트 컴포넌트
 
-import './DashboardTile.css';
+import './css/DashboardTile.css';
 
 const DashboardChart = () => {
     return(

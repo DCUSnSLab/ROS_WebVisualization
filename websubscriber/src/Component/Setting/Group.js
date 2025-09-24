@@ -1,5 +1,5 @@
+// 그룹 정보 설정 컴포넌트
 import React, {useState} from "react";
-
 
 function Group() {
     const [edit, setEdit] = useState(false);

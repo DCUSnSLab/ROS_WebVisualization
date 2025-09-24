@@ -13,7 +13,7 @@ function Setting() {
                 tab2Name ={'Vehicle'}
                 tab3Name ={'LoggingTopic'}
                 tab1 ={<Individual/>}
-                tab2 ={<Vehicle/>}
+                tab2 ={<Vehicle vehicleText={'Group'} title={'Vehicle registration'}/>}
                 tab3 ={<LoggingTopic/>}
                 exit = '/main'
             ></SettingTab>

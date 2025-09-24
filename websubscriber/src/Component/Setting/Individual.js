@@ -1,14 +1,24 @@
+// 개인정보 설정 컴포넌트
 import React, { useState } from 'react';
 import '../../css/Setting.css';
 
 function Individual() {
+    const [edit, setEdit] = useState(false);
+
     return (
         <div className='setting-content'>
-            <button className='setting-btn' style={{float: 'right', marginRight: '10px'}}>Edit</button>
-            <h5>ID: 사용자 아이디</h5>
-            <h5>Name: 사용자 이름</h5>
-            <h5>Email: 사용자 이메일</h5>
-            <button className='unsubscribe-btn'>unsubscribe</button>
+            <button
+                className='setting-btn'
+                style={{float: 'right', marginRight: '10px'}}
+                onClick={() => { setEdit((prev) => !prev)}}
+            >{edit ? 'Save' : 'Edit'}</button>
+            <h5>ID</h5>
+            <input className='setting-input' disabled/>
+            <h5>Name</h5>
+            <input className='setting-input' disabled={!edit}/>
+            <h5>Email</h5>
+            <input className='setting-input' disabled={!edit}/>
+            <button className='unsubscribe-btn'>Delete</button>
         </div>
     );
 }

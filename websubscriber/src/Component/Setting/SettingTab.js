@@ -1,3 +1,4 @@
+// 세팅 탭 레이아웃
 import React, { useState } from 'react';
 import '../../css/Setting.css'
 import {Link} from "react-router-dom";

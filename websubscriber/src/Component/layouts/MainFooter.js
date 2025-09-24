@@ -9,6 +9,15 @@ import '../../css/Modal.css';
 
 function MainFooter(){
     const [open, setOpen] = useState(false);
+    const [logging, setLogging] = useState(false);
+    const [value, setValue] = useState("pre");
+
+    const handleChange = (e) => setValue(e.target.value);
+
+    const handleStart = () => {
+        setLogging(true);
+        setOpen(false);
+    };
 
     return(
         <footer className='footer-bar'>
@@ -26,22 +35,39 @@ function MainFooter(){
                     className='logging-btn'
                     onClick={(e) => {
                         e.stopPropagation();
-                        setOpen(true);
+                        if (logging) {
+                            setLogging(false);
+                        }
+                        else {
+                            setOpen(true);
+                        }
                     }}
-                >Logiging
+                >{logging ? "Logging Stop" : "Logiging"}
                 </button>
 
                 <Modal isOpen={open} onClose={() => setOpen(false)}>
                     <h3 className='modal-title'>Select Logging Topic
-                        <button className='modal-btn' style={{float: 'right', fontSize: '20px'}}>Start</button>
+                        <button
+                            className='modal-btn'
+                            style={{float: 'right', fontSize: '20px'}}
+                            onClick={handleStart}
+                        >Start</button>
                     </h3>
                     <div className='modal-content'>
-                        <p>추후 구현 예정</p>
+                        <div>
+                            <select className='select-option' id="whiteSpace" value={value} onChange={handleChange}>
+                                <option>Topic List 이름</option>
+                            </select>
+                        </div>
+
                     </div>
+                    <textarea
+                        className="setting-input"
+                        style={{width: "95%", height: "60%", marginLeft: '20px'}}
+                        disabled
+                    />
                 </Modal>
             </div>
-
-
         </footer>
     );
 }

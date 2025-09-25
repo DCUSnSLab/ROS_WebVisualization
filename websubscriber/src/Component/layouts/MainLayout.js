@@ -1,17 +1,15 @@
 // 메인 화면 레이아웃
-import React from "react";
+import React, {useState} from "react";
 import '../../css/MainLayout.css';
 import Header from './MainHeader';
 import Footer from './MainFooter';
+import SidebarTop from "./SidebarTop";
+import SidebarBottom from "./SidebarBottom";
 
-type Props = React.PropsWithChildren<{
-    sidebarTop? : React.ReactNode;
-    sidebarBottom? : React.ReactNode;
-    dropdownContent? : React.ReactNode;
-    name? : React.ReactNode;
-}>
+const MainLayout: React.FC<Props> = ({children, name, dropdownContent, content}) => {
+    const [isOpen, setIsOpen] = useState(true);
+    const [isOpenVehicle, setIsOpenVehicle] = useState(true);
 
-const MainLayout: React.FC<Props> = ({children, sidebarTop, sidebarBottom, name, dropdownContent}) => {
     return (
         <div className='layout'>
             <Header name={name} dropdownContent={dropdownContent}/>
@@ -19,12 +17,28 @@ const MainLayout: React.FC<Props> = ({children, sidebarTop, sidebarBottom, name,
                 <div className='main-grid'>
                     <div className='side-bar-grid'>
                         <aside className='side-bar-topic'>
-                            <h6 className='side-title'>Topic</h6>
-                            {sidebarTop}
+                            <button
+                                className='side-btn'
+                                onClick={() => setIsOpen(!isOpen)}
+                            >
+                                <span>{isOpen ? "▲ " : "▼ "}</span>
+                                Topic
+                            </button>
+                            <div className='side-title'></div>
+                            {isOpen && (content || <SidebarTop />)}
+
+
                         </aside>
                         <aside className='side-bar-vehicle'>
-                            <h6 className='side-title'>Vehicle Status</h6>
-                            {sidebarBottom}
+                            <button
+                                className='side-btn'
+                                onClick={() => setIsOpenVehicle(!isOpenVehicle)}
+                            >
+                                <span>{isOpenVehicle ? "▲ " : "▼ "}</span>
+                                Vehicle Status
+                            </button>
+                            <div className='side-title'></div>
+                            {isOpenVehicle && (content || <SidebarBottom />)}
                         </aside>
                     </div>
 

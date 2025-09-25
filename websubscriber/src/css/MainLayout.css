@@ -21,10 +21,12 @@
 
 .side-bar-topic{
     background-color: #1B1F3B;
+    overflow: hidden;
 }
 
 .side-bar-vehicle{
     background-color: #57676E;
+    overflow: hidden;
 }
 
 .content {
@@ -33,11 +35,15 @@
     color: #fff;
 }
 
-.side-title{
+.side-btn{
     color: #fff;
     font-family: Galmuri11;
     margin: 10px 0  0 5px;
+    background: none;
+    border: none;
+}
 
+.side-title{
     border-bottom: 1px solid white;
     padding-bottom: 6px;
 }

@@ -13,11 +13,6 @@
     grid-template-columns: 350px 1fr;
 }
 
-.side-bar{
-    display: grid;
-    height: 100%;
-}
-
 .side-bar-topic{
     background-color: #1B1F3B;
     overflow: hidden;

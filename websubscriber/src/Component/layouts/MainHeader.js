@@ -1,4 +1,5 @@
 // 메인화면 상단 헤더 컴포넌트
+//name: 사용자 이름, dropdownContent: 드롭다운 클릭 시 나오는 컴포넌트
 import { FaBell } from "react-icons/fa";
 import { SlArrowDown } from "react-icons/sl";
 import {useEffect, useRef, useState} from "react";

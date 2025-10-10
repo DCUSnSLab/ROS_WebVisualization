@@ -1,3 +1,6 @@
+// 메인 사이드바 차량 센사 데이터 부분
+// title: Topic, content: 안에 들어갈 관련 내용
+
 import React, { useState } from "react";
 import '../../css/Sidebar.css';
 

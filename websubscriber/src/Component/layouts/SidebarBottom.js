@@ -1,3 +1,6 @@
+// 메인 사이드바 차량 데이터 부분
+// title: Vehicle Status, content: 안에 들어갈 관련 내용
+
 import React, { useState } from "react";
 import '../../css/Sidebar.css';
 

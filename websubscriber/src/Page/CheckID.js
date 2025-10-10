@@ -20,7 +20,7 @@ function CheckID(){
             <div className='vertical-box'>
                 <h1 className='font-title' style={{fontSize: '30px'}}>Forget your ID?</h1>
                 <div className= 'id-box'>
-                    <p className='font-content'>아이디 출력 공간</p>
+                    <p className='font-content' style={{margin: '20px'}}>아이디 출력 공간</p>
                 </div>
                 <div>
                     <button className='button' style={{width: '180px'}} onClick={handleClickLogin}>Login</button>

@@ -13,19 +13,13 @@
     grid-template-columns: 350px 1fr;
 }
 
-.side-bar-grid{
+.side-bar{
     display: grid;
     height: 100%;
-    grid-template-rows: 1fr 1fr;
 }
 
 .side-bar-topic{
     background-color: #1B1F3B;
-    overflow: hidden;
-}
-
-.side-bar-vehicle{
-    background-color: #57676E;
     overflow: hidden;
 }
 
@@ -37,7 +31,7 @@
 
 .side-btn{
     color: #fff;
-    font-family: Galmuri11;
+    font-family: GMarketSans;
     margin: 10px 0  0 5px;
     background: none;
     border: none;
@@ -57,7 +51,6 @@
     background-color: #1B1F3B;
     color: white;
     font-size: 15px;
-    font-family: Galmuri11;
 }
 
 .header-contents{
@@ -118,7 +111,7 @@
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
-    font-family: Galmuri11;
+    font-family: GMarketSans;
 }
 
 .footer-contents {

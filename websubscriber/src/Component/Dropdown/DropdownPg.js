@@ -50,9 +50,9 @@ function DropdownPg() {
                 </h3>
                 <div className='modal-content'>
                     <div className='modal-group'>
-                        <h5>name*</h5>
+                        <h2>name*</h2>
                         <input className='input'/>
-                        <h5>Description</h5>
+                        <h2>Description</h2>
                         <textarea className='input-desc'/>
                     </div>
 

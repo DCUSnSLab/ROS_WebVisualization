@@ -3,19 +3,19 @@ import React from "react";
 function AddTopicList() {
     return (
         <div className='setting-content'>
-            <h5>Logging Topic List
+            <h2>Logging Topic List
                 <button className='setting-btn'
                     style={{marginLeft: '10px'}}
                 >Create</button>
-            </h5>
+            </h2>
             <div className='setting-grid'>
-                <div>
-                    <h5>Name</h5>
+                <div style={{marginTop: '30px'}}>
+                    <h3>Name</h3>
                     <input className='setting-input'/>
-                    <div style={{marginTop: '1vw'}}>
-                        <h5>Topics to logging</h5>
+                    <div style={{marginTop: '0.5vw'}}>
+                        <h3>Topics to logging</h3>
                         <input className='setting-input'/>
-                        <h5>Topic Message</h5>
+                        <h3>Topic Message</h3>
                         <input className='setting-input'/>
                     </div>
                     <button
@@ -24,7 +24,7 @@ function AddTopicList() {
                     >Add Topic</button>
                 </div>
                 <div>
-                    <h5>Selected Topic</h5>
+                    <h3>Selected Topic</h3>
                     <textarea
                         className="setting-input"
                         style={{ width: "60vw", height: "70vh"}}

@@ -9,7 +9,7 @@ const AddVehicle = ({title, onCancel}) => {
 
     return (
         <div className='setting-content'>
-            <h4>{title}</h4>
+            <h2>{title}</h2>
             {location.pathname === '/group/setting' && (
                 <div>
                     <p>Retrieve registered vehicle information
@@ -22,32 +22,32 @@ const AddVehicle = ({title, onCancel}) => {
             <div className='setting-grid'>
 
                 <div>
-                    <h5>Name*</h5>
+                    <h3>Name*</h3>
                     <input className='setting-input'/>
-                    <h5>Administrator</h5>
+                    <h3>Administrator</h3>
                     <input className='setting-input'/>
                 </div>
                 <div>
-                    <h5>MAC*
+                    <h3>MAC*
                         <button
                             className='setting-btn'
                             style={{marginLeft: '10px'}}
                         >Connection</button>
-                    </h5>
+                    </h3>
                     <input className='setting-input'/>
-                    <h5>Purpose of Operation</h5>
+                    <h3>Purpose of Operation</h3>
                     <input className='setting-input'/>
                 </div>
             </div>
             <div className='setting-people-title'></div>
             <div className='setting-grid' style={{padding: '10px'}}>
                 <div>
-                    <h5>Vehicle Topic Information
+                    <h3>Vehicle Topic Information
                         <button
                             className='setting-btn'
                             style={{marginLeft: '10px'}}
                         >Add</button>
-                    </h5>
+                    </h3>
                     <input className='setting-input' placeholder='Topic Name'/>
                     <input className='setting-input' placeholder='Topic'/>
                     <textarea
@@ -57,12 +57,12 @@ const AddVehicle = ({title, onCancel}) => {
                     />
                 </div>
                 <div>
-                    <h5>Sensor Topic Information
+                    <h3>Sensor Topic Information
                         <button
                             className='setting-btn'
                             style={{marginLeft: '10px'}}
                         >Add</button>
-                    </h5>
+                    </h3>
                     <input className='setting-input' placeholder='Sensor Name'/>
                     <input className='setting-input' placeholder='Topic'/>
                     <textarea

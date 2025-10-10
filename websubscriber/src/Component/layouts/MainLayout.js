@@ -15,7 +15,7 @@ const MainLayout: React.FC<Props> = ({children, name, dropdownContent, content})
             <Header name={name} dropdownContent={dropdownContent}/>
             <main className='main'>
                 <div className='main-grid'>
-                    <div className='side-bar-grid'>
+                    <div className='side-bar'>
                         <aside className='side-bar-topic'>
                             <button
                                 className='side-btn'
@@ -26,10 +26,6 @@ const MainLayout: React.FC<Props> = ({children, name, dropdownContent, content})
                             </button>
                             <div className='side-title'></div>
                             {isOpen && (content || <SidebarTop />)}
-
-
-                        </aside>
-                        <aside className='side-bar-vehicle'>
                             <button
                                 className='side-btn'
                                 onClick={() => setIsOpenVehicle(!isOpenVehicle)}
@@ -39,6 +35,7 @@ const MainLayout: React.FC<Props> = ({children, name, dropdownContent, content})
                             </button>
                             <div className='side-title'></div>
                             {isOpenVehicle && (content || <SidebarBottom />)}
+
                         </aside>
                     </div>
 

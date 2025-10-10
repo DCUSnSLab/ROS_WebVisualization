@@ -1,20 +1,36 @@
-@import url('https://cdn.jsdelivr.net/npm/galmuri@latest/dist/galmuri.css');
+@font-face {
+    font-family: 'Ria';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/RiaSans-ExtraBold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'GMarketSans';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: 500;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+}
 
 .background{
-    width: 100vw;
-    height: 100vh;
-    background-color: #1B1F3B;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: Galmuri11;
+    background-color: #1B1F3B;
 }
 
 .vertical-box{
     display: flex;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    border-radius: 12px;
+    min-height: 100vh;
 }
 
 .id-box{
@@ -39,6 +55,7 @@
     color: white;
     font-size: 50px;
     margin: 10px 0  0 20px;
+    font-family: Ria;
 }
 
 .font-content{
@@ -46,38 +63,38 @@
     font-size: 15px;
     align-self: flex-start;
     margin: 10px 0  0 20px;
+    font-family: GMarketSans;
 }
 
 .input{
     background: #B0BEC54D;
     outline: none;
     border: none;
-    margin: 5px;
     width: 587px;
-    padding: 10px;
     border-radius: 6px;
-
     color: white;
+
 }
 
 .input::placeholder{
-    color: #9E9E9E;
+    color: #EFEFEF;
 }
 
 .button{
     background: #57676E;
-    margin: 20px;
+    margin: 10px;
     width: 587px;
     height: 40px;
     color: white;
     border: none;
     border-radius: 5px;
-
+    font-family: GMarketSans;
+    font-size: 15px;
 }
 
 .button-send{
     background: #57676E;
-    margin: 0 0 0 25px;
+    margin: 0 0 0 16px;
     width: 150px;
     font-size: clamp(10px, 2vw, 14px);
     white-space: nowrap;
@@ -86,10 +103,11 @@
     border: none;
     border-radius: 5px;
     height: 40px;
+    font-family: GMarketSans;
 }
 
 .forgot-text {
-    margin-top: 20px;
+    margin-top: 10px;
     color: white;
     font-size: 18px;
 }
@@ -108,6 +126,7 @@
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
-    font-family: Galmuri11;
     margin-top: 30px;
+    font-family: GMarketSans;
+    font-size: 15px;
 }

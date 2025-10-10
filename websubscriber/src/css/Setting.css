@@ -1,10 +1,9 @@
-
 .tab-top{
     background-color: #1B1F3B;
     padding: 5px;
     flex-direction: row;
     color: white;
-    font-family: Galmuri11;
+    font-family: Ria;
 
 }
 
@@ -26,7 +25,7 @@
     background: #8B8B8B;
     font-size: 20px;
     padding: 10px 20px;
-    font-family: Galmuri11;
+    font-family: GMarketSans;
 }
 
 .tab-btn.active {
@@ -34,7 +33,7 @@
 }
 
 .setting-content{
-    font-family: Galmuri11;
+    font-family: GMarketSans;
     padding: 20px;
 }
 
@@ -44,6 +43,7 @@
     color: white;
     padding: 3px 20px;
     border-radius: 4px;
+    font-size: 20px;
 }
 
 .unsubscribe-btn{
@@ -55,7 +55,7 @@
     color: white;
     padding: 2px 20px;
     border-radius: 4px;
-
+    font-size: 20px;
 }
 
 .register-btn{
@@ -68,10 +68,12 @@
     padding: 2px 20px;
     margin-right: 10px;
     border-radius: 4px;
+    font-size: 20px;
 }
 
 .setting-input{
     width: 30vw;
+    height: 4vh;
     background: #B0BEC54D;
     outline: none;
     padding: 10px;
@@ -79,6 +81,8 @@
     color: #1b1f3b;
     margin-bottom: 10px;
     border: none;
+    resize: none !important;
+    overflow-y: auto;
 }
 
 .setting-textarea{
@@ -104,9 +108,11 @@
 }
 
 .select-option{
-    width: 10vw;
+    width: 12vw;
+    height: 3vh;
     outline: none;
     min-width: 150px;
+    font-family: GMarketSans;
 }
 
 .setting-grid{

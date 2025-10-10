@@ -17,30 +17,31 @@ const Vehicle = ({vehicleText, title}) => {
     return (
         <div className='setting-content'>
             <button className='setting-btn' style={{float: 'right', marginRight: '10px'}} onClick={() => setPage('add')}>+Add</button>
-            <h5>Currently registered vehicles: 현재 차량 수 </h5>
+            <h3>Currently registered vehicles: 현재 차량 수 </h3>
             <select className='select-option' id="whiteSpace" value={value} onChange={handleChange}>
                 <option>저장된 차량 이름</option>
             </select>
             <button
                 className='setting-btn'
+                style={{marginLeft: '10px'}}
                 onClick={() => { setEdit((prev) => !prev)}}
             >{edit ? 'Save' : 'Edit'}</button>
             <div className='setting-grid'>
-                <div>
-                    <h5>MAC</h5>
+                <div style={{marginTop: '20px'}}>
+                    <h3>MAC</h3>
                     <input className='setting-input' disabled/>
-                    <h5>Purpose of Operation</h5>
+                    <h3>Purpose of Operation</h3>
                     <input className='setting-input' disabled={!edit}/>
-                    <h5>{vehicleText}</h5>
+                    <h3>{vehicleText}</h3>
                     <input className='setting-input' disabled={!edit}/>
                 </div>
                 <div>
-                    <h5>Vehicle Topic Information</h5>
+                    <h3>Vehicle Topic Information</h3>
                     <input
                         className='setting-input'
                         style={{height: '10vw'}}
                         disabled={!edit}/>
-                    <h5>Sensor Topic Information</h5>
+                    <h3>Sensor Topic Information</h3>
                     <input
                         className='setting-input'
                         style={{height: '10vw'}}

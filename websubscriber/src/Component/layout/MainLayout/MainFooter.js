@@ -2,10 +2,10 @@
 import { FaPlay } from "react-icons/fa";
 import { IoPlaySkipBackSharp } from "react-icons/io5";
 import { IoPlaySkipForward } from "react-icons/io5";
-import '../../css/MainLayout.css';
+import '../../../css/MainLayout.css';
 import React, {useState} from "react";
-import Modal from "../Modal/Modal";
-import '../../css/Modal.css';
+import Modal from "../../Modal/Modal";
+import '../../../css/Modal.css';
 
 function MainFooter(){
     const [open, setOpen] = useState(false);

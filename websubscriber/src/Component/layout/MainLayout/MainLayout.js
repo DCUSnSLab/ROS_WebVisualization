@@ -1,14 +1,15 @@
 // 메인 화면 레이아웃
-//children: 센서 데이터가 나오는 공간, name: 사용자 이름, dropdownContent: 드롭다운 클릭 시 나오는 컴포넌트, content: 사이드바에 표시할 컴포넌트
+//name: 사용자 이름, dropdownContent: 드롭다운 클릭 시 나오는 컴포넌트, content: 사이드바에 표시할 컴포넌트
 
 import React, {useState} from "react";
-import '../../css/MainLayout.css';
+import '../../../css/MainLayout.css';
 import Header from './MainHeader';
 import Footer from './MainFooter';
 import SidebarTop from "./SidebarTop";
 import SidebarBottom from "./SidebarBottom";
+import DataSpace from "../DataSpace";
 
-const MainLayout: React.FC<Props> = ({children, name, dropdownContent, content}) => {
+const MainLayout: React.FC<Props> = ({name, dropdownContent, content}) => {
     const [isOpen, setIsOpen] = useState(true);
     const [isOpenVehicle, setIsOpenVehicle] = useState(true);
 
@@ -38,7 +39,7 @@ const MainLayout: React.FC<Props> = ({children, name, dropdownContent, content})
                         {isOpenVehicle && (content || <SidebarBottom />)}
                     </aside>
                     <section className='content'>
-                        {children}
+                        <DataSpace />
                     </section>
                 </div>
             </main>

@@ -2,7 +2,7 @@
 // title: Topic, content: 안에 들어갈 관련 내용
 
 import React, { useState } from "react";
-import '../../css/Sidebar.css';
+import '../../../css/Sidebar.css';
 
 const AccordionItem = ({ title, content }) => {
     const [isOpen, setIsOpen] = useState(false);

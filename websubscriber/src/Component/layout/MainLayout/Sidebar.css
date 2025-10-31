@@ -2,9 +2,8 @@
     border-bottom: 1px solid #ccc;
 }
 
-.siderbar-btn{
+.siderbar-btn {
     display: flex;
-    justify-content: space-between;
     width: 100%;
     padding: 10px;
     border: none;
@@ -16,7 +15,6 @@
 }
 
 .siderbar-content{
-    padding: 10px;
     background: #fafafa;
     font-family: GMarketSans;
 }

@@ -1,7 +1,7 @@
 // 회원가입 페이지
 
 import React from "react";
-import '../css/Loginout.css';
+import './Loginout.css';
 
 function SignUp(){
     return(

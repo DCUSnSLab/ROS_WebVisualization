@@ -1,5 +1,5 @@
 // 메인페이지(그룹)
-import MainLayout from "../Component/layouts/MainLayout";
+import MainLayout from "../Component/layout/MainLayout/MainLayout";
 import DropdownPgGroup from '../Component/Dropdown/DropdownPgGroup';
 import React from "react";
 

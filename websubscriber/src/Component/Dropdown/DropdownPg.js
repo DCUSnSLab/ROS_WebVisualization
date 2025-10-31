@@ -1,6 +1,6 @@
 // 개인 페이지 드롭다운
 import React, { useState } from "react";
-import "../../css/Dropdown.css";
+import "./Dropdown.css";
 import Modal from "../Modal/Modal";
 import {Link, useNavigate} from "react-router-dom";
 

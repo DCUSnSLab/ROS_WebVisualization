@@ -1,6 +1,6 @@
 // 차량 정보 확인 컴포넌트
 import React, {useState} from "react";
-import '../../css/Setting.css';
+import './Setting.css';
 import AddVehicle from './AddVehicle';
 
 const Vehicle = ({vehicleText, title}) => {

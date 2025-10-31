@@ -2,7 +2,7 @@
 //isOpen: 모달창이 열렸을 떄, onClose: 모달창이 닫혔을 떄, children:안에 들어갈 내용
 
 import React, { useEffect } from "react";
-import "../../css/Modal.css";
+import "./Modal.css";
 
 const Modal = ({ isOpen, onClose, children }) => {
     useEffect(() => {

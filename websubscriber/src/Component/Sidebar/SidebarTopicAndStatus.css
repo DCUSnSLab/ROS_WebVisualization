@@ -1,0 +1,32 @@
+/*사이드바 토픽 정보 및 차량 상태 정보 컴포넌트 css*/
+.sidebar-bg{
+    background: white;
+    border: 1px solid #D3D3D3;
+    padding: 5px;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.topic-name{
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.sidebar-btn{
+    font-size: 15px;
+    padding: 3px 5px 3px 5px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    margin-left: 2px;
+}
+
+.more-btn{
+    width: 100%;
+    border: none;
+    padding: 3px 5px 3px 5px;
+    background: #E9E9E9;
+    border-radius: 3px;
+}

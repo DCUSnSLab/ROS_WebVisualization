@@ -1,7 +1,7 @@
 // 대시보드 페이지
 
 import React from "react";
-import '../css/bashboard.css';
+import './bashboard.css';
 import DashboardTile from "../Component/Dashboard/DashboardTile";
 import {Link} from "react-router-dom";
 import DashboardChart from "../Component/Dashboard/DashboardChart";

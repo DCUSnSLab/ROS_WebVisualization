@@ -1,6 +1,6 @@
 // 메인페이지(개인)
 
-import MainLayout from "../Component/layouts/MainLayout";
+import MainLayout from "../Component/layout/MainLayout/MainLayout";
 import DropdownPg from '../Component/Dropdown/DropdownPg';
 import React, {useState} from "react";
 

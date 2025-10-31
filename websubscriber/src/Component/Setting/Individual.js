@@ -1,6 +1,6 @@
 // 개인정보 설정 컴포넌트
 import React, { useState } from 'react';
-import '../../css/Setting.css';
+import './Setting.css';
 
 function Individual() {
     const [edit, setEdit] = useState(false);

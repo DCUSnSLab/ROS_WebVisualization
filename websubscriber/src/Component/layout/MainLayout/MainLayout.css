@@ -1,21 +1,32 @@
-/*MainLayout*/
+/* ===== 전체 레이아웃 유지 부분 ===== */
 .layout{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
     padding-top: 40px;
 }
 
 .main{
-    height: calc(100vh - 40px - 80px);
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .main-grid{
     display: grid;
-    height: 100%;
-    grid-template-columns: 350px 1fr;
+    grid-template-columns: 250px 1fr;
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
 }
 
 .side-bar-topic{
     background-color: #1B1F3B;
-    overflow: hidden;
+    color: #fff;
+    border-right: 1px solid #2a2f55;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .content {
@@ -37,54 +48,90 @@
     padding-bottom: 6px;
 }
 
-/*MainHeader*/
+/* ===== 헤더 부분 수정 ===== */
 .header-bar{
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
+    height: 40px; /* 헤더 높이 명시해주면 깔끔 */
     background-color: #1B1F3B;
     color: white;
     font-size: 15px;
+    display: flex;
+    align-items: center;
+    z-index: 1000;
 }
 
 .header-contents{
+    /* 헤더 안 실제 컨텐츠 래퍼 */
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    margin: 0 100px 0 0 ;
+    justify-content: space-between; /* 왼쪽 덩어리 / 오른쪽 덩어리 */
+    padding: 0 16px;
+    box-sizing: border-box;
 }
 
-.font-title{
+/* 왼쪽 클러스터: SCMS + add-vehicle 한 줄 */
+.left-cluster {
+    display: flex;
+    align-items: center;
+    gap: 16px; /* 로고와 add-vehicle 사이 간격 */
+}
+
+.header-logo {
+    font-size: 25px;
+    line-height: 1;
+    margin: 0;
+    white-space: nowrap;
+    color: #fff;
+}
+
+/* 차량 추가 폼 */
+.add-vehicle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap; /* 한 줄 유지 */
+}
+
+.vehicle-input {
+    height: 28px;
+    padding: 0 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 13px;
+}
+
+.vehicle-add-btn {
+    background-color: #2e86de;
     color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.vehicle-add-btn:hover {
+    background-color: #1b5dbf;
 }
 
+/* 오른쪽 영역: 이름 드롭다운 + 알림 */
 .font-content{
     display: flex;
+    align-items: center;
     list-style: none;
-}
-
-.dropdown-wrap {
-    position: relative;
-    display: inline-block;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    min-width: 160px;
-    background: #1b1f3b;
+    gap: 12px;
     color: #fff;
-    border-radius: 8px;
-    padding: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-    z-index: 2000;
+    font-size: 14px;
 }
 
-/*MainFooter*/
+/* ===== 푸터 유지 ===== */
 .footer-bar {
-    height: 80px;
+    height: 60px;
     margin-top: auto;
     background-color: #1B1F3B;
 }

@@ -1,7 +1,7 @@
 // 그룹 페이지 드롭다운
 
 import React from "react";
-import '../../css/Dropdown.css';
+import './Dropdown.css';
 import {Link} from "react-router-dom";
 
 function DropdownPgGroup() {

@@ -1,6 +1,6 @@
 // 세팅 탭 레이아웃
 import React, { useState } from 'react';
-import '../../css/Setting.css'
+import './Setting.css'
 import {Link} from "react-router-dom";
 
 const SettingTab = ({ tab1Name, tab2Name, tab3Name, tab1, tab2, tab3, exit }) => {

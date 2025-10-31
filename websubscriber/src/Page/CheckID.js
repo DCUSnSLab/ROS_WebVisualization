@@ -1,7 +1,7 @@
 // 조회한 아이디 확인하는 페이지
 
 import React from "react";
-import '../css/Loginout.css';
+import './Loginout.css';
 import {useNavigate} from "react-router-dom";
 
 function CheckID(){

@@ -1,7 +1,7 @@
 // 비밀번호 재설정 페이지
 
 import React from "react";
-import '../css/Loginout.css';
+import './Loginout.css';
 import {useNavigate} from "react-router-dom";
 
 function RePassword(){

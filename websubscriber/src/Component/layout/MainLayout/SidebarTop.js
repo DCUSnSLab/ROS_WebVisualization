@@ -2,7 +2,8 @@
 // title: Topic, content: 안에 들어갈 관련 내용
 
 import React, { useState } from "react";
-import '../../../css/Sidebar.css';
+import './Sidebar.css';
+import SidebarTopic from '../../Sidebar/SidebarTopic';
 
 const AccordionItem = ({ title, content }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -11,6 +12,7 @@ const AccordionItem = ({ title, content }) => {
         <div className='siderbar'>
             <button
                 className='siderbar-btn'
+                style={{justifyContent: 'space-between'}}
                 onClick={() => setIsOpen(!isOpen)}
             >
                 {title}
@@ -29,9 +31,9 @@ const AccordionItem = ({ title, content }) => {
 export default function SidebarTop() {
     return (
         <div className='siderbar-scroll'>
-            <AccordionItem title="Bookmarks" content="북마크" />
-            <AccordionItem title="Using" content="사용 중 토픽" />
-            <AccordionItem title="All" content={"전체 토픽"} />
+            <AccordionItem title="Bookmarks" content={<SidebarTopic/>}/>
+            <AccordionItem title="Using" content={<SidebarTopic/>}/>
+            <AccordionItem title="All" content={<SidebarTopic/>}/>
         </div>
     );
 }

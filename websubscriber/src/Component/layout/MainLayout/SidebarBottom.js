@@ -2,9 +2,11 @@
 // title: Vehicle Status, content: 안에 들어갈 관련 내용
 
 import React, { useState } from "react";
-import '../../../css/Sidebar.css';
+import './Sidebar.css';
+import SidebarVehicle from "../../Sidebar/SidebarVehicle";
+import { FaMinus } from "react-icons/fa6";
 
-const AccordionItem = ({ title, content }) => {
+const AccordionItem = ({ title, content, onRemove}) => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
@@ -13,9 +15,18 @@ const AccordionItem = ({ title, content }) => {
                 className='siderbar-btn'
                 onClick={() => setIsOpen(!isOpen)}
             >
-                {title}
                 <span>{isOpen ? "▲" : "▼"}</span>
+                {title}
+
+                <FaMinus
+                    style={{ marginLeft: 'auto', display: 'block' }}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove();
+                    }}
+                />
             </button>
+
 
             {isOpen && (
                 <div className='siderbar-content'>
@@ -26,11 +37,17 @@ const AccordionItem = ({ title, content }) => {
     );
 };
 
-export default function SidebarBottom() {
+export default function SidebarBottom({vehicles, removeVehicle}) {
     return (
         <div className='siderbar-scroll'>
-            <AccordionItem title="차량 이름" content="차량 데이터" />
-
+            {vehicles.map((vehicles) => (
+                <AccordionItem
+                    key={vehicles.ip}
+                    title={vehicles.name}
+                    content={<SidebarVehicle vehicles={vehicles}/>}
+                    onRemove={() => removeVehicle(vehicles.ip)}/>
+            ))}
+            {/*<button>sdf</button>*/}
         </div>
     );
 }

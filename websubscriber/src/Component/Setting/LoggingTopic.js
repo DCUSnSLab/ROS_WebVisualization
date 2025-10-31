@@ -1,6 +1,6 @@
 // 로깅 토픽 데이터 확인 컴포넌트
 import React, { useState } from 'react';
-import '../../css/Setting.css';
+import './Setting.css';
 import AddTopicList from "./AddTopicList";
 
 function LoggingTopic() {

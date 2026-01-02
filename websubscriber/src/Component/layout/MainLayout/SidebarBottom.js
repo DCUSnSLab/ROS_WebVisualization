@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import './Sidebar.css';
 import SidebarVehicle from "../../Sidebar/SidebarVehicle";
 import { FaMinus } from "react-icons/fa6";
+import * as ROSLIB from "roslib";
 
 const AccordionItem = ({ title, content, onRemove}) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +48,6 @@ export default function SidebarBottom({vehicles, removeVehicle}) {
                     content={<SidebarVehicle vehicles={vehicles}/>}
                     onRemove={() => removeVehicle(vehicles.ip)}/>
             ))}
-            {/*<button>sdf</button>*/}
         </div>
     );
 }

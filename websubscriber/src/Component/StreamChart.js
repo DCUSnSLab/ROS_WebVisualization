@@ -8,12 +8,12 @@ import {useSelector} from "react-redux";
 
 Chart.register(StreamingPlugin);
 
-export default function Stream() {
+export default function Stream({topic, ip, width, height}) {
     const [PoseX, setPoseX] = useState([]);
     const [PoseY, setPoseY] = useState([]);
     const [PoseZ, setPoseZ] = useState([]);
 
-    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+    // const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
 
     useEffect(() => {
 
@@ -23,7 +23,7 @@ export default function Stream() {
 
         const listener = new ROSLIB.Topic({
           ros: ros,
-          name: '/zed2/zed_node/pose',
+          name: topic,
           messageType: 'geometry_msgs/PoseStamped'
         });
 
@@ -32,52 +32,60 @@ export default function Stream() {
             setPoseY((PoseY) => [...PoseY, {x: Date.now(), y: message.pose.position.y}]);
             setPoseZ((PoseZ) => [...PoseZ, {x: Date.now(), y: message.pose.position.z}]);
         });
-    }, []);
+
+        return () => {
+            listener.unsubscribe();
+            ros.close();
+        }
+    }, [topic, ip]);
 
   return (
-    <Line
-      data={{
-        datasets: [
-          {
-            label: "Dataset 1",
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
-            borderColor: "rgb(255, 99, 132)",
-            data: PoseX,
-          },
-          {
-            label: "Dataset 2",
-            backgroundColor: "rgba(54, 162, 235, 0.5)",
-            borderColor: "rgb(54, 162, 235)",
-            cubicInterpolationMode: "monotone",
-            data: PoseY,
-          },
-            {
-            label: "Dataset 3",
-            backgroundColor: "rgba(255, 255, 0, 0.5)",
-            borderColor: "rgb(190, 190, 0, 0.5)",
-            cubicInterpolationMode: "monotone",
-            data: PoseZ,
-          },
-        ],
-      }}
-      options={{
-        scales: {
-          x: {
-            type: "realtime",
-            realtime: {
-              delay: 5000,
-              onRefresh: (chart) => {
-                chart.data.datasets.forEach((dataset) => {
-                });
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <Line
+          data={{
+            datasets: [
+              {
+                label: "Dataset 1",
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                borderColor: "rgb(255, 99, 132)",
+                data: PoseX,
               },
+              {
+                label: "Dataset 2",
+                backgroundColor: "rgba(54, 162, 235, 0.5)",
+                borderColor: "rgb(54, 162, 235)",
+                cubicInterpolationMode: "monotone",
+                data: PoseY,
+              },
+                {
+                label: "Dataset 3",
+                backgroundColor: "rgba(255, 255, 0, 0.5)",
+                borderColor: "rgb(190, 190, 0, 0.5)",
+                cubicInterpolationMode: "monotone",
+                data: PoseZ,
+              },
+            ],
+          }}
+          options={{
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                type: "realtime",
+                realtime: {
+                  delay: 5000,
+                  onRefresh: (chart) => {
+                    chart.data.datasets.forEach((dataset) => {
+                    });
+                  },
+                },
+              },
+              y: {
+                min: -1000,
+                max: 1000
+              }
             },
-          },
-          y: {
-            min: -1000,
-            max: 1000
-          }
-        },
-      }}
-    />
+          }}
+        />
+    </div>
   );
 }

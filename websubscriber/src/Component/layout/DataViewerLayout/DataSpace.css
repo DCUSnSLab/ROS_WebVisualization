@@ -1,0 +1,89 @@
+/* DataSpace 레이아웃 */
+.dataspace-full {
+    width: 100%;
+    height: calc(100vh - 40px - 60px); /* 헤더(40) + 푸터(60) 제외 */
+}
+
+.dataspace-full > * {
+    width: 100%;
+    height: 100%;
+}
+
+.dataspace-split {
+    display: grid;
+    width: 100%;
+    height: calc(100vh - 40px - 60px);
+    padding-right: 6px;
+    box-sizing: border-box;
+}
+
+.dataspace-resizer {
+    cursor: col-resize;
+    background-color: #373b53;
+    opacity: 0.8;
+}
+
+.map-pane, .visuals-pane {
+    width: 100%;
+    height: 100%;
+    min-height: 0; /* 내부 스크롤 위해 */
+}
+
+.map-pane > * {
+    width: 100%;
+    height: 100%;
+}
+
+.visuals-pane {
+    display: grid;
+    grid-auto-rows: minmax(280px, 1fr);
+    grid-template-columns: 1fr; /* 1열 레이아웃 복원 */
+    gap: 12px;
+    overflow: auto;
+}
+
+/* 패널 카드 */
+.visual-card {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    min-height: 280px;
+    box-sizing: border-box; /* Keep this, it's good practice */
+}
+
+.visual-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: rgba(0,0,0,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.visual-title {
+    font-size: 13px;
+    color: #fff;
+    opacity: 0.9;
+}
+
+.visual-close {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 4px;
+    padding: 0 8px;
+    cursor: pointer;
+}
+
+.visual-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 6px;
+}
+
+.visual-body > * {
+    width: 100%;
+    height: 100%;
+}

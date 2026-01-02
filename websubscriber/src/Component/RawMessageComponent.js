@@ -1,52 +1,67 @@
 // Import the necessary modules and components
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { useSelector } from "react-redux";
 import * as ROSLIB from "roslib";
 import {useROS} from "../ROSContext";
 
-export default function RawMessageComponent({ topic }) {
+export default function RawMessageComponent({ topic, ip }) {
 
-    const receivedTopic = topic;
-    const [receivedType, setReceivedType] = useState();
-    const topicList = useSelector((state) => state.TopicList.topics.topic);
-    const typeList = useSelector((state) => state.TopicList.topics.type);
-    const [msg, setMsg] = useState();
-
-    const ip = useSelector((state) => state.ipServerReducer.VisualizeSystemAddress);
+    const [msg, setMsg] = useState(null);
+    const latestMsgRef = useRef(null);
 
 
     useEffect(() => {
+        if (!ip || !topic) {
+            return;
+        }
 
         const ros = new ROSLIB.Ros({
             url: ip
         });
 
-        setReceivedType(
-            topicList.findIndex((value) => value === receivedTopic)
-        );
+        let listener;
 
-        const listener = new ROSLIB.Topic({
-            ros: ros,
-            name: receivedTopic,
-            messageType: typeList[receivedType],
+        // Fetch the topic type, then create the subscriber
+        ros.getTopicType(topic, (messageType) => {
+            if (messageType) {
+                listener = new ROSLIB.Topic({
+                    ros: ros,
+                    name: topic,
+                    messageType: messageType,
+                });
+
+                listener.subscribe((message) => {
+                    // Store the latest message in a ref to avoid re-rendering on every message
+                    latestMsgRef.current = message;
+                });
+            } else {
+                console.error(`Could not determine message type for topic: ${topic}`);
+            }
         });
 
-        listener.subscribe((message) => {
-            setMsg(message);
-        });
+        // Update the displayed message every 2 seconds
+        const intervalId = setInterval(() => {
+            if (latestMsgRef.current) {
+                setMsg(latestMsgRef.current);
+            }
+        }, 200);
 
-      // Additional ROS topic definition (not sure if it's needed in your use case)
-        const exampleTopic = new ROSLIB.Topic({
-            ros: ros,
-            name: '/com/endpoint/example',
-            messageType: 'std_msgs/String',
-        });
-
-    }, []);
+        return () => {
+            if (listener) {
+                listener.unsubscribe();
+            }
+            clearInterval(intervalId);
+            ros.close();
+        };
+    }, [topic, ip]);
 
     return (
-        <div style={{ overflow: "scroll", height: "auto" }}>
-          {JSON.stringify(msg, null, '\n')}
+        <div style={{ height: "100%", overflowY: "auto" }}>
+            {msg ? (
+                <pre>{JSON.stringify(msg, null, 2)}</pre>
+            ) : (
+                <p>Waiting for messages...</p>
+            )}
         </div>
     );
 }

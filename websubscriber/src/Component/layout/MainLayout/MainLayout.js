@@ -92,34 +92,25 @@ const MainLayout = ({ name, dropdownContent, content }) => {
             <main className="main">
                 <div className="main-grid" style={{ gridTemplateColumns: `${sidebarWidth}px 6px 1fr` }}>
                     <aside className="side-bar-topic">
-                        <button className="side-btn" onClick={() => setIsOpen(!isOpen)}>
-                            <span>{isOpen ? "▲ " : "▼ "}</span>
-                            Topic
-                        </button>
-                        <div className="side-title" />
-                        {isOpen &&
-                            (content || (
-                                <SidebarTop
-                                    vehicles={vehicles}
-                                    vehiclesData={vehiclesData}
-                                    onTopicSelect={handleTopicSelect}
-                                    onPanelSelect={handlePanelSelect}
-                                    selectedTopic={selectedTopic}
-                                    selectedPanel={selectedPanel}
-                                    activePanelsByTopic={activePanelsByTopic}
-                                />
-                            ))}
-
-                        {/*<button className="side-btn" onClick={() => setIsOpenVehicle(!isOpenVehicle)}>*/}
-                        {/*    <span>{isOpenVehicle ? "▲ " : "▼ "}</span>*/}
-                        {/*    Vehicle Status*/}
-                        {/*</button>*/}
-                        {/*<div className="side-title" />*/}
-                        {/*{isOpenVehicle &&*/}
-                        {/*    (content || (*/}
-                        {/*        <SidebarBottom vehicles={vehicles} vehiclesData={vehiclesData} removeVehicle={removeVehicle} />*/}
-
-                        {/*    ))}*/}
+                        <div className="side-bar-topic-list">
+                            <button className="side-btn" onClick={() => setIsOpen(!isOpen)}>
+                                <span>{isOpen ? "▲ " : "▼ "}</span>
+                                Topic
+                            </button>
+                            <div className="side-title" />
+                            {isOpen &&
+                                (content || (
+                                    <SidebarTop
+                                        vehicles={vehicles}
+                                        vehiclesData={vehiclesData}
+                                        onTopicSelect={handleTopicSelect}
+                                        onPanelSelect={handlePanelSelect}
+                                        selectedTopic={selectedTopic}
+                                        selectedPanel={selectedPanel}
+                                        activePanelsByTopic={activePanelsByTopic}
+                                    />
+                                ))}
+                        </div>
                     </aside>
 
                     <div className="sidebar-resizer" onMouseDown={handleMouseDown} />

@@ -19,7 +19,7 @@ function AccordionItem({
 
     return (
 
-        <div style={{ marginBottom: 8 }}>
+        <div style={{ marginBottom: 3 }}>
 
             <button
 
@@ -83,7 +83,7 @@ export default function SidebarTopic({
 
                                          onPanelSelect,           // ({topic, panel})
 
-                                         activePanelsByTopic = {},// { [topic]: Set(['Image','Plot',...]) }
+                                         activePanelsByTopic = {},
 
                                      }) {
 

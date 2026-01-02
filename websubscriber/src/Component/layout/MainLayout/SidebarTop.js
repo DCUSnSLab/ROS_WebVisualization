@@ -19,26 +19,25 @@ const AccordionItem = ({ title, content }) => {
 export default function SidebarTop({
                                        vehicles,
                                        vehiclesData,
-                                       onTopicSelect,
                                        onPanelSelect,
-                                       selectedTopic,
-                                       selectedPanel,
+                                       activePanelsByTopic,
                                    }) {
     return (
         <div className="siderbar-scroll">
-            <AccordionItem
-                title={(vehicles && vehicles.length > 0 && vehicles[0]?.name) || "Vehicle"}
-                content={
-                    <SidebarTopic
-                        vehicles={vehicles}
-                        vehiclesData={vehiclesData}
-                        onTopicSelect={onTopicSelect}
-                        onPanelSelect={onPanelSelect}
-                        selectedTopic={selectedTopic}
-                        selectedPanel={selectedPanel}
-                    />
-                }
-            />
+            {vehicles.map((vehicle) => (
+                <AccordionItem
+                    key={vehicle.ip}
+                    title={vehicle.name || "Vehicle"}
+                    content={
+                        <SidebarTopic
+                            vehicles={[vehicle]}
+                            vehiclesData={vehiclesData}
+                            onPanelSelect={onPanelSelect}
+                            activePanelsByTopic={activePanelsByTopic}
+                        />
+                    }
+                />
+            ))}
         </div>
     );
 }

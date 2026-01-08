@@ -1,4 +1,3 @@
-// UseRosVehicles.js (JS 버전)
 import { useEffect, useState } from "react";
 import * as ROSLIB from "roslib";
 
@@ -6,72 +5,128 @@ export default function UseRosVehicles(vehicles) {
     const [vehiclesData, setVehiclesData] = useState({});
 
     useEffect(() => {
-        if (!vehicles || vehicles.length === 0) return;
+        if (!vehicles || vehicles.length === 0) {
+            setVehiclesData({});
+            return;
+        }
 
-        const rosConnections = {}; // ip -> { ros, gpsTopic? }
+        const rosConnections = {};
+        // ip -> { ros, metaTopic, gpsTopic }
 
         vehicles.forEach(({ ip, name }) => {
-            if (!ip) return;
-            if (rosConnections[ip]) return;
+            if (!ip || rosConnections[ip]) return;
 
             const ros = new ROSLIB.Ros({ url: ip });
-            rosConnections[ip] = { ros, gpsTopic: null };
 
+            rosConnections[ip] = {
+                ros,
+                metaTopic: null,
+                gpsTopic: null,
+            };
+
+            /* ===============================
+               ROS CONNECTION
+            =============================== */
             ros.on("connection", () => {
                 console.log(`✅ Connected: ${ip}`);
 
-                // ① 현재 토픽 목록 저장
-                ros.getTopics((topics) => {
-                    const allTopics = (topics?.topics || []);
-                    const uniqueSorted = Array.from(new Set(allTopics)).sort();
+                /* ===============================
+                   TOPICS + TYPES (MAIN META)
+                =============================== */
+                const metaTopic = new ROSLIB.Topic({
+                    ros,
+                    name: "/scms_meta/topics",
+                    messageType: "std_msgs/String",
+                });
 
+                rosConnections[ip].metaTopic = metaTopic;
+
+                metaTopic.subscribe((msg) => {
+                    let parsed;
+                    try {
+                        parsed = JSON.parse(msg.data);
+                    } catch (e) {
+                        console.error("Invalid metadata JSON", e);
+                        return;
+                    }
+
+                    const topicNames = parsed.topics || [];
+
+                    /* ===============================
+                       UPDATE TOPIC LIST (UI)
+                    =============================== */
                     setVehiclesData((prev) => ({
                         ...prev,
                         [ip]: {
                             ...(prev[ip] || { waypoints: [] }),
                             name,
-                            topics: uniqueSorted,
+                            topics: topicNames,
                         },
                     }));
-                });
 
-                // ② GPS (예: /ublox_gps_node/fix, /ublox_gps/fix, /ublox/fix)
-                const pickGps = (names) =>
-                    names.includes("/ublox_gps_node/fix")
-                        ? "/ublox_gps_node/fix"
-                        : names.includes("/ublox_gps/fix")
-                            ? "/ublox_gps/fix"
-                            : names.includes("/ublox/fix")
-                                ? "/ublox/fix"
-                                : null;
+                    /* ===============================
+                       GPS AUTO SUBSCRIBE (RETRY OK)
+                    =============================== */
+                    const pickGps = (names) =>
+                        names.includes("/ublox_gps_node/fix")
+                            ? "/ublox_gps_node/fix"
+                            : names.includes("/ublox_gps/fix")
+                                ? "/ublox_gps/fix"
+                                : names.includes("/ublox/fix")
+                                    ? "/ublox/fix"
+                                    : null;
 
-                ros.getTopics((t) => {
-                    const names = t?.topics || [];
-                    const gpsTopicName = pickGps(names);
+                    const gpsTopicName = pickGps(topicNames);
                     if (!gpsTopicName) return;
+
+                    // 이미 구독 중이면 스킵
+                    if (rosConnections[ip].gpsTopic) return;
 
                     const gpsTopic = new ROSLIB.Topic({
                         ros,
                         name: gpsTopicName,
                         messageType: "sensor_msgs/NavSatFix",
                     });
+
                     rosConnections[ip].gpsTopic = gpsTopic;
 
                     gpsTopic.subscribe((msg) => {
                         const { latitude, longitude } = msg || {};
-                        if (typeof latitude !== "number" || typeof longitude !== "number") return;
+                        if (
+                            typeof latitude !== "number" ||
+                            typeof longitude !== "number"
+                        )
+                            return;
 
                         setVehiclesData((prev) => {
-                            const prevWaypoints = prev[ip]?.waypoints || [];
-                            const nextWp = [...prevWaypoints, { lat: latitude, lng: longitude }];
+                            const current = prev[ip] || {};
+                            const prevWaypoints = current.waypoints || [];
+                            const last =
+                                prevWaypoints[prevWaypoints.length - 1];
+
+                            // 중복 좌표 제거
+                            if (
+                                last &&
+                                last.lat === latitude &&
+                                last.lng === longitude
+                            ) {
+                                return prev;
+                            }
+
                             return {
                                 ...prev,
                                 [ip]: {
-                                    ...(prev[ip] || {}),
+                                    ...current,
                                     name,
                                     lat: latitude,
                                     lng: longitude,
-                                    waypoints: nextWp,
+                                    waypoints: [
+                                        ...prevWaypoints,
+                                        {
+                                            lat: latitude,
+                                            lng: longitude,
+                                        },
+                                    ],
                                 },
                             };
                         });
@@ -79,17 +134,37 @@ export default function UseRosVehicles(vehicles) {
                 });
             });
 
-            ros.on("error", (e) => console.error("ROS error", ip, e));
-            ros.on("close", () => console.warn("ROS closed", ip));
+            ros.on("error", (e) => {
+                console.error("❌ ROS error", ip, e);
+            });
+
+            ros.on("close", () => {
+                console.warn("⚠️ ROS closed", ip);
+            });
         });
 
+        /* ===============================
+           CLEANUP
+        =============================== */
         return () => {
-            Object.entries(rosConnections).forEach(([ip, { ros, gpsTopic }]) => {
-                try { gpsTopic?.unsubscribe(); } catch {}
-                try { ros?.close(); } catch {}
-            });
+            Object.values(rosConnections).forEach(
+                ({ ros, metaTopic, gpsTopic }) => {
+                    try {
+                        gpsTopic && gpsTopic.unsubscribe();
+                        metaTopic && metaTopic.unsubscribe();
+                    } catch (e) {
+                        console.error("Unsubscribe error", e);
+                    }
+
+                    try {
+                        ros && ros.isConnected && ros.close();
+                    } catch (e) {
+                        console.error("ROS close error", e);
+                    }
+                }
+            );
         };
     }, [vehicles]);
 
-    return vehiclesData; // { [ip]: { name, topics: [...], lat, lng, waypoints: [...] } }
+    return vehiclesData;
 }

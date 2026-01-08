@@ -21,8 +21,9 @@ export function AddPostForm(){
 
     const topicsClient = new ROSLIB.Service({
         ros : ros,
-        name : '/rosapi/topics',
-        serviceType : 'rosapi/Topics'
+
+        name: '/_rosapi/topics_and_types',
+        serviceType: 'rosapi_msgs/srv/TopicsAndTypes'
     });
 
     useEffect(() => {

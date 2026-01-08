@@ -53,7 +53,7 @@ const MainHeader: React.FC<Props> = ({ name, dropdownContent, onAddVehicle}) => 
                     <div className="add-vehicle">
                         <input
                             type="text"
-                            placeholder="IP"
+                            placeholder="IP:Port"
                             className="vehicle-input"
                             value={userIP}
                             onChange={(e) => setUserIP(e.target.value)}

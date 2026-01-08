@@ -24,21 +24,27 @@ export default function AllTopicSub(){
 
         console.log("AllTopicSub")
 
-        ros.getTopics(function(result) {
-            let topics = result.topics
-            let types = result.types
+        const topicsClient = new ROSLIB.Service({
+            ros : ros,
+            name: '/_rosapi/topics_and_types',
+            serviceType: 'rosapi_msgs/srv/TopicsAndTypes'
+        });
 
-            const updatedTopicList = topics.map((topic, index) => ({
-                topic: topics[index],
-                type: types[index]
-            }))
-            dispatch(updatedTopic(updatedTopicList))
-            console.log(updatedTopicList)
-        })
+        const request = new ROSLIB.ServiceRequest();
+
+        topicsClient.callService(request, function(result) {
+            const updatedTopicList = result.topics.map((topic, index) => ({
+                topic: topic,
+                type: result.types[index]
+            }));
+            dispatch(updatedTopic(updatedTopicList));
+            console.log(updatedTopicList);
+        });
+
         return () => {
             ros.close();
         };
-    },[]);
+    },[ip, dispatch]);
 
 
     const handleCheck = (event) => {

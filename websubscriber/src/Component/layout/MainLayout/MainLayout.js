@@ -21,7 +21,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     // 차량 추가/삭제 (기존대로)
     const addVehicle = (rawIP, vehicleName) => {
         if (!rawIP || !vehicleName) return;
-        const vehicleIP = `ws://${rawIP}:9090`;
+        const vehicleIP = `ws://${rawIP}`;
         setVehicles((prev) => (prev.some((v) => v.ip === vehicleIP) ? prev : [...prev, { ip: vehicleIP, name: vehicleName }]));
     };
     const removeVehicle = (ip) => setVehicles((prev) => prev.filter((v) => v.ip !== ip));

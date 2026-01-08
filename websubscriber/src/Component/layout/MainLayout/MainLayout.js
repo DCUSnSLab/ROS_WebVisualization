@@ -50,20 +50,22 @@ const MainLayout = ({ name, dropdownContent, content }) => {
 
     const handlePanelSelect = ({ topic, panel, ip }) => {
         setVisuals((prev) => {
-            const isAlreadyOn = prev.some(
-                (x) => x.topic === topic && x.panel === panel
-            );
+            // Use a unique ID that includes the vehicle IP
+            const vizId = `${ip}-${topic}-${panel}`;
+
+            const isAlreadyOn = prev.some((x) => x.id === vizId);
 
             if (isAlreadyOn) {
-                return prev.filter((x) => !(x.topic === topic && x.panel === panel));
+                // Remove by the unique ID
+                return prev.filter((x) => x.id !== vizId);
             }
 
             if (!panel) {
                 return prev;
             }
 
-            const id = `${topic}__${panel}`;
-            return [...prev, { id, topic, panel, ip }];
+            // Add the new visualization with the unique ID
+            return [...prev, { id: vizId, topic, panel, ip }];
         });
     };
 

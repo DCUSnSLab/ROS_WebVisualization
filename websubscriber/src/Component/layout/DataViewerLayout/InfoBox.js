@@ -1,94 +1,191 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import * as ROSLIB from 'roslib';
+import { hideInfoBox } from '../../../features/infobox/infoBoxSlice';
+
+function voltageToPercent(v) {
+    if (v >= 24.0) return '-';
+    return 0;
+}
 
 const InfoBox = () => {
-    const { visible, position, vehicle } = useSelector((state) => state.infoBox);
-    const topicsByVehicle = useSelector((state) => state.TopicList?.topicsByVehicle);
-    const [rpm, setRpm] = useState(null);
+    const dispatch = useDispatch();
+    const { visible, position, vehicle } = useSelector(
+        (state) => state.infoBox
+    );
+
+    const [dragging, setDragging] = useState(false);
+    const [offset, setOffset] = useState({ x: 0, y: 0 });
+    const [localPos, setLocalPos] = useState({
+        x: position.x,
+        y: position.y,
+    });
+
+    const [speedMs, setSpeedMs] = useState('N/A');
+    const [speedKmh, setSpeedKmh] = useState('N/A');
+    const [batteryV, setBatteryV] = useState('N/A');
+    const [batteryPct, setBatteryPct] = useState('N/A');
+    const [controlMode, setControlMode] = useState('N/A');
+    const [temperature, setTemperature] = useState('N/A');
 
     useEffect(() => {
-        if (!visible || !vehicle) {
-            return;
-        }
+        setLocalPos({
+            x: position.x,
+            y: position.y,
+        });
+    }, [position.x, position.y]);
 
-        setRpm('Loading...');
-
-        if (!topicsByVehicle) {
-            setRpm('None');
-            return;
-        }
-
-        const vehicleTopics = topicsByVehicle[vehicle.ip];
-        const hasHunterStatus = vehicleTopics?.topic.includes('/hunter_status');
-
-        if (!hasHunterStatus) {
-            setRpm('None');
-            return;
-        }
+    useEffect(() => {
+        if (!visible || !vehicle?.ip) return;
 
         const ros = new ROSLIB.Ros({
-            url: `ws://${vehicle.ip}:9090`,
+            url: vehicle.ip,
         });
 
-        ros.on('connection', () => {
-            console.log('Connected to ROS for RPM.');
-        });
-
-        ros.on('error', (error) => {
-            console.log('Error connecting to ROS for RPM:', error);
-            setRpm('Error');
-        });
-
-        ros.on('close', () => {
-            console.log('Connection to ROS for RPM closed.');
-        });
-
-        const rpmListener = new ROSLIB.Topic({
-            ros: ros,
+        const hunterStatusListener = new ROSLIB.Topic({
+            ros,
             name: '/hunter_status',
-            messageType: 'std_msgs/String', // Assumption: change if incorrect
+            messageType: 'hunter_msgs/HunterStatus',
         });
 
-        rpmListener.subscribe((message) => {
-            // Assuming the message is a string that can be parsed to a number.
-            // If the message is a different type, this needs to be changed.
-            setRpm(message.data);
+        hunterStatusListener.subscribe((message) => {
+            if (typeof message.linear_velocity === 'number') {
+                const v = message.linear_velocity;
+                setSpeedMs(v.toFixed(2));
+                setSpeedKmh((v * 3.6).toFixed(1));
+            }
+
+            if (typeof message.battery_voltage === 'number') {
+                const v = message.battery_voltage;
+                setBatteryV(v.toFixed(1));
+                setBatteryPct(voltageToPercent(v));
+            }
+
+            const controlMap = {
+                0: 'Manual',
+                1: 'ROS',
+                2: 'Auto',
+                3: 'Remote',
+            };
+            setControlMode(controlMap[message.control_mode] ?? 'Unknown');
+
+            const states = message.actuator_states;
+            if (states && states.length > 0) {
+                const maxMotorTemp = Math.max(
+                    ...states.map((s) => s.motor_temperature ?? 0)
+                );
+                const maxDriverTemp = Math.max(
+                    ...states.map((s) => s.driver_temperature ?? 0)
+                );
+                setTemperature(`${maxMotorTemp}°C / ${maxDriverTemp}°C`);
+            }
         });
 
         return () => {
-            rpmListener.unsubscribe();
+            hunterStatusListener.unsubscribe();
             ros.close();
         };
-    }, [visible, vehicle, topicsByVehicle]);
+    }, [visible, vehicle]);
 
-    if (!visible) {
-        return null;
-    }
+    const onMouseDown = (e) => {
+        e.stopPropagation();
+        setDragging(true);
+        setOffset({
+            x: e.clientX - localPos.x,
+            y: e.clientY - localPos.y,
+        });
+    };
+
+    const onMouseMove = (e) => {
+        if (!dragging) return;
+        setLocalPos({
+            x: e.clientX - offset.x,
+            y: e.clientY - offset.y,
+        });
+    };
+
+    const onMouseUp = () => {
+        setDragging(false);
+    };
+
+    useEffect(() => {
+        if (dragging) {
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+        return () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+    }, [dragging, offset]);
+
+    if (!visible) return null;
 
     return (
         <div
             id="info-box"
             style={{
                 position: 'absolute',
-                top: position.y,
-                left: position.x,
-                width: '200px',
-                height: '180px',
+                top: localPos.y,
+                left: localPos.x,
+                width: '270px',
                 backgroundColor: 'white',
                 border: '1px solid black',
+                borderRadius: '6px',
                 zIndex: 1000,
-                padding: '10px',
+                padding: '12px',
+                cursor: dragging ? 'grabbing' : 'default',
             }}
+            onClick={(e) => e.stopPropagation()}
         >
-            {vehicle && (
-                <div>
-                    <h3>{vehicle.name}</h3>
-                    <p>Lat: {vehicle.lat}</p>
-                    <p>Lng: {vehicle.lng}</p>
-                    <p>RPM: {rpm}</p>
-                </div>
-            )}
+            <button
+                onClick={(e) => {
+                    e.stopPropagation();
+                    dispatch(hideInfoBox());
+                }}
+                style={{
+                    position: 'absolute',
+                    top: '6px',
+                    right: '8px',
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '16px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                }}
+            >
+                ✕
+            </button>
+
+            <div
+                style={{
+                    cursor: 'grab',
+                    fontWeight: 'bold',
+                    marginBottom: '6px',
+                    userSelect: 'none',
+                }}
+                onMouseDown={onMouseDown}
+            >
+                {vehicle?.name}
+            </div>
+
+            <hr />
+
+            <p>
+                <strong>Speed:</strong> {speedMs} m/s ({speedKmh} km/h)
+            </p>
+
+            <p>
+                <strong>Battery:</strong> {batteryV} V ({batteryPct}%)
+            </p>
+
+            <p>
+                <strong>Control:</strong> {controlMode}
+            </p>
+
+            <p>
+                <strong>Temperature:</strong> {temperature}
+            </p>
         </div>
     );
 };

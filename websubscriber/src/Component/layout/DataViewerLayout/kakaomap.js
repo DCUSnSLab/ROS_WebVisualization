@@ -1,10 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { Map, MapMarker, Polyline } from "react-kakao-maps-sdk";
 import { useDispatch } from 'react-redux';
-import { showInfoBox } from "../../../features/infobox/infoBoxSlice";
+import { showInfoBox, hideInfoBox } from "../../../features/infobox/infoBoxSlice";
 
 const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
     const mapRef = useRef(null);
+    const markerClickedRef = useRef(false);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -16,7 +17,9 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
         }
     }, [leftPanelWidth]);
 
-    const handleMarkerClick = (marker, vehicle) => {
+    const handleMarkerClick = (marker, vehicle, ip) => {
+        markerClickedRef.current = true;
+
         const map = mapRef.current;
         if (!map) return;
 
@@ -26,14 +29,12 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
         dispatch(showInfoBox({
             x: point.x,
             y: point.y,
-            vehicle: vehicle,
+            vehicle: { ...vehicle, ip },
         }));
     };
 
     return (
-        <div
-            style={{ width: "100%", height: "100%" }}
-        >
+        <div style={{ width: "100%", height: "100%" }}>
             <Map
                 center={{ lat: 35.9138, lng: 128.8036 }}
                 level={5}
@@ -47,7 +48,9 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
                         <MapMarker
                             position={{ lat: data.lat, lng: data.lng }}
                             title={`Vehicle: ${data.name}`}
-                            onClick={(marker) => handleMarkerClick(marker, data)}
+                            onClick={(marker) =>
+                                handleMarkerClick(marker, data, ip)
+                            }
                         />
                         {data.waypoints?.length > 1 && (
                             <Polyline
@@ -65,4 +68,3 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
 };
 
 export default Kakaomap;
-

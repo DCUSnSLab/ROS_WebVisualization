@@ -1,9 +1,12 @@
 // UseRosVehicles.js (JS 버전)
 import { useEffect, useState } from "react";
 import * as ROSLIB from "roslib";
+import { useDispatch } from "react-redux";
+import { updateTopicsForVehicle } from "../../../features/PublishedTopics/PublishedTopicSlice";
 
 export default function UseRosVehicles(vehicles) {
     const [vehiclesData, setVehiclesData] = useState({});
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!vehicles || vehicles.length === 0) return;
@@ -24,6 +27,8 @@ export default function UseRosVehicles(vehicles) {
                 ros.getTopics((topics) => {
                     const allTopics = (topics?.topics || []);
                     const uniqueSorted = Array.from(new Set(allTopics)).sort();
+
+                    dispatch(updateTopicsForVehicle({ vehicleId: ip, topics: { topic: topics.topics, type: topics.types } }));
 
                     setVehiclesData((prev) => ({
                         ...prev,
@@ -89,7 +94,7 @@ export default function UseRosVehicles(vehicles) {
                 try { ros?.close(); } catch {}
             });
         };
-    }, [vehicles]);
+    }, [vehicles, dispatch]);
 
     return vehiclesData; // { [ip]: { name, topics: [...], lat, lng, waypoints: [...] } }
 }

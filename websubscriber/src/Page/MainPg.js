@@ -15,7 +15,7 @@ function MainPg() {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (infoBoxVisible && !document.getElementById('info-box')?.contains(event.target)) {
-                dispatch(hideInfoBox());
+                // dispatch(hideInfoBox());
             }
         };
 

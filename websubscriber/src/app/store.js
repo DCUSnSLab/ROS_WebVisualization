@@ -3,12 +3,14 @@ import {publishedTopicSlice} from "../features/PublishedTopics/PublishedTopicSli
 import {PanelSlice} from "../features/Panel/PanelSlice";
 import {IpServer} from "../features/IPserver/IpServer";
 import {markerClickReducer} from "../features/MarkerClickReducer/showComponentMapMarker";
+import { infoBoxSlice } from '../features/infobox/infoBoxSlice';
 
 export const store = configureStore({
   reducer: {
     TopicList: publishedTopicSlice.reducer,
     PanelList: PanelSlice.reducer,
     ipServerReducer: IpServer.reducer,
-    markerDisplayState: markerClickReducer.reducer
+    markerDisplayState: markerClickReducer.reducer,
+    infoBox: infoBoxSlice.reducer,
   }
 })

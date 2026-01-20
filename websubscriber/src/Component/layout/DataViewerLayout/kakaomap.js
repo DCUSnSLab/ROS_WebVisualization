@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { Map, MapMarker, Polyline } from "react-kakao-maps-sdk";
+import { useDispatch } from 'react-redux';
+import { showInfoBox } from "../../../features/infobox/infoBoxSlice";
 
 const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
     const mapRef = useRef(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const map = mapRef.current;
@@ -12,6 +15,20 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
             map.setCenter(center);
         }
     }, [leftPanelWidth]);
+
+    const handleMarkerClick = (marker, vehicle) => {
+        const map = mapRef.current;
+        if (!map) return;
+
+        const projection = map.getProjection();
+        const point = projection.pointFromCoords(marker.getPosition());
+
+        dispatch(showInfoBox({
+            x: point.x,
+            y: point.y,
+            vehicle: vehicle,
+        }));
+    };
 
     return (
         <div
@@ -30,6 +47,7 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
                         <MapMarker
                             position={{ lat: data.lat, lng: data.lng }}
                             title={`Vehicle: ${data.name}`}
+                            onClick={(marker) => handleMarkerClick(marker, data)}
                         />
                         {data.waypoints?.length > 1 && (
                             <Polyline
@@ -47,3 +65,4 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
 };
 
 export default Kakaomap;
+

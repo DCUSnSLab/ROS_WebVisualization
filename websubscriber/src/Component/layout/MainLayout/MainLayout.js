@@ -4,7 +4,6 @@ import "./MainLayout.css";
 import Header from "./MainHeader";
 import Footer from "./MainFooter";
 import SidebarTop from "./SidebarTop";
-import SidebarBottom from "./SidebarBottom";
 import DataSpace from "../DataViewerLayout/DataSpace";
 import UseRosVehicles from "./UseRosVehicles";
 

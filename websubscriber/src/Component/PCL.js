@@ -8,7 +8,6 @@ export default function PCL({ topic, ip }) {
     const cloudClientRef = useRef(null);
     const unmountedRef = useRef(false);
 
-    // 🔒 div id는 컴포넌트 생명주기 동안 고정
     const elemIdRef = useRef(
         `pcl-viewer-${topic.replace(/\//g, "-")}-${Math.random()
             .toString(36)
@@ -22,9 +21,6 @@ export default function PCL({ topic, ip }) {
 
         const { clientWidth, clientHeight } = viewerRef.current;
 
-        // =========================
-        // ROS Connection
-        // =========================
         const ros = new ROSLIB.Ros({ url: ip });
         rosRef.current = ros;
 
@@ -40,33 +36,24 @@ export default function PCL({ topic, ip }) {
             console.log("[PCL] ROS closed");
         });
 
-        // =========================
-        // ROS3D Viewer
-        // =========================
         const viewer = new Viewer({
             divID: elemIdRef.current,
             width: clientWidth,
             height: clientHeight,
-            antialias: true,
+            antialias: false,
             background: "#111111",
         });
 
         viewer.addObject(new Grid());
 
-        // =========================
-        // TF Client
-        // =========================
         const tfClient = new ROSLIB.TFClient({
             ros,
             angularThres: 0.1,
             transThres: 0.1,
-            rate: 10.0,
+            rate: 1.0,
             fixedFrame: "/velodyne",
         });
 
-        // =========================
-        // TF Availability Check
-        // =========================
         let tfAvailable = false;
 
         const tfChecker = new ROSLIB.Topic({
@@ -88,9 +75,6 @@ export default function PCL({ topic, ip }) {
             }
         });
 
-        // =========================
-        // Fake TF (fallback)
-        // =========================
         const fakeTFClient = {
             subscribe: (_, cb) => {
                 cb({
@@ -101,9 +85,6 @@ export default function PCL({ topic, ip }) {
             unsubscribe: () => {},
         };
 
-        // =========================
-        // PointCloud2 (지연 생성)
-        // =========================
         const timeoutId = setTimeout(() => {
             if (unmountedRef.current) return;
 
@@ -112,8 +93,8 @@ export default function PCL({ topic, ip }) {
                 rootObject: viewer.scene,
                 tfClient: tfAvailable ? tfClient : fakeTFClient,
                 topic,
-                material: { color: 0xff00ff, size: 0.05 },
-                max_pts: 50000,
+                material: { color: 0xff00ff, size: 0.02 },
+                max_pts: 10000,
             });
 
             if (!tfAvailable) {
@@ -121,9 +102,6 @@ export default function PCL({ topic, ip }) {
             }
         }, 2000);
 
-        // =========================
-        // Resize Handling
-        // =========================
         const resizeObserver = new ResizeObserver((entries) => {
             for (const entry of entries) {
                 const { width, height } = entry.contentRect;
@@ -133,9 +111,6 @@ export default function PCL({ topic, ip }) {
 
         resizeObserver.observe(viewerRef.current);
 
-        // =========================
-        // Cleanup (🔥 핵심)
-        // =========================
         return () => {
             unmountedRef.current = true;
             clearTimeout(timeoutId);

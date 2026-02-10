@@ -40,15 +40,10 @@ export default function UseRosVehicles(vehicles) {
                     }));
                 });
 
-                // ② GPS (예: /ublox_gps_node/fix, /ublox_gps/fix, /ublox/fix)
                 const pickGps = (names) =>
-                    names.includes("/ublox_gps_node/fix")
-                        ? "/ublox_gps_node/fix"
-                        : names.includes("/ublox_gps/fix")
-                            ? "/ublox_gps/fix"
-                            : names.includes("/ublox/fix")
-                                ? "/ublox/fix"
-                                : null;
+                    names.includes("/gps_sampled")
+                        ? "/gps_sampled" //샘플링을 거친 gps 토픽명
+                        : null;
 
                 ros.getTopics((t) => {
                     const names = t?.topics || [];

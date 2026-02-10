@@ -1,3 +1,5 @@
+//추후 CPU, GPU, RAM 데이터 출력 추가 필요
+
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import * as ROSLIB from 'roslib';
@@ -44,7 +46,8 @@ const InfoBox = () => {
 
         const hunterStatusListener = new ROSLIB.Topic({
             ros,
-            name: '/hunter_status',
+            // name: '/hunter_status',
+            name: 'vehicle_status_sampled',
             messageType: 'hunter_msgs/HunterStatus',
         });
 

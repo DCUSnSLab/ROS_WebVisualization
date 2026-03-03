@@ -43,25 +43,30 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
                     mapRef.current = map;
                 }}
             >
-                {Object.entries(vehiclesData || {}).map(([ip, data]) => (
-                    <React.Fragment key={ip}>
-                        <MapMarker
-                            position={{ lat: data.lat, lng: data.lng }}
-                            title={`Vehicle: ${data.name}`}
-                            onClick={(marker) =>
-                                handleMarkerClick(marker, data, ip)
-                            }
-                        />
-                        {data.waypoints?.length > 1 && (
-                            <Polyline
-                                path={data.waypoints}
-                                strokeWeight={3}
-                                strokeColor="#FF0000"
-                                strokeOpacity={0.8}
+                {Object.entries(vehiclesData || {}).map(([ip, data]) => {
+                    const lat = data.lat === 0 ? 35.9145 : data.lat ?? 35.9145;
+                    const lng = data.lng === 0 ? 128.8044 : data.lng ?? 128.8044;
+
+                    return (
+                        <React.Fragment key={ip}>
+                            <MapMarker
+                                position={{ lat, lng }}
+                                title={`Vehicle: ${data.name}`}
+                                onClick={(marker) =>
+                                    handleMarkerClick(marker, data, ip)
+                                }
                             />
-                        )}
-                    </React.Fragment>
-                ))}
+                            {data.waypoints?.length > 1 && (
+                                <Polyline
+                                    path={data.waypoints}
+                                    strokeWeight={3}
+                                    strokeColor="#FF0000"
+                                    strokeOpacity={0.8}
+                                />
+                            )}
+                        </React.Fragment>
+                    );
+                })}
             </Map>
         </div>
     );

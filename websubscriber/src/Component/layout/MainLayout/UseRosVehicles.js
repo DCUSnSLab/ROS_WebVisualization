@@ -1,4 +1,3 @@
-// UseRosVehicles.js (JS 버전)
 import { useEffect, useState } from "react";
 import * as ROSLIB from "roslib";
 import { useDispatch } from "react-redux";
@@ -41,9 +40,20 @@ export default function UseRosVehicles(vehicles) {
                 });
 
                 const pickGps = (names) =>
-                    names.includes("/gps_sampled")
-                        ? "/gps_sampled" //샘플링을 거친 gps 토픽명
-                        : null;
+                    // names.includes("/gps_sampled")
+                    //     ? "/gps_sampled" //샘플링을 거친 gps 토픽명
+                    //     : null;
+
+                    //기존 gps 연결 방식
+                    names.includes("/ublox_gps_node/fix")
+                        ? "/ublox_gps_node/fix"
+                        : names.includes("/ublox_gps/fix")
+                            ? "/ublox_gps/fix"
+                            : names.includes("/ublox/fix")
+                                ? "/ublox/fix"
+                                : null;
+
+
 
                 ros.getTopics((t) => {
                     const names = t?.topics || [];

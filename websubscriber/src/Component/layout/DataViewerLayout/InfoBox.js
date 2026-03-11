@@ -55,8 +55,8 @@ const InfoBox = () => {
 
         const hunterStatusListener = new ROSLIB.Topic({
             ros,
-            name: '/hunter_status', //기존 토픽
-            // name: 'vehicle_status_sampled', //샘플링한 토픽
+            // name: '/hunter_status', //기존 토픽
+            name: 'vehicle_status_sampled', //샘플링한 토픽
             messageType: 'hunter_msgs/HunterStatus',
         });
 

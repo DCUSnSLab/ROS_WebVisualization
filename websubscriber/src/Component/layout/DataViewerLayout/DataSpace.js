@@ -1,16 +1,3 @@
-// import React from "react";
-// import Kakaomap from "./kakaomap";
-//
-// function DataSpace({ vehicles, vehiclesData }) {
-//     return (
-//         <div style={{ width: "100%", height: "100%" }}>
-//             <Kakaomap vehicles={vehicles} vehiclesData={vehiclesData} />
-//         </div>
-//     );
-// }
-//
-// export default DataSpace;
-
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Kakaomap from "./kakaomap";
 import ImageLR from "../../../Component/ImageLR";
@@ -20,7 +7,6 @@ import RawMessageComponent from "../../../Component/RawMessageComponent";
 import "./DataSpace.css"
 
 function VisualRenderer({ panel, topic, ip, onClose }) {
-    // 각 컴포넌트가 부모 크기에 맞게 100% 쓰도록 감싸줌
     return (
         <div className="visual-card">
             <div className="visual-card-header">
@@ -110,3 +96,6 @@ export default function DataSpace({ vehicles, vehiclesData, visuals = [], onClos
         </div>
     );
 }
+
+
+

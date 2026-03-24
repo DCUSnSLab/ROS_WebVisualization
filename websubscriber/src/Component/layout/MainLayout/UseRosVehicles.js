@@ -1,173 +1,106 @@
 import { useEffect, useState, useRef } from "react";
-import * as ROSLIB from "roslib";
-import { useDispatch } from "react-redux";
-import { updateTopicsForVehicle } from "../../../features/PublishedTopics/PublishedTopicSlice";
 
-export default function UseRosVehicles(vehicles) {
+export default function UseRosVehicles() {
     const [vehiclesData, setVehiclesData] = useState({});
-    const dispatch = useDispatch();
-
-    const rosConnections = useRef({});
+    const [vehicleList, setVehicleList] = useState([]);
+    const wsRef = useRef(null);
+    const subscribedRef = useRef(new Set());
 
     useEffect(() => {
-        if (!vehicles || vehicles.length === 0) return;
+        if (wsRef.current) return;
 
-        vehicles.forEach(({ ip, name }) => {
-            if (!ip) return;
-            if (rosConnections.current[ip]) return;
+        const ws = new WebSocket("ws://203.250.34.164:8080");
+        wsRef.current = ws;
 
-            const ros = new ROSLIB.Ros({ url: ip });
+        ws.onopen = () => {
+            console.log("✅ WS Connected");
 
-            rosConnections.current[ip] = {
-                ros,
-                gpsTopic: null,
-                knownTopics: [],
-                interval: null,
-            };
+            ws.send(JSON.stringify({
+                type: "register",
+                role: "user",
+                user_id: "user_" + Date.now()
+            }));
 
-            ros.on("connection", () => {
-                console.log(`✅ Connected: ${ip}`);
-
-                const refreshTopics = () => {
-                    ros.getTopics((topics) => {
-                        const names = topics?.topics || [];
-                        const types = topics?.types || [];
-                        const conn = rosConnections.current[ip];
-
-                        const prevTopics = conn.knownTopics || [];
-
-                        // 새 토픽
-                        const added = names.filter((t) => !prevTopics.includes(t));
-
-                        // 사라진 토픽
-                        const removed = prevTopics.filter((t) => !names.includes(t));
-
-                        if (added.length > 0) {
-                            console.log("📌 Added topics:", added);
-                        }
-
-                        if (removed.length > 0) {
-                            console.log("❌ Removed topics:", removed);
-                        }
-
-                        conn.knownTopics = names;
-
-                        // Redux 업데이트
-                        dispatch(
-                            updateTopicsForVehicle({
-                                vehicleId: ip,
-                                topics: { topic: names, type: types },
-                            })
-                        );
-
-                        // React state 업데이트
-                        setVehiclesData((prev) => ({
-                            ...prev,
-                            [ip]: {
-                                ...(prev[ip] || { waypoints: [] }),
-                                name,
-                                topics: names,
-                            },
-                        }));
-
-                        // GPS topic 확인
-                        // const gpsTopicName = names.includes("/gps_sampled")
-                        //     ? "/gps_sampled"
-                        //     : null;
-
-                        //기존 gps 연결 방식
-                        const gpsTopicName = names.includes("/ublox_gps_node/fix")
-                            ? "/ublox_gps_node/fix"
-                            : names.includes("/ublox_gps/fix")
-                                ? "/ublox_gps/fix"
-                                : names.includes("/ublox/fix")
-                                    ? "/ublox/fix"
-                                    : null;
-
-                        if (gpsTopicName && !conn.gpsTopic) {
-                            const gpsTopic = new ROSLIB.Topic({
-                                ros,
-                                name: gpsTopicName,
-                                messageType: "sensor_msgs/NavSatFix",
-                            });
-
-                            conn.gpsTopic = gpsTopic;
-
-                            gpsTopic.subscribe((msg) => {
-                                const { latitude, longitude } = msg || {};
-
-                                if (
-                                    typeof latitude !== "number" ||
-                                    typeof longitude !== "number"
-                                )
-                                    return;
-
-                                setVehiclesData((prev) => {
-                                    const prevWaypoints =
-                                        prev[ip]?.waypoints || [];
-
-                                    const nextWp = [
-                                        ...prevWaypoints,
-                                        { lat: latitude, lng: longitude },
-                                    ];
-
-                                    return {
-                                        ...prev,
-                                        [ip]: {
-                                            ...(prev[ip] || {}),
-                                            name,
-                                            lat: latitude,
-                                            lng: longitude,
-                                            waypoints: nextWp,
-                                        },
-                                    };
-                                });
-                            });
-
-                            console.log("📡 GPS subscribed:", gpsTopicName);
-                        }
-                    });
-                };
-
-                // 최초 실행
-                refreshTopics();
-
-                // 30초마다 토픽 갱신
-                rosConnections.current[ip].interval = setInterval(
-                    refreshTopics,
-                    30000
-                );
-            });
-
-            ros.on("error", (e) => {
-                console.error("ROS error", ip, e);
-            });
-
-            ros.on("close", () => {
-                console.warn("ROS closed", ip);
-            });
-        });
-
-        return () => {
-            Object.entries(rosConnections.current).forEach(
-                ([ip, { ros, gpsTopic, interval }]) => {
-                    try {
-                        gpsTopic?.unsubscribe();
-                    } catch {}
-
-                    try {
-                        ros?.close();
-                    } catch {}
-
-                    try {
-                        clearInterval(interval);
-                    } catch {}
-                }
-            );
-
-            rosConnections.current = {};
+            ws.send(JSON.stringify({
+                type: "vehicle_list"
+            }));
         };
-    }, [vehicles, dispatch]);
 
-    return vehiclesData;
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+
+            console.log("📡 sensor:", msg.topic);
+
+            // test (수정 필요)
+            if (msg.type === "vehicle_list") {
+                setVehicleList(msg.vehicles);
+            }
+
+            // server가 topic_list를 보내줬을 때 실행. 즉, 응답 처리 (server -> user)
+            if (msg.type === "topic_list") {
+                const vid = msg.vehicle_id;
+
+                setVehiclesData((prev) => ({
+                    ...prev,
+                    [vid]: {
+                        ...(prev[vid] || {}),
+                        topics: msg.topics
+                    }
+                }));
+            }
+
+            if (msg.type === "sensor_data") {
+                const { lat, lon } = msg.data;
+                const vid = msg.vehicle_id;
+
+                setVehiclesData((prev) => {
+                    const prevWp = prev[vid]?.waypoints || [];
+
+                    return {
+                        ...prev,
+                        [vid]: {
+                            ...(prev[vid] || {}),
+                            lat,
+                            lng: lon,
+                            waypoints: [...prevWp, { lat, lng: lon }],
+                        },
+                    };
+                });
+            }
+        };
+
+        ws.onerror = (e) => {
+            console.error("WS error:", e);
+        };
+
+        ws.onclose = () => {
+            console.warn("WS closed");
+        };
+
+    }, []);
+
+    const connectVehicle = (vehicleId, topic, topicType) => {
+        if (subscribedRef.current.has(topic)) {
+            console.warn("이미 구독중:", topic);
+            return;
+        }
+
+        wsRef.current.send(JSON.stringify({
+            type: "subscribe",
+            vehicle_id: vehicleId,
+            topic: topic,
+            msg_type: topicType
+        }));
+
+        console.log("🚗 SUBSCRIBE:", vehicleId, topic, topicType);
+
+        wsRef.current.send(JSON.stringify({
+            type: "get_topic_list",
+            vehicle_id: vehicleId
+        }));
+
+        console.log("🚗 CONNECT:", vehicleId);
+    };
+
+    return { vehiclesData, vehicleList, connectVehicle };
 }

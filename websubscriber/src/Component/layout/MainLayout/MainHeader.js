@@ -9,13 +9,16 @@ type Props = {
     dropdownContent?: React.ReactNode;
     name?: React.ReactNode;
     onAddVehicle: (ip: string, name: string) => void;
+    vehicleList: string[];
+    connectVehicle: (vid: string) => void;
 };
 
-const MainHeader: React.FC<Props> = ({ name, dropdownContent, onAddVehicle}) => {
+const MainHeader: React.FC<Props> = ({ name, dropdownContent, onAddVehicle, vehicleList, connectVehicle}) => {
     const containerRef = useRef(null);
     const [view, setView] = useState(false);
     const [userIP, setUserIP] = useState("");
     const [vehicleName, setVehicleName] = useState("");
+    const [selectedVehicle, setSelectedVehicle] = useState("");
 
     useEffect(() => {
         const handleOutside = (e) => {
@@ -50,23 +53,18 @@ const MainHeader: React.FC<Props> = ({ name, dropdownContent, onAddVehicle}) => 
                 <div className="left-cluster">
                     <h2 className="font-title header-logo">SCMS</h2>
 
-                    <div className="add-vehicle">
-                        <input
-                            type="text"
-                            placeholder="IP:Port"
-                            className="vehicle-input"
-                            value={userIP}
-                            onChange={(e) => setUserIP(e.target.value)}
-                        />
-                        <input
-                            type="text"
-                            placeholder="Vehicle Name"
-                            className="vehicle-input"
-                            value={vehicleName}
-                            onChange={(e) => setVehicleName(e.target.value)}
-                        />
-                        <button onClick={handleAddClick} className="vehicle-add-btn">Add</button>
-                    </div>
+                    <select
+                        value={selectedVehicle}
+                        onChange={(e) => setSelectedVehicle(e.target.value)}
+                    >
+                        <option value="">차량 선택</option>
+                        {vehicleList.map((vid) => (
+                            <option key={vid} value={vid}>
+                                {vid}
+                            </option>
+                        ))}
+                    </select>
+                    <button onClick={() => connectVehicle(selectedVehicle)} className="vehicle-add-btn">Connect</button>
                 </div>
 
                 {/* 오른쪽 영역: 유저/알림 */}

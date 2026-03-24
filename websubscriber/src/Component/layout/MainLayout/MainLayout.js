@@ -12,7 +12,8 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [isOpenVehicle, setIsOpenVehicle] = useState(true);
     const [vehicles, setVehicles] = useState([]);
 
-    const vehiclesData = UseRosVehicles(vehicles);
+    // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
+    const { vehiclesData, vehicleList, connectVehicle } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -88,7 +89,13 @@ const MainLayout = ({ name, dropdownContent, content }) => {
 
     return (
         <div className="layout">
-            <Header name={name} dropdownContent={dropdownContent} onAddVehicle={addVehicle} />
+            <Header
+                name={name}
+                dropdownContent={dropdownContent}
+                onAddVehicle={addVehicle}
+                vehicleList={vehicleList}
+                connectVehicle={connectVehicle}
+            />
 
             <main className="main">
                 <div className="main-grid" style={{ gridTemplateColumns: `${sidebarWidth}px 6px 1fr` }}>
@@ -102,13 +109,14 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                             {isOpen &&
                                 (content || (
                                     <SidebarTop
-                                        vehicles={vehicles}
+                                        // vehicles={vehicles}
                                         vehiclesData={vehiclesData}
-                                        onTopicSelect={handleTopicSelect}
+                                        // onTopicSelect={handleTopicSelect}
                                         onPanelSelect={handlePanelSelect}
-                                        selectedTopic={selectedTopic}
-                                        selectedPanel={selectedPanel}
+                                        // selectedTopic={selectedTopic}
+                                        // selectedPanel={selectedPanel}
                                         activePanelsByTopic={activePanelsByTopic}
+                                        connectVehicle={connectVehicle}
                                     />
                                 ))}
                         </div>

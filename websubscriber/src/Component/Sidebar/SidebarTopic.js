@@ -5,183 +5,112 @@ import SelectOutput from "./SelectOutput";
 
 function AccordionItem({
                            topic,
-                           ip,
+                           topicType,
+                           vehicleId,
                            isOpen,
                            onToggle,
                            onPanelSelect,
-                           activePanelsSet = new Set(), // topic에 대해 활성화된 패널들
-
+                           activePanelsSet = new Set(),
+                           connectVehicle
                        }) {
-
-    const isActive = activePanelsSet.size > 0; // 하나라도 켜져 있으면 색 하이라이트
-
-
+    const isActive = activePanelsSet.size > 0;
 
     return (
-
         <div style={{ marginBottom: 3 }}>
-
             <button
-
                 className={`topic-chip ${isOpen ? "open" : ""} ${isActive ? "active" : ""}`}
+                onClick={() => {
+                    onToggle()
 
-                onClick={onToggle}
-
-                title={topic}
-
-                style={{
-
-                    width: "100%",
-
-                    textAlign: "left",
-
-                    whiteSpace: "normal",
-
-                    wordBreak: "break-all",
-
+                    connectVehicle(vehicleId, topic, topicType);
                 }}
-
             >
-
                 {topic}
-
             </button>
 
-
-
             {isOpen && (
-
                 <SelectOutput
-
                     topic={topic}
-
-                    ip={ip}
-
-                    // topic에 대해 어떤 패널들이 활성인지 내려줘서 버튼 개별 하이라이트
-
+                    vehicleId={vehicleId}
                     activePanels={activePanelsSet}
-
-                    // onSelect={onPanelSelect}
-                    onSelect={({ topic, panel }) => onPanelSelect && onPanelSelect({topic, panel, ip})}
+                    onSelect={({ topic, panel }) =>
+                        onPanelSelect && onPanelSelect({
+                            topic,
+                            panel,
+                            ip: vehicleId
+                        })
+                    }
                 />
-
             )}
-
         </div>
-
     );
-
 }
 
 
-
 export default function SidebarTopic({
-
-                                         vehicles,
-
+                                         vehicleList,
                                          vehiclesData,
-
-                                         onPanelSelect,           // ({topic, panel})
-
+                                         onPanelSelect,
                                          activePanelsByTopic = {},
-
+                                         connectVehicle
                                      }) {
-
     const [openTopics, setOpenTopics] = useState(new Set());
 
-
-
-    if (!vehicles || vehicles.length === 0) {
-
-        return (
-
-            <div className="sidebar-bg">
-
-                <p style={{ color: "#aaa", fontSize: 13 }}>연결된 차량이 없습니다.</p>
-
-            </div>
-
-        );
-
-    }
-
-
-
     const toggle = (topic) => {
-
         setOpenTopics((prev) => {
-
             const next = new Set(prev);
-
             next.has(topic) ? next.delete(topic) : next.add(topic);
-
             return next;
-
         });
-
     };
 
-
+    if (!vehicleList || vehicleList.length === 0) {
+        return (
+            <div className="sidebar-bg">
+                <p style={{ color: "#aaa", fontSize: 13 }}>
+                    연결된 차량이 없습니다.
+                </p>
+            </div>
+        );
+    }
 
     return (
-
         <div className="sidebar-bg">
-
-            {vehicles.map(({ ip }) => {
-
-                const topics = vehiclesData?.[ip]?.topics || [];
+            {vehicleList.map((vehicleId) => {
+                const topics = vehiclesData?.[vehicleId]?.topics || [];
 
                 return (
-
-                    <div key={ip} className="topic-vehicle-block" style={{ color: "black" }}>
-
+                    <div key={vehicleId} className="topic-vehicle-block">
                         {topics.length ? (
+                            topics.map((topicObj) => {
+                                const topicName = topicObj.name;
+                                const topicType = topicObj.type;
 
-                            topics.map((topic) => {
-
-                                const isOpen = openTopics.has(topic);
-
-                                const activePanelsSet = activePanelsByTopic[topic] || new Set();
+                                const isOpen = openTopics.has(topicName);
+                                const activePanelsSet =
+                                    activePanelsByTopic[topicName] || new Set();
 
                                 return (
-
                                     <AccordionItem
-
-                                        key={`${ip}-${topic}`}
-
-                                        topic={topic}
-
-                                        ip={ip}
-
+                                        key={`${vehicleId}-${topicName}`}
+                                        topic={topicName}
+                                        vehicleId={vehicleId}
+                                        topicType={topicType}
                                         isOpen={isOpen}
-
-                                        onToggle={() => toggle(topic)}
-
+                                        onToggle={() => toggle(topicName)}
                                         onPanelSelect={onPanelSelect}
-
                                         activePanelsSet={activePanelsSet}
-
+                                        connectVehicle={connectVehicle}
                                     />
-
                                 );
-
                             })
-
                         ) : (
-
-                            <div className="no-topic">토픽을 불러오는 중...</div>
-
+                            <div className="no-topic">토픽 없음</div>
                         )}
-
                     </div>
-
                 );
-
             })}
-
         </div>
-
     );
-
 }
 

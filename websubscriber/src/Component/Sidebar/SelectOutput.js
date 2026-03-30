@@ -1,7 +1,7 @@
 // SelectOutput.js
 import React, { useState } from "react";
 
-export default function SelectOutput({ topic, ip, onSelect, activePanels = new Set() }) {
+export default function SelectOutput({ topic, vehicleId, topicType, connectVehicle, onSelect, activePanels = new Set() }) {
     const panels = [
         { label: "Image", value: "Image" },
         { label: "PointCloud", value: "PointCloud" },
@@ -10,7 +10,8 @@ export default function SelectOutput({ topic, ip, onSelect, activePanels = new S
     ];
 
     const handleClick = (panel) => {
-        onSelect && onSelect({ topic, panel, ip });
+        connectVehicle && connectVehicle(vehicleId, topic, topicType);
+        onSelect && onSelect({ topic, panel, vehicleId });
     };
 
     return (

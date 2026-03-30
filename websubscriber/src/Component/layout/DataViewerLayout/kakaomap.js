@@ -44,8 +44,8 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
                 }}
             >
                 {Object.entries(vehiclesData || {}).map(([ip, data]) => {
-                    const lat = data.lat === 0 ? 35.9145 : data.lat ?? 35.9145;
-                    const lng = data.lng === 0 ? 128.8044 : data.lng ?? 128.8044;
+                    const lat = data.lat;
+                    const lng = data.lng;
 
                     return (
                         <React.Fragment key={ip}>

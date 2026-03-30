@@ -29,9 +29,6 @@ export default function UseRosVehicles() {
         ws.onmessage = (event) => {
             const msg = JSON.parse(event.data);
 
-            console.log("📡 sensor:", msg.topic);
-
-            // test (수정 필요)
             if (msg.type === "vehicle_list") {
                 setVehicleList(msg.vehicles);
             }
@@ -49,21 +46,40 @@ export default function UseRosVehicles() {
                 }));
             }
 
+            // 토픽 구독 응답
             if (msg.type === "sensor_data") {
-                const { lat, lon } = msg.data;
                 const vid = msg.vehicle_id;
+                const topic = msg.topic;
 
                 setVehiclesData((prev) => {
-                    const prevWp = prev[vid]?.waypoints || [];
+                    const vehicle = prev[vid] || {};
 
+                    // gps 처리
+                    if (topic === "/ublox_gps_node/fix") {
+                        const { lat, lon } = msg.data;
+                        const prevWp = vehicle.waypoints || [];
+
+                        return {
+                            ...prev,
+                            [vid]: {
+                                ...vehicle,
+                                lat,
+                                lng: lon,
+                                waypoints: [...prevWp, { lat, lng: lon }],
+                            },
+                        };
+                    }
+
+                    // gps를 제외한 나머지 토픽 처리
                     return {
                         ...prev,
                         [vid]: {
-                            ...(prev[vid] || {}),
-                            lat,
-                            lng: lon,
-                            waypoints: [...prevWp, { lat, lng: lon }],
-                        },
+                            ...vehicle,
+                            topicsData: {
+                                ...(vehicle.topicsData || {}),
+                                [topic]: msg.data
+                            }
+                        }
                     };
                 });
             }
@@ -80,10 +96,16 @@ export default function UseRosVehicles() {
     }, []);
 
     const connectVehicle = (vehicleId, topic, topicType) => {
+        if (!wsRef.current || wsRef.current.readyState !== 1) {
+            console.warn("ws not ready");
+            return;
+        }
         if (subscribedRef.current.has(topic)) {
             console.warn("이미 구독중:", topic);
             return;
         }
+
+        subscribedRef.current.add(topic);
 
         wsRef.current.send(JSON.stringify({
             type: "subscribe",

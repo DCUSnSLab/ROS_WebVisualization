@@ -21,8 +21,6 @@ function AccordionItem({
                 className={`topic-chip ${isOpen ? "open" : ""} ${isActive ? "active" : ""}`}
                 onClick={() => {
                     onToggle()
-
-                    connectVehicle(vehicleId, topic, topicType);
                 }}
             >
                 {topic}
@@ -32,6 +30,8 @@ function AccordionItem({
                 <SelectOutput
                     topic={topic}
                     vehicleId={vehicleId}
+                    topicType={topicType}
+                    connectVehicle={connectVehicle}
                     activePanels={activePanelsSet}
                     onSelect={({ topic, panel }) =>
                         onPanelSelect && onPanelSelect({

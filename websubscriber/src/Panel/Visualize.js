@@ -16,12 +16,14 @@ import VehicleStatus from "../Component/vehicleStatus";
 import VehicleReactChart from "../Component/VehicleReactChart";
 import Stream from "../Component/StreamChart";
 import DrivingVehicleList from "../Component/DrivingVehicleList";
+import UseRosVehicles from "../Component/layout/MainLayout/UseRosVehicles"
 
 export default function Visualize(){
 
     const [checked, setChecked] = useState([]);
     const topicList = useSelector((state) => state.TopicList.topics.topic);
     const [cards, setCards] = useState([]);
+    const { vehiclesData } = UseRosVehicles();
 
     const panelSelectList = (setSelectedPanel) => (
         <select onChange={(event) => setSelectedPanel(event.target.value)}>
@@ -34,16 +36,17 @@ export default function Visualize(){
     );
 
     const VisualizationComponent = ({ panelType, topic }) => {
+        const data = vehiclesData?.[topic];
 
         switch (panelType) {
             case 'Image':
-                return <ImageLR topic={topic}/>;
+                return <ImageLR data={data}/>;
             case 'PointCloud':
-                return <PCL className="cancel" topic={topic}/>;
+                return <PCL className="cancel" topic={topic} ip={ip}/>;
             case 'Plot':
                 return <Stream/>;
             case 'RawMessage':
-                return <RawMessageComponent topic={topic}/>;
+                return <RawMessageComponent data={data}/>;
             default:
                 return null;
         }

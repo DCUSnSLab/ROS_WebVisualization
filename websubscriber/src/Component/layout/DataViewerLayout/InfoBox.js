@@ -1,170 +1,125 @@
-//추후 CPU, GPU, RAM 데이터 출력 추가 필요
-
-import React, { useEffect, useState, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import * as ROSLIB from 'roslib';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { hideInfoBox } from '../../../features/infobox/infoBoxSlice';
 
-function voltageToPercent(v) {
-    if (v >= 24.0) return '-';
+function voltageToPercent(voltage) {
+    if (voltage >= 24.0) return '-';
     return 0;
 }
 
-const InfoBox = () => {
+function formatNumber(value, digits = 1) {
+    return typeof value === 'number' ? value.toFixed(digits) : 'N/A';
+}
+
+export default function InfoBox({ vehiclesData = {} }) {
     const dispatch = useDispatch();
-    const { visible, position, vehicle } = useSelector(
-        (state) => state.infoBox
-    );
+    const { visible, position, vehicle } = useSelector((state) => state.infoBox);
 
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    const [localPos, setLocalPos] = useState({
-        x: position.x,
-        y: position.y,
-    });
+    const [localPos, setLocalPos] = useState({ x: position.x, y: position.y });
 
-    const [speedMs, setSpeedMs] = useState('N/A');
-    const [speedKmh, setSpeedKmh] = useState('N/A');
-    const [batteryV, setBatteryV] = useState('N/A');
-    const [batteryPct, setBatteryPct] = useState('N/A');
-    const [temperature, setTemperature] = useState('N/A');
+    const vehicleData = vehicle?.id ? vehiclesData?.[vehicle.id] : null;
+    const hunterStatus = useMemo(
+        () =>
+            vehicleData?.topicsData?.['/hunter_status'] ||
+            vehicleData?.topicsData?.['vehicle_status_sampled'] ||
+            null,
+        [vehicleData]
+    );
 
-    const [controlMode, setControlMode] = useState('N/A'); //현재 상태 출력
-    const [controlTab, setControlTab] = useState('auto'); //control 토글
+    const speedMs = useMemo(() => {
+        if (typeof hunterStatus?.linear_velocity === 'number') {
+            return hunterStatus.linear_velocity.toFixed(2);
+        }
+        return 'N/A';
+    }, [hunterStatus]);
 
-    const [isRealVehicle, setIsRealVehicle] = useState(false); //bag, vehicle 구분용
-    const heartbeatTimeoutRef = useRef(null);
+    const speedKmh = useMemo(() => {
+        if (typeof hunterStatus?.linear_velocity === 'number') {
+            return (hunterStatus.linear_velocity * 3.6).toFixed(1);
+        }
+        return 'N/A';
+    }, [hunterStatus]);
 
-    const rosRef = useRef(null);
+    const batteryV = useMemo(
+        () => formatNumber(hunterStatus?.battery_voltage, 1),
+        [hunterStatus]
+    );
+
+    const batteryPct = useMemo(() => {
+        if (typeof hunterStatus?.battery_voltage === 'number') {
+            return voltageToPercent(hunterStatus.battery_voltage);
+        }
+        return 'N/A';
+    }, [hunterStatus]);
+
+    const controlMode = useMemo(() => {
+        const controlMap = {
+            0: 'Manual',
+            1: 'ROS',
+            2: 'Auto',
+            3: 'Remote',
+        };
+        return controlMap[hunterStatus?.control_mode] ?? 'N/A';
+    }, [hunterStatus]);
+
+    const temperature = useMemo(() => {
+        const states = hunterStatus?.actuator_states;
+        if (!Array.isArray(states) || states.length === 0) {
+            return 'N/A';
+        }
+
+        const maxMotorTemp = Math.max(
+            ...states.map((state) => state.motor_temperature ?? 0)
+        );
+        const maxDriverTemp = Math.max(
+            ...states.map((state) => state.driver_temperature ?? 0)
+        );
+        return `${maxMotorTemp}C / ${maxDriverTemp}C`;
+    }, [hunterStatus]);
+
+    const isRealVehicle = useMemo(() => {
+        return Boolean(vehicleData?.rosbridgeIp && hunterStatus);
+    }, [hunterStatus, vehicleData?.rosbridgeIp]);
 
     useEffect(() => {
-        setLocalPos({
-            x: position.x,
-            y: position.y,
-        });
+        setLocalPos({ x: position.x, y: position.y });
     }, [position.x, position.y]);
 
     useEffect(() => {
-        if (!visible || !vehicle?.ip) return;
-
-        const ros = new ROSLIB.Ros({
-            url: vehicle.ip,
-        });
-
-        rosRef.current = ros;
-
-        const hunterStatusListener = new ROSLIB.Topic({
-            ros,
-            // name: '/hunter_status', //기존 토픽
-            name: 'vehicle_status_sampled', //샘플링한 토픽
-            messageType: 'hunter_msgs/HunterStatus',
-        });
-
-        hunterStatusListener.subscribe((message) => {
-            if (typeof message.linear_velocity === 'number') {
-                const v = message.linear_velocity;
-                setSpeedMs(v.toFixed(2));
-                setSpeedKmh((v * 3.6).toFixed(1));
-            }
-
-            if (typeof message.battery_voltage === 'number') {
-                const v = message.battery_voltage;
-                setBatteryV(v.toFixed(1));
-                setBatteryPct(voltageToPercent(v));
-            }
-
-            const controlMap = {
-                0: 'Manual', //직접 조종
-                1: 'ROS', //ROS 노드
-                2: 'Auto', //알고리즘
-                3: 'Remote', //무선 조종기
+        if (dragging) {
+            const onMouseMove = (event) => {
+                setLocalPos({
+                    x: event.clientX - offset.x,
+                    y: event.clientY - offset.y,
+                });
             };
 
-            const mode = controlMap[message.control_mode] ?? 'Unknown';
+            const onMouseUp = () => {
+                setDragging(false);
+            };
 
-            setControlMode(mode);
-
-            if (isRealVehicle) {
-                if (mode === 'Remote' || mode === 'Manual') {
-                    setControlTab('remote');
-                } else {
-                    setControlTab('auto');
-                }
-            }
-
-            const states = message.actuator_states;
-            if (states && states.length > 0) {
-                const maxMotorTemp = Math.max(
-                    ...states.map((s) => s.motor_temperature ?? 0)
-                );
-                const maxDriverTemp = Math.max(
-                    ...states.map((s) => s.driver_temperature ?? 0)
-                );
-                setTemperature(`${maxMotorTemp}°C / ${maxDriverTemp}°C`);
-            }
-        });
-
-        //이동체 연결 구분
-        ros.on('connection', () => {
-            ros.getTopics((topics) => {
-                if (topics.topics.includes('/final_cmd')) {
-                    console.log('/final_cmd 토픽 있음');
-                    setIsRealVehicle(true);
-                } else {
-                    console.log('/final_cmd 토픽 없음');
-                    setIsRealVehicle(false);
-                }
-            });
-        });
-
-        return () => {
-            hunterStatusListener.unsubscribe();
-
-            if (heartbeatTimeoutRef.current) {
-                clearTimeout(heartbeatTimeoutRef.current);
-            }
-
-            ros.close();
-        };
-    }, [visible, vehicle]);
-
-    const onMouseDown = (e) => {
-        e.stopPropagation();
-        setDragging(true);
-        setOffset({
-            x: e.clientX - localPos.x,
-            y: e.clientY - localPos.y,
-        });
-    };
-
-    const onMouseMove = (e) => {
-        if (!dragging) return;
-        setLocalPos({
-            x: e.clientX - offset.x,
-            y: e.clientY - offset.y,
-        });
-    };
-
-    const onMouseUp = () => {
-        setDragging(false);
-    };
-
-    useEffect(() => {
-        if (dragging) {
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
-        }
-        return () => {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        };
-    }, [dragging, offset]);
 
-    useEffect(() => {
-        if (!isRealVehicle) {
-            setControlTab('auto');
+            return () => {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
         }
-    }, [isRealVehicle]);
+
+        return undefined;
+    }, [dragging, offset.x, offset.y]);
+
+    const onMouseDown = (event) => {
+        event.stopPropagation();
+        setDragging(true);
+        setOffset({
+            x: event.clientX - localPos.x,
+            y: event.clientY - localPos.y,
+        });
+    };
 
     if (!visible) return null;
 
@@ -183,11 +138,11 @@ const InfoBox = () => {
                 padding: '12px',
                 cursor: dragging ? 'grabbing' : 'default',
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
         >
             <button
-                onClick={(e) => {
-                    e.stopPropagation();
+                onClick={(event) => {
+                    event.stopPropagation();
                     dispatch(hideInfoBox());
                 }}
                 style={{
@@ -201,7 +156,7 @@ const InfoBox = () => {
                     fontWeight: 'bold',
                 }}
             >
-                ✕
+                X
             </button>
 
             <div
@@ -213,7 +168,7 @@ const InfoBox = () => {
                 }}
                 onMouseDown={onMouseDown}
             >
-                {vehicle?.name}
+                {vehicle?.name || vehicle?.id || 'Unknown Vehicle'}
             </div>
 
             <hr />
@@ -227,12 +182,11 @@ const InfoBox = () => {
             </p>
 
             <div>
-                <strong>Control:</strong> {' '}
-                {controlMode}
+                <strong>Control:</strong> {controlMode}{' '}
                 {!isRealVehicle && (
                     <span style={{ color: 'orange', marginLeft: '1px', fontWeight: 'bold' }}>
-                            (bag)
-                        </span>
+                        (bag)
+                    </span>
                 )}
                 <div>
                     <div
@@ -245,14 +199,13 @@ const InfoBox = () => {
                             padding: '4px',
                             fontSize: '14px',
                             fontWeight: '600',
-                            cursor: 'pointer',
                         }}
                     >
                         <div
                             style={{
                                 position: 'absolute',
                                 top: '4px',
-                                left: controlTab === 'auto' ? '4px' : '75px',
+                                left: controlMode === 'Remote' ? '75px' : '4px',
                                 width: '70px',
                                 height: 'calc(100% - 8px)',
                                 backgroundColor: 'white',
@@ -263,69 +216,24 @@ const InfoBox = () => {
                         />
 
                         <div
-                            onClick={() => {
-                                if (controlTab === 'auto') return;
-                                if (!isRealVehicle) return;
-                                setControlTab('auto');
-                            }}
                             style={{
                                 flex: 1,
                                 textAlign: 'center',
                                 zIndex: 1,
-                                color: controlTab === 'auto' ? '#111' : '#888',
+                                color:
+                                    controlMode === 'Remote' ? '#888' : '#111',
                             }}
                         >
                             Auto
                         </div>
 
                         <div
-                            onClick={() => {
-                                if (controlTab === 'remote') return;
-                                if (isRealVehicle) {
-                                    if (controlMode !== 'Auto') {
-                                        alert("현재 Auto 상태가 아닙니다.");
-                                        return;
-                                    }
-                                } else return;
-
-                                alert('remote 모드로 전환합니다.');
-
-                                if (!rosRef.current) {
-                                    alert('연결 실패');
-                                    return;
-                                }
-
-                                const service = new ROSLIB.Service({
-                                    ros: rosRef.current,
-                                    name: '/monitoring/request_control',
-                                    serviceType: 'control_msgs/srv/RequestControl',
-                                });
-
-                                const request = new ROSLIB.ServiceRequest({
-                                    requester_id: 'web',
-                                    requested_mode: 3,
-                                });
-
-                                service.callService(
-                                    request,
-                                    function (result) {
-                                        if (result.success) {
-                                            console.log('이동체 제어 연결 성공');
-                                        } else {
-                                            alert('이동체 연결에 실패하였습니다.\n' + result.message);
-                                        }
-                                    },
-                                    function (error) {
-                                        console.error("Service 호출 에러:", error);
-                                        alert("Service 호출 자체가 실패했습니다.");
-                                    }
-                                );
-                            }}
                             style={{
                                 flex: 1,
                                 textAlign: 'center',
                                 zIndex: 1,
-                                color: controlTab === 'remote' ? '#111' : '#888',
+                                color:
+                                    controlMode === 'Remote' ? '#111' : '#888',
                             }}
                         >
                             Remote
@@ -339,6 +247,4 @@ const InfoBox = () => {
             </p>
         </div>
     );
-};
-
-export default InfoBox;
+}

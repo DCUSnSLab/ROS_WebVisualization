@@ -6,6 +6,8 @@ export default function UseRosVehicles() {
     const wsRef = useRef(null);
     const subscribedRef = useRef(new Set());
 
+    const makeTopicKey = (vehicleId, topic) => `${vehicleId}::${topic}`;
+
     useEffect(() => {
         if (wsRef.current) return;
 
@@ -13,7 +15,7 @@ export default function UseRosVehicles() {
         wsRef.current = ws;
 
         ws.onopen = () => {
-            console.log("✅ WS Connected");
+            console.log("WS Connected");
 
             ws.send(JSON.stringify({
                 type: "register",
@@ -31,9 +33,24 @@ export default function UseRosVehicles() {
 
             if (msg.type === "vehicle_list") {
                 setVehicleList(msg.vehicles);
+                setVehiclesData((prev) => {
+                    const next = { ...prev };
+
+                    for (const vehicle of msg.vehicles || []) {
+                        if (!vehicle?.id) continue;
+
+                        next[vehicle.id] = {
+                            ...(prev[vehicle.id] || {}),
+                            id: vehicle.id,
+                            name: vehicle.name || vehicle.id,
+                            rosbridgeIp: vehicle.rosbridge_ip || vehicle.rosbridgeIp || "",
+                        };
+                    }
+
+                    return next;
+                });
             }
 
-            // server가 topic_list를 보내줬을 때 실행. 즉, 응답 처리 (server -> user)
             if (msg.type === "topic_list") {
                 const vid = msg.vehicle_id;
 
@@ -44,9 +61,29 @@ export default function UseRosVehicles() {
                         topics: msg.topics
                     }
                 }));
+
+                const gpsTopic = msg.topics?.find(
+                    (topicInfo) => topicInfo?.name === "/ublox_gps_node/fix"
+                );
+                const hunterStatusTopic = msg.topics?.find(
+                    (topicInfo) =>
+                        topicInfo?.name === "/hunter_status" ||
+                        topicInfo?.name === "vehicle_status_sampled"
+                );
+
+                if (gpsTopic) {
+                    subscribeTopic(vid, gpsTopic.name, gpsTopic.type);
+                }
+
+                if (hunterStatusTopic) {
+                    subscribeTopic(
+                        vid,
+                        hunterStatusTopic.name,
+                        hunterStatusTopic.type
+                    );
+                }
             }
 
-            // 토픽 구독 응답
             if (msg.type === "sensor_data") {
                 const vid = msg.vehicle_id;
                 const topic = msg.topic;
@@ -54,7 +91,6 @@ export default function UseRosVehicles() {
                 setVehiclesData((prev) => {
                     const vehicle = prev[vid] || {};
 
-                    // gps 처리
                     if (topic === "/ublox_gps_node/fix") {
                         const { lat, lon } = msg.data;
                         const prevWp = vehicle.waypoints || [];
@@ -66,11 +102,18 @@ export default function UseRosVehicles() {
                                 lat,
                                 lng: lon,
                                 waypoints: [...prevWp, { lat, lng: lon }],
+                                topicsData: {
+                                    ...(vehicle.topicsData || {}),
+                                    [topic]: msg.data
+                                },
+                                rawTopicsData: {
+                                    ...(vehicle.rawTopicsData || {}),
+                                    [topic]: msg
+                                }
                             },
                         };
                     }
 
-                    // gps를 제외한 나머지 토픽 처리
                     return {
                         ...prev,
                         [vid]: {
@@ -78,6 +121,10 @@ export default function UseRosVehicles() {
                             topicsData: {
                                 ...(vehicle.topicsData || {}),
                                 [topic]: msg.data
+                            },
+                            rawTopicsData: {
+                                ...(vehicle.rawTopicsData || {}),
+                                [topic]: msg
                             }
                         }
                     };
@@ -92,37 +139,76 @@ export default function UseRosVehicles() {
         ws.onclose = () => {
             console.warn("WS closed");
         };
-
     }, []);
 
-    const connectVehicle = (vehicleId, topic, topicType) => {
+    const requestTopicList = (vehicleId) => {
         if (!wsRef.current || wsRef.current.readyState !== 1) {
             console.warn("ws not ready");
             return;
         }
-        if (subscribedRef.current.has(topic)) {
-            console.warn("이미 구독중:", topic);
-            return;
-        }
-
-        subscribedRef.current.add(topic);
-
-        wsRef.current.send(JSON.stringify({
-            type: "subscribe",
-            vehicle_id: vehicleId,
-            topic: topic,
-            msg_type: topicType
-        }));
-
-        console.log("🚗 SUBSCRIBE:", vehicleId, topic, topicType);
 
         wsRef.current.send(JSON.stringify({
             type: "get_topic_list",
             vehicle_id: vehicleId
         }));
 
-        console.log("🚗 CONNECT:", vehicleId);
+        console.log("GET_TOPIC_LIST:", vehicleId);
     };
 
-    return { vehiclesData, vehicleList, connectVehicle };
+    const subscribeTopic = (vehicleId, topic, topicType) => {
+        if (!wsRef.current || wsRef.current.readyState !== 1) {
+            console.warn("ws not ready");
+            return;
+        }
+
+        const topicKey = makeTopicKey(vehicleId, topic);
+
+        if (subscribedRef.current.has(topicKey)) {
+            console.warn("Already subscribed:", topicKey);
+            return;
+        }
+
+        subscribedRef.current.add(topicKey);
+
+        wsRef.current.send(JSON.stringify({
+            type: "subscribe",
+            vehicle_id: vehicleId,
+            topic,
+            msg_type: topicType
+        }));
+
+        console.log("SUBSCRIBE:", topicKey, topicType);
+    };
+
+    const unsubscribeTopic = (vehicleId, topic) => {
+        if (!wsRef.current || wsRef.current.readyState !== 1) {
+            console.warn("ws not ready");
+            return;
+        }
+
+        const topicKey = makeTopicKey(vehicleId, topic);
+
+        if (!subscribedRef.current.has(topicKey)) {
+            console.warn("Not subscribed:", topicKey);
+            return;
+        }
+
+        subscribedRef.current.delete(topicKey);
+
+        wsRef.current.send(JSON.stringify({
+            type: "unsubscribe",
+            vehicle_id: vehicleId,
+            topic
+        }));
+
+        console.log("UNSUBSCRIBE:", topicKey);
+    };
+
+    return {
+        vehiclesData,
+        vehicleList,
+        requestTopicList,
+        subscribeTopic,
+        unsubscribeTopic
+    };
 }

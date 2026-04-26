@@ -1,61 +1,45 @@
-// import React, {useEffect, useRef, useState} from 'react';
-// import * as ROSLIB from 'roslib';
-// import {useSelector} from "react-redux";
-//
-// function ImageLR ({topic, ip}) {
-//     const f_flag = useRef(0);
-//     const [Limg, setLImg] = useState();
-//     const receivedTopic = topic
-//
-//     useEffect(() => {
-//         if (!ip || !topic) {
-//             console.log("[ImageLR] waiting for ip/topic", ip, topic);
-//             return;
-//         }
-//
-//         console.log("[ImageLR] connect to", ip);
-//
-//         const ros = new ROSLIB.Ros({
-//             url: ip
-//         });
-//
-//         const image_L_topic = new ROSLIB.Topic({
-//           ros: ros,
-//           name: receivedTopic,
-//           messageType: 'sensor_msgs/CompressedImage'
-//         });
-//
-//         image_L_topic.subscribe(function(message) {
-//         if (f_flag.current < 5){
-//           // console.log(f_flag);
-//           f_flag.current += 1;
-//         }
-//         else{
-//             setLImg("data:image/jpg;base64," + message.data);
-//               f_flag.current = 0;
-//             }
-//         });
-//
-//         return () => {
-//             ros.close();
-//         };
-//     }, [receivedTopic, ip]);
-//
-//     return(
-//         <img style={{width: "100%", height: "100%", objectFit: "contain"}} src={Limg}></img>
-//     );
-// }
-//
-// export default ImageLR;
+import React, { useEffect, useState } from "react";
 
-import React from 'react';
+function getImageMime(format) {
+    const normalized = String(format || "").toLowerCase();
 
-function ImageLR({ data }) {
-    if (!data || !data.data) {
+    if (normalized.includes("png")) return "image/png";
+    if (normalized.includes("bmp")) return "image/bmp";
+    if (normalized.includes("webp")) return "image/webp";
+    return "image/jpeg";
+}
+
+export default function ImageLR({ data }) {
+    const [imgSrc, setImgSrc] = useState("");
+
+    useEffect(() => {
+        if (!data?.data) {
+            setImgSrc("");
+            return;
+        }
+
+        if (typeof data.data === "string") {
+            setImgSrc(`data:${getImageMime(data.format)};base64,${data.data}`);
+            return;
+        }
+
+        if (Array.isArray(data.data)) {
+            const byteArray = new Uint8Array(data.data);
+            const blob = new Blob([byteArray], { type: getImageMime(data.format) });
+            const objectUrl = URL.createObjectURL(blob);
+            setImgSrc(objectUrl);
+
+            return () => {
+                URL.revokeObjectURL(objectUrl);
+            };
+        }
+
+        setImgSrc("");
+    }, [data]);
+
+    if (!imgSrc) {
         return <p>Waiting for image...</p>;
     }
-
-    const imgSrc = "data:image/jpg;base64," + data.data;
 
     return (
         <img
@@ -65,5 +49,3 @@ function ImageLR({ data }) {
         />
     );
 }
-
-export default ImageLR;

@@ -1,7 +1,7 @@
 // SelectOutput.js
-import React, { useState } from "react";
+import React from "react";
 
-export default function SelectOutput({ topic, vehicleId, topicType, connectVehicle, onSelect, activePanels = new Set() }) {
+export default function SelectOutput({ topic, vehicleId, topicType, subscribeTopic, onSelect, activePanels = new Set() }) {
     const panels = [
         { label: "Image", value: "Image" },
         { label: "PointCloud", value: "PointCloud" },
@@ -10,7 +10,7 @@ export default function SelectOutput({ topic, vehicleId, topicType, connectVehic
     ];
 
     const handleClick = (panel) => {
-        connectVehicle && connectVehicle(vehicleId, topic, topicType);
+        subscribeTopic && subscribeTopic(vehicleId, topic, topicType);
         onSelect && onSelect({ topic, panel, vehicleId });
     };
 

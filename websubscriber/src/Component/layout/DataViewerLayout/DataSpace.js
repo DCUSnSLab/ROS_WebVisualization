@@ -4,27 +4,33 @@ import ImageLR from "../../../Component/ImageLR";
 import PCL from "../../../Component/PCL";
 import Stream from "../../../Component/StreamChart";
 import RawMessageComponent from "../../../Component/RawMessageComponent";
-import "./DataSpace.css"
+import "./DataSpace.css";
 
-function VisualRenderer({ panel, topic, ip, onClose }) {
+function VisualRenderer({ panel, topic, vehicleId, rosbridgeUrl, data, rawData, onClose }) {
     return (
         <div className="visual-card">
             <div className="visual-card-header">
-                <div className="visual-title">{panel} — {topic}</div>
-                <button className="visual-close" onClick={onClose}>×</button>
+                <div className="visual-title">{panel} - {topic}</div>
+                <button className="visual-close" onClick={onClose}>X</button>
             </div>
             <div className="visual-body">
-                {panel === "Image" && <ImageLR topic={topic} ip={ip}/>}
-                {panel === "PointCloud" && <PCL topic={topic} ip={ip}/>}
-                {panel === "Plot" && <Stream topic={topic} ip={ip}/>}
-                {panel === "RawMessage" && <RawMessageComponent topic={topic} ip={ip}/>}
+                {panel === "Image" && <ImageLR data={data} />}
+                {panel === "PointCloud" && (
+                    <PCL
+                        topic={topic}
+                        vehicleId={vehicleId}
+                        rosbridgeUrl={rosbridgeUrl}
+                    />
+                )}
+                {panel === "Plot" && <Stream data={data} />}
+                {panel === "RawMessage" && <RawMessageComponent data={rawData ?? data} />}
             </div>
         </div>
     );
 }
 
 export default function DataSpace({ vehicles, vehiclesData, visuals = [], onCloseVisual }) {
-    const [leftPanelWidth, setLeftPanelWidth] = useState('50%'); // 초기 넓이
+    const [leftPanelWidth, setLeftPanelWidth] = useState("50%");
     const isResizing = useRef(false);
     const splitPaneRef = useRef(null);
 
@@ -43,24 +49,21 @@ export default function DataSpace({ vehicles, vehiclesData, visuals = [], onClos
         const rect = splitPaneRef.current.getBoundingClientRect();
         const newLeftWidth = e.clientX - rect.left;
         const totalWidth = rect.width;
-        
-        // 최소/최대 넓이 제한 (예: 20% ~ 80%)
         const newLeftPercent = Math.max(20, Math.min(80, (newLeftWidth / totalWidth) * 100));
 
         setLeftPanelWidth(`${newLeftPercent}%`);
     }, []);
 
     useEffect(() => {
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("mouseup", handleMouseUp);
 
         return () => {
-            window.removeEventListener('mousemove', handleMouseMove);
-            window.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("mouseup", handleMouseUp);
         };
     }, [handleMouseMove, handleMouseUp]);
 
-    // 오른쪽 레이아웃: 맵 + 패널 분할
     if (!visuals.length) {
         return (
             <div className="dataspace-full">
@@ -70,8 +73,8 @@ export default function DataSpace({ vehicles, vehiclesData, visuals = [], onClos
     }
 
     return (
-        <div 
-            className="dataspace-split" 
+        <div
+            className="dataspace-split"
             ref={splitPaneRef}
             style={{ gridTemplateColumns: `${leftPanelWidth} 6px 1fr` }}
         >
@@ -81,21 +84,24 @@ export default function DataSpace({ vehicles, vehiclesData, visuals = [], onClos
             <div className="dataspace-resizer" onMouseDown={handleMouseDown} />
             <div className="visuals-pane">
                 {visuals.map(({ id, topic, panel, ip }) => {
+                    const vehicle = vehiclesData?.[ip];
+                    const data = vehicle?.topicsData?.[topic];
+                    const rawData = vehicle?.rawTopicsData?.[topic];
+
                     return (
                         <VisualRenderer
                             key={id}
                             topic={topic}
                             panel={panel}
-                            ip={ip}
+                            vehicleId={ip}
+                            rosbridgeUrl={vehicle?.rosbridgeIp}
+                            data={data}
+                            rawData={rawData}
                             onClose={() => onCloseVisual(id)}
                         />
                     );
                 })}
-
             </div>
         </div>
     );
 }
-
-
-

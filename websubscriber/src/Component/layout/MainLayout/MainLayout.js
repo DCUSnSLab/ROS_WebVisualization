@@ -5,6 +5,7 @@ import Header from "./MainHeader";
 import Footer from "./MainFooter";
 import SidebarTop from "./SidebarTop";
 import DataSpace from "../DataViewerLayout/DataSpace";
+import InfoBox from "../DataViewerLayout/InfoBox";
 import UseRosVehicles from "./UseRosVehicles";
 
 const MainLayout = ({ name, dropdownContent, content }) => {
@@ -13,7 +14,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [vehicles, setVehicles] = useState([]);
 
     // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
-    const { vehiclesData, vehicleList, connectVehicle } = UseRosVehicles();
+    const { vehiclesData, vehicleList, requestTopicList, subscribeTopic, unsubscribeTopic } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -36,8 +37,9 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const activePanelsByTopic = useMemo(() => {
         const map = {};
         for (const v of visuals) {
-            if (!map[v.topic]) map[v.topic] = new Set();
-            map[v.topic].add(v.panel);
+            const topicKey = `${v.ip}::${v.topic}`;
+            if (!map[topicKey]) map[topicKey] = new Set();
+            map[topicKey].add(v.panel);
         }
         return map;
     }, [visuals]);
@@ -50,13 +52,16 @@ const MainLayout = ({ name, dropdownContent, content }) => {
 
     const handlePanelSelect = ({ topic, panel, ip }) => {
         setVisuals((prev) => {
-            // Use a unique ID that includes the vehicle IP
             const vizId = `${ip}-${topic}-${panel}`;
-
             const isAlreadyOn = prev.some((x) => x.id === vizId);
 
             if (isAlreadyOn) {
-                // Remove by the unique ID
+                const remainingForTopic = prev.filter(
+                    (x) => x.id !== vizId && x.ip === ip && x.topic === topic
+                );
+                if (remainingForTopic.length === 0) {
+                    unsubscribeTopic(ip, topic);
+                }
                 return prev.filter((x) => x.id !== vizId);
             }
 
@@ -64,7 +69,6 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 return prev;
             }
 
-            // Add the new visualization with the unique ID
             return [...prev, { id: vizId, topic, panel, ip }];
         });
     };
@@ -94,7 +98,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 dropdownContent={dropdownContent}
                 onAddVehicle={addVehicle}
                 vehicleList={vehicleList}
-                connectVehicle={connectVehicle}
+                connectVehicle={requestTopicList}
             />
 
             <main className="main">
@@ -109,14 +113,10 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                             {isOpen &&
                                 (content || (
                                     <SidebarTop
-                                        // vehicles={vehicles}
                                         vehiclesData={vehiclesData}
-                                        // onTopicSelect={handleTopicSelect}
                                         onPanelSelect={handlePanelSelect}
-                                        // selectedTopic={selectedTopic}
-                                        // selectedPanel={selectedPanel}
                                         activePanelsByTopic={activePanelsByTopic}
-                                        connectVehicle={connectVehicle}
+                                        subscribeTopic={subscribeTopic}
                                     />
                                 ))}
                         </div>
@@ -130,13 +130,25 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                             vehiclesData={vehiclesData}
                             visuals={visuals}
                             onCloseVisual={(id) =>
-                                setVisuals((prev) => prev.filter((v) => v.id !== id))}
+                                setVisuals((prev) => {
+                                    const target = prev.find((v) => v.id === id);
+                                    if (target) {
+                                        const remainingForTopic = prev.filter(
+                                            (v) => v.id !== id && v.ip === target.ip && v.topic === target.topic
+                                        );
+                                        if (remainingForTopic.length === 0) {
+                                            unsubscribeTopic(target.ip, target.topic);
+                                        }
+                                    }
+                                    return prev.filter((v) => v.id !== id);
+                                })}
                         />
                     </section>
                 </div>
             </main>
 
             <Footer />
+            <InfoBox vehiclesData={vehiclesData} />
         </div>
     );
 };

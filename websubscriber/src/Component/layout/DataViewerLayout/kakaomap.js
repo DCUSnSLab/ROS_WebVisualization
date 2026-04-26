@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { Map, MapMarker, Polyline } from "react-kakao-maps-sdk";
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { showInfoBox, hideInfoBox } from "../../../features/infobox/infoBoxSlice";
+import { hideInfoBox, showInfoBox } from "../../../features/infobox/infoBoxSlice";
 
 const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
     const mapRef = useRef(null);
     const markerClickedRef = useRef(false);
     const dispatch = useDispatch();
+    const infoBoxVisible = useSelector((state) => state.infoBox.visible);
 
     useEffect(() => {
         const map = mapRef.current;
@@ -17,8 +19,13 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
         }
     }, [leftPanelWidth]);
 
-    const handleMarkerClick = (marker, vehicle, ip) => {
+    const handleMarkerClick = (marker, vehicleId, vehicle) => {
         markerClickedRef.current = true;
+
+        if (infoBoxVisible) {
+            dispatch(hideInfoBox());
+            return;
+        }
 
         const map = mapRef.current;
         if (!map) return;
@@ -29,7 +36,12 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
         dispatch(showInfoBox({
             x: point.x,
             y: point.y,
-            vehicle: { ...vehicle, ip },
+            vehicle: {
+                ...vehicle,
+                id: vehicleId,
+                name: vehicle?.name || vehicleId,
+                rosbridgeIp: vehicle?.rosbridgeIp || "",
+            },
         }));
     };
 
@@ -43,17 +55,21 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
                     mapRef.current = map;
                 }}
             >
-                {Object.entries(vehiclesData || {}).map(([ip, data]) => {
+                {Object.entries(vehiclesData || {}).map(([vehicleId, data]) => {
                     const lat = data.lat;
                     const lng = data.lng;
 
+                    if (typeof lat !== "number" || typeof lng !== "number") {
+                        return null;
+                    }
+
                     return (
-                        <React.Fragment key={ip}>
+                        <React.Fragment key={vehicleId}>
                             <MapMarker
                                 position={{ lat, lng }}
-                                title={`Vehicle: ${data.name}`}
+                                title={`Vehicle: ${data.name || vehicleId}`}
                                 onClick={(marker) =>
-                                    handleMarkerClick(marker, data, ip)
+                                    handleMarkerClick(marker, vehicleId, data)
                                 }
                             />
                             {data.waypoints?.length > 1 && (

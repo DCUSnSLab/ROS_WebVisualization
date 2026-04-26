@@ -20,11 +20,17 @@ export default function SidebarTop({
                                        vehiclesData,
                                        onPanelSelect,
                                        activePanelsByTopic,
-                                       connectVehicle
-                                   }) {
+                                       subscribeTopic
+                                     }) {
+    const connectedVehicles = Object.entries(vehiclesData || {}).filter(
+        ([, vehicleData]) =>
+            vehicleData &&
+            Object.prototype.hasOwnProperty.call(vehicleData, "topics")
+    );
+
     return (
         <div className="siderbar-scroll">
-            {Object.keys(vehiclesData).map((vehicleId) => (
+            {connectedVehicles.map(([vehicleId]) => (
                 <AccordionItem
                     key={vehicleId}
                     title={vehicleId}
@@ -34,7 +40,7 @@ export default function SidebarTop({
                             vehiclesData={vehiclesData}
                             onPanelSelect={onPanelSelect}
                             activePanelsByTopic={activePanelsByTopic}
-                            connectVehicle={connectVehicle}
+                            subscribeTopic={subscribeTopic}
                         />
                     }
                 />

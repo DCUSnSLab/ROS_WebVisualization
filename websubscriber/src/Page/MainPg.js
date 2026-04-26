@@ -1,12 +1,7 @@
-// 메인페이지(개인)
-
-import MainLayout from "../Component/layout/MainLayout/MainLayout";
-import DropdownPg from '../Component/Dropdown/DropdownPg';
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import InfoBox from "../Component/layout/DataViewerLayout/InfoBox";
-import { hideInfoBox } from "../features/infobox/infoBoxSlice";
-
+import DropdownPg from "../Component/Dropdown/DropdownPg";
+import MainLayout from "../Component/layout/MainLayout/MainLayout";
 
 function MainPg() {
     const dispatch = useDispatch();
@@ -14,22 +9,23 @@ function MainPg() {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (infoBoxVisible && !document.getElementById('info-box')?.contains(event.target)) {
-                // dispatch(hideInfoBox());
+            if (
+                infoBoxVisible &&
+                !document.getElementById("info-box")?.contains(event.target)
+            ) {
+                // Keep outside-click behavior disabled for now.
             }
         };
 
-        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener("mousedown", handleClickOutside);
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [infoBoxVisible, dispatch]);
-
+    }, [dispatch, infoBoxVisible]);
 
     return (
         <div>
             <MainLayout name={"이름"} dropdownContent={<DropdownPg />} />
-            <InfoBox />
         </div>
     );
 }

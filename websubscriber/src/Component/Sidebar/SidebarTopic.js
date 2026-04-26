@@ -11,7 +11,7 @@ function AccordionItem({
                            onToggle,
                            onPanelSelect,
                            activePanelsSet = new Set(),
-                           connectVehicle
+                           subscribeTopic
                        }) {
     const isActive = activePanelsSet.size > 0;
 
@@ -31,7 +31,7 @@ function AccordionItem({
                     topic={topic}
                     vehicleId={vehicleId}
                     topicType={topicType}
-                    connectVehicle={connectVehicle}
+                    subscribeTopic={subscribeTopic}
                     activePanels={activePanelsSet}
                     onSelect={({ topic, panel }) =>
                         onPanelSelect && onPanelSelect({
@@ -52,7 +52,7 @@ export default function SidebarTopic({
                                          vehiclesData,
                                          onPanelSelect,
                                          activePanelsByTopic = {},
-                                         connectVehicle
+                                         subscribeTopic
                                      }) {
     const [openTopics, setOpenTopics] = useState(new Set());
 
@@ -87,8 +87,9 @@ export default function SidebarTopic({
                                 const topicType = topicObj.type;
 
                                 const isOpen = openTopics.has(topicName);
+                                const topicKey = `${vehicleId}::${topicName}`;
                                 const activePanelsSet =
-                                    activePanelsByTopic[topicName] || new Set();
+                                    activePanelsByTopic[topicKey] || new Set();
 
                                 return (
                                     <AccordionItem
@@ -100,7 +101,7 @@ export default function SidebarTopic({
                                         onToggle={() => toggle(topicName)}
                                         onPanelSelect={onPanelSelect}
                                         activePanelsSet={activePanelsSet}
-                                        connectVehicle={connectVehicle}
+                                        subscribeTopic={subscribeTopic}
                                     />
                                 );
                             })

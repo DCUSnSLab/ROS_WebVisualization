@@ -1,0 +1,9 @@
+services:
+  web_visualization:
+    build: .
+    image: web-visualization
+    container_name: web-visualization
+    ports:
+      - "3000:3000"
+    environment:
+      - HOST=0.0.0.0

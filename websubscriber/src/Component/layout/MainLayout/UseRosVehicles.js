@@ -16,7 +16,7 @@ export default function UseRosVehicles() {
     useEffect(() => {
         if (wsRef.current) return;
 
-        const ws = new WebSocket("ws://203.250.34.164:8080");
+        const ws = new WebSocket("ws://203.250.32.54:8080");
         wsRef.current = ws;
 
         ws.onopen = () => {
@@ -119,33 +119,33 @@ export default function UseRosVehicles() {
                     ) {
                         stats.done = true;
 
-                        if (stats.samples.length > 0) {
-                            const avgLatency =
-                                stats.samples.reduce((acc, cur) => acc + cur, 0) /
-                                stats.samples.length;
-
-                            latencyResultsRef.current[topicKey] = {
-                                average: avgLatency,
-                                count: stats.samples.length,
-                                warmupMs: LATENCY_WARMUP_MS,
-                                measureMs: LATENCY_MEASURE_MS,
-                            };
-
-                            console.log(
-                                `[LATENCY RESULT] ${topicKey} avg=${avgLatency.toFixed(2)}ms samples=${stats.samples.length}`
-                            );
-                        } else {
-                            latencyResultsRef.current[topicKey] = {
-                                average: null,
-                                count: 0,
-                                warmupMs: LATENCY_WARMUP_MS,
-                                measureMs: LATENCY_MEASURE_MS,
-                            };
-
-                            console.warn(
-                                `[LATENCY RESULT] ${topicKey} no samples collected in measurement window`
-                            );
-                        }
+                        // if (stats.samples.length > 0) {
+                        //     const avgLatency =
+                        //         stats.samples.reduce((acc, cur) => acc + cur, 0) /
+                        //         stats.samples.length;
+                        //
+                        //     latencyResultsRef.current[topicKey] = {
+                        //         average: avgLatency,
+                        //         count: stats.samples.length,
+                        //         warmupMs: LATENCY_WARMUP_MS,
+                        //         measureMs: LATENCY_MEASURE_MS,
+                        //     };
+                        //
+                        //     // console.log(
+                        //     //     `[LATENCY RESULT] ${topicKey} avg=${avgLatency.toFixed(2)}ms samples=${stats.samples.length}`
+                        //     // );
+                        // } else {
+                        //     latencyResultsRef.current[topicKey] = {
+                        //         average: null,
+                        //         count: 0,
+                        //         warmupMs: LATENCY_WARMUP_MS,
+                        //         measureMs: LATENCY_MEASURE_MS,
+                        //     };
+                        //
+                        //     console.warn(
+                        //         `[LATENCY RESULT] ${topicKey} no samples collected in measurement window`
+                        //     );
+                        // }
                     }
                 }
 

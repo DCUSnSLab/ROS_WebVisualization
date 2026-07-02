@@ -25,7 +25,7 @@ function MainPg() {
 
     return (
         <div>
-            <MainLayout name={"이름"} dropdownContent={<DropdownPg />} />
+            <MainLayout name={"user"} dropdownContent={<DropdownPg />} />
         </div>
     );
 }

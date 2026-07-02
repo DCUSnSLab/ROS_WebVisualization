@@ -8,6 +8,7 @@ export default function UseRosVehicles() {
     const latencyStatsRef = useRef({});
     const latencyResultsRef = useRef({});
 
+    // 실험 시간
     const LATENCY_WARMUP_MS = 10_000;
     const LATENCY_MEASURE_MS = 60_000;
 

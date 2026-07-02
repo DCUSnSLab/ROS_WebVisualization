@@ -8,6 +8,7 @@ export default function UseRosVehicles() {
     const latencyStatsRef = useRef({});
     const latencyResultsRef = useRef({});
 
+    // 실험 시간
     const LATENCY_WARMUP_MS = 10_000;
     const LATENCY_MEASURE_MS = 60_000;
 
@@ -118,34 +119,6 @@ export default function UseRosVehicles() {
                         elapsed >= LATENCY_WARMUP_MS + LATENCY_MEASURE_MS
                     ) {
                         stats.done = true;
-
-                        // if (stats.samples.length > 0) {
-                        //     const avgLatency =
-                        //         stats.samples.reduce((acc, cur) => acc + cur, 0) /
-                        //         stats.samples.length;
-                        //
-                        //     latencyResultsRef.current[topicKey] = {
-                        //         average: avgLatency,
-                        //         count: stats.samples.length,
-                        //         warmupMs: LATENCY_WARMUP_MS,
-                        //         measureMs: LATENCY_MEASURE_MS,
-                        //     };
-                        //
-                        //     // console.log(
-                        //     //     `[LATENCY RESULT] ${topicKey} avg=${avgLatency.toFixed(2)}ms samples=${stats.samples.length}`
-                        //     // );
-                        // } else {
-                        //     latencyResultsRef.current[topicKey] = {
-                        //         average: null,
-                        //         count: 0,
-                        //         warmupMs: LATENCY_WARMUP_MS,
-                        //         measureMs: LATENCY_MEASURE_MS,
-                        //     };
-                        //
-                        //     console.warn(
-                        //         `[LATENCY RESULT] ${topicKey} no samples collected in measurement window`
-                        //     );
-                        // }
                     }
                 }
 

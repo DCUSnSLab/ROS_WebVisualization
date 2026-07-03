@@ -1,0 +1,82 @@
+# Web Visualization — 자율주행 모니터링 프론트 (Create React App, :3000)
+# - 결정사항: CRA 개발 서버(npm start) 그대로 구동 → REACT_APP_RELAY_WS_URL 런타임 주입이
+#   컨테이너 기동 시점에 그대로 반영됨(GEN-1133 의도). 무겁지만 지금 바로 배포 가능.
+# - 브라우저는 UI 를 여기서 받은 뒤, REACT_APP_RELAY_WS_URL 로 "릴레이 서버에 직접" WS 접속한다.
+#   따라서 이 값은 클러스터 내부 DNS 가 아니라 "외부에서 닿는" 릴레이 주소여야 한다.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-visualization
+  labels:
+    app.kubernetes.io/name: web-visualization
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: autonomous-monitoring
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web-visualization
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web-visualization
+        app.kubernetes.io/component: frontend
+        app.kubernetes.io/part-of: autonomous-monitoring
+    spec:
+      containers:
+        - name: web-visualization
+          image: harbor.cu.ac.kr/autonomousmonitoring/web-visualization:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: HOST
+              value: "0.0.0.0"
+            # CRA dev server 는 Host 헤더 검사를 하므로, NodePort(<node-ip>:31300) 로 들어오는
+            # 요청이 "Invalid Host header" 로 거부되지 않도록 호스트 체크를 끈다.
+            - name: DANGEROUSLY_DISABLE_HOST_CHECK
+              value: "true"
+            # ── 중계(릴레이) 서버 WebSocket 외부 주소 (브라우저가 직접 접속) ──────────────
+            # NodePort 라 <node-ip>:30808 형태. 아래 IP 는 워커 노드(n1-k8s) 기준 기본값이며,
+            # 어느 노드 IP 든 동작한다(NodePort 는 전 노드에서 listen). 단, 단일 IP 라 해당 노드가
+            # 내려가면 브라우저→릴레이 접속이 끊긴다. HA 가 필요하면 릴레이를 LoadBalancer/VIP 로
+            # 바꾸고 이 값을 그 주소로 교체할 것.
+            - name: REACT_APP_RELAY_WS_URL
+              value: "ws://203.250.32.220:30808"
+            # 카카오맵 JS appkey — Secret(web-visualization-secrets)에서 주입(index.html 의
+            # %REACT_APP_KAKAO_MAP_KEY% 치환에 사용). 네임스페이스당 1회 Secret 생성 필요:
+            #   kubectl create secret generic web-visualization-secrets -n autonomous \
+            #     --from-literal=REACT_APP_KAKAO_MAP_KEY=<카카오_JS_appkey>
+            - name: REACT_APP_KAKAO_MAP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: web-visualization-secrets
+                  key: REACT_APP_KAKAO_MAP_KEY
+          # dev server 는 기동 시 webpack 컴파일로 첫 응답까지 수십 초 걸릴 수 있어 startupProbe 로 여유
+          startupProbe:
+            httpGet:
+              path: /
+              port: 3000
+            periodSeconds: 10
+            failureThreshold: 30      # 최대 ~300s 기동 대기
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            periodSeconds: 20
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi        # CRA dev server 는 무거움(기존 eunviz 파드 ~933Mi 관측)

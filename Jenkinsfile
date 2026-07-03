@@ -30,11 +30,16 @@ pipeline {
             steps { checkout scm }
         }
 
-        // 배포 대상 브랜치: main (그 외 브랜치는 Checkout 만 하고 빌드·배포 스킵).
+        // 배포 대상 브랜치: SCV_Monitoring_Tools (그 외 브랜치는 Checkout 만 하고 빌드·배포 스킵).
         stage('Build & Push') {
             when {
+                // 멀티브랜치 잡이면 branch 조건이, 단일 브랜치 Pipeline 잡이면 GIT_BRANCH 표현식이 매칭된다.
                 anyOf {
-                    branch 'main'
+                    branch 'SCV_Monitoring_Tools'
+                    expression {
+                        def b = env.GIT_BRANCH ?: ''
+                        return b == 'SCV_Monitoring_Tools' || b.endsWith('/SCV_Monitoring_Tools')
+                    }
                     expression { return params.FORCE_DEPLOY }
                 }
             }
@@ -51,8 +56,13 @@ pipeline {
 
         stage('Deploy') {
             when {
+                // 멀티브랜치 잡이면 branch 조건이, 단일 브랜치 Pipeline 잡이면 GIT_BRANCH 표현식이 매칭된다.
                 anyOf {
-                    branch 'main'
+                    branch 'SCV_Monitoring_Tools'
+                    expression {
+                        def b = env.GIT_BRANCH ?: ''
+                        return b == 'SCV_Monitoring_Tools' || b.endsWith('/SCV_Monitoring_Tools')
+                    }
                     expression { return params.FORCE_DEPLOY }
                 }
             }

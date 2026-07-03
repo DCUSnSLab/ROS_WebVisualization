@@ -1,0 +1,18 @@
+# Web Visualization 외부 노출 — NodePort
+# 외부 접속: http://<node-ip>:31300
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-visualization
+  labels:
+    app.kubernetes.io/name: web-visualization
+    app.kubernetes.io/component: frontend
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: web-visualization
+  ports:
+    - name: http
+      port: 3000
+      targetPort: 3000
+      nodePort: 31300

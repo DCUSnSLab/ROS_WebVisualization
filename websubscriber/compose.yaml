@@ -7,3 +7,5 @@ services:
       - "3000:3000"
     environment:
       - HOST=0.0.0.0
+      # 중계 서버 주소. 호스트 환경변수/.env 로 덮어쓸 수 있으며, 미지정 시 아래 기본값 사용.
+      - REACT_APP_RELAY_WS_URL=${REACT_APP_RELAY_WS_URL:-ws://203.250.32.54:8080}

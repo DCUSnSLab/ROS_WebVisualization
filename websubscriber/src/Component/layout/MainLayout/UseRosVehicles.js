@@ -1,5 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 
+// 중계 서버 주소는 환경변수(REACT_APP_RELAY_WS_URL)로 주입한다.
+// 미설정 시 기존 배포 동작을 유지하기 위해 기본값으로 fallback.
+const RELAY_WS_URL =
+    process.env.REACT_APP_RELAY_WS_URL || "ws://203.250.32.54:8080";
+
 export default function UseRosVehicles() {
     const [vehiclesData, setVehiclesData] = useState({});
     const [vehicleList, setVehicleList] = useState([]);
@@ -17,7 +22,7 @@ export default function UseRosVehicles() {
     useEffect(() => {
         if (wsRef.current) return;
 
-        const ws = new WebSocket("ws://203.250.32.54:8080");
+        const ws = new WebSocket(RELAY_WS_URL);
         wsRef.current = ws;
 
         ws.onopen = () => {

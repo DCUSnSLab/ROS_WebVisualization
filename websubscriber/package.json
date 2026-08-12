@@ -59,6 +59,7 @@
     "smart-webcomponents-react": "^18.0.2",
     "stream-browserify": "^3.0.0",
     "styled-components": "^6.1.8",
+    "three": "^0.185.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

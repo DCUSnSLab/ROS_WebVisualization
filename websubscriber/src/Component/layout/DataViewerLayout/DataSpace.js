@@ -19,7 +19,7 @@ function VisualRenderer({ panel, topic, vehicleId, rosbridgeUrl, data, rawData, 
                     <PCL
                         topic={topic}
                         vehicleId={vehicleId}
-                        rosbridgeUrl={rosbridgeUrl}
+                        data={data}
                     />
                 )}
                 {panel === "Plot" && <Stream data={data} />}

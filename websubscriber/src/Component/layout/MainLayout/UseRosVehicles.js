@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { publishBinary } from "../../../binaryStreamBus";
 
 // 중계 서버 주소는 환경변수(REACT_APP_RELAY_WS_URL)로 주입한다.
 // 미설정 시 기존 배포 동작을 유지하기 위해 기본값으로 fallback.
@@ -23,6 +24,7 @@ export default function UseRosVehicles() {
         if (wsRef.current) return;
 
         const ws = new WebSocket(RELAY_WS_URL);
+        ws.binaryType = "arraybuffer";
         wsRef.current = ws;
 
         ws.onopen = () => {
@@ -39,7 +41,76 @@ export default function UseRosVehicles() {
             }));
         };
 
+        // 바이너리 프레임 디코드
+        // 레이아웃: [uint16 BE 헤더길이 H][H바이트 JSON 헤더][바이너리 페이로드]
+        const handleBinaryFrame = (buf) => {
+            const view = new DataView(buf);
+            const headerLen = view.getUint16(0, false);
+
+            let header;
+            try {
+                header = JSON.parse(
+                    new TextDecoder().decode(new Uint8Array(buf, 2, headerLen))
+                );
+            } catch (e) {
+                console.warn("bad binary header", e);
+                return;
+            }
+
+            const vid = header.vehicle_id;
+            const topic = header.topic;
+            const payloadOffset = 2 + headerLen;
+
+            // 포인트 클라우드: 고빈도라 React state를 거치지 않고 버스로 뷰어에 직접 전달
+            // (setVehiclesData 미호출 → 전체 리렌더 없음)
+            if (header.msg_type === "sensor_msgs/msg/PointCloud2") {
+                // Float32Array는 4바이트 정렬이 필요하므로 페이로드를 새 버퍼로 복사
+                const bytes = new Uint8Array(buf, payloadOffset);
+                const aligned = new Uint8Array(bytes.length);
+                aligned.set(bytes);
+                publishBinary(vid, topic, {
+                    __binary: "pointcloud",
+                    points: new Float32Array(aligned.buffer),
+                    count: header.count,
+                    fields: header.fields,
+                });
+                return;
+            }
+
+            // 이미지: 상대적으로 저빈도라 기존 React state 경로 유지
+            let value;
+            if (header.msg_type === "sensor_msgs/msg/CompressedImage") {
+                value = {
+                    __binary: "image",
+                    data: new Uint8Array(buf.slice(payloadOffset)),
+                    format: header.format,
+                };
+            } else {
+                return;
+            }
+
+            setVehiclesData((prev) => {
+                const vehicle = prev[vid] || {};
+                return {
+                    ...prev,
+                    [vid]: {
+                        ...vehicle,
+                        topicsData: { ...(vehicle.topicsData || {}), [topic]: value },
+                        rawTopicsData: {
+                            ...(vehicle.rawTopicsData || {}),
+                            [topic]: { ...header, __binary: true },
+                        },
+                    },
+                };
+            });
+        };
+
         ws.onmessage = (event) => {
+            if (event.data instanceof ArrayBuffer) {
+                handleBinaryFrame(event.data);
+                return;
+            }
+
             const msg = JSON.parse(event.data);
 
             if (msg.type === "vehicle_list") {

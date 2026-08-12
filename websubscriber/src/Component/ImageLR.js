@@ -23,6 +23,17 @@ export default function ImageLR({ data }) {
             return;
         }
 
+        // 릴레이 바이너리 프레임: 압축 이미지 바이트가 그대로 옴
+        if (data.data instanceof Uint8Array || data.data instanceof ArrayBuffer) {
+            const blob = new Blob([data.data], { type: getImageMime(data.format) });
+            const objectUrl = URL.createObjectURL(blob);
+            setImgSrc(objectUrl);
+
+            return () => {
+                URL.revokeObjectURL(objectUrl);
+            };
+        }
+
         if (Array.isArray(data.data)) {
             const byteArray = new Uint8Array(data.data);
             const blob = new Blob([byteArray], { type: getImageMime(data.format) });
@@ -42,10 +53,26 @@ export default function ImageLR({ data }) {
     }
 
     return (
-        <img
-            style={{ width: "100%", height: "100%", objectFit: "contain" }}
-            src={imgSrc}
-            alt="camera"
-        />
+        <div
+            style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+            }}
+        >
+            <img
+                style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
+                    display: "block",
+                }}
+                src={imgSrc}
+                alt="camera"
+            />
+        </div>
     );
 }

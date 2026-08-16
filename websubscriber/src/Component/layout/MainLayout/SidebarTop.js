@@ -2,14 +2,37 @@ import React, { useEffect, useState } from "react";
 import "./Sidebar.css";
 import SidebarTopic from "../../Sidebar/SidebarTopic";
 
-const AccordionItem = ({ title, content }) => {
+const AccordionItem = ({ title, content, onClose }) => {
     const [isOpen, setIsOpen] = useState(true);
+    const toggle = () => setIsOpen((v) => !v);
     return (
         <div className="siderbar">
-            <button className="siderbar-btn" onClick={() => setIsOpen(!isOpen)} style={{ justifyContent: "space-between" }}>
-                {title}
-                <span>{isOpen ? "▲" : "▼"}</span>
-            </button>
+            {/* 헤더 행 전체가 하나의 배경(.siderbar-btn)을 공유 → 검은 박스 방지 */}
+            <div
+                className="siderbar-btn"
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", color: "#111" }}
+            >
+                <span
+                    onClick={toggle}
+                    style={{ display: "flex", alignItems: "center", flex: 1, cursor: "pointer" }}
+                >
+                    {title}
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span onClick={toggle} style={{ cursor: "pointer" }}>
+                        {isOpen ? "▲" : "▼"}
+                    </span>
+                    {onClose && (
+                        <span
+                            onClick={onClose}
+                            title="이동체 연결 종료"
+                            style={{ cursor: "pointer", fontWeight: "bold", color: "#e53935" }}
+                        >
+                            ✕
+                        </span>
+                    )}
+                </span>
+            </div>
             {isOpen && <div className="siderbar-content">{content}</div>}
         </div>
     );
@@ -30,7 +53,8 @@ export default function SidebarTop({
                                        vehicleStatuses,
                                        onPanelSelect,
                                        activePanelsByTopic,
-                                       subscribeTopic
+                                       subscribeTopic,
+                                       onDisconnectVehicle
                                      }) {
     // 색상이 시간 경과에 따라 갱신되도록 1초마다 리렌더
     const [, setTick] = useState(0);
@@ -50,6 +74,11 @@ export default function SidebarTop({
             {connectedVehicles.map(([vehicleId]) => (
                 <AccordionItem
                     key={vehicleId}
+                    onClose={
+                        onDisconnectVehicle
+                            ? () => onDisconnectVehicle(vehicleId)
+                            : undefined
+                    }
                     title={
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                             <span

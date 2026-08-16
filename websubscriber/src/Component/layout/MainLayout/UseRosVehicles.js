@@ -139,6 +139,7 @@ export default function UseRosVehicles() {
                             id: vehicle.id,
                             name: vehicle.name || vehicle.id,
                             rosbridgeIp: vehicle.rosbridge_ip || vehicle.rosbridgeIp || "",
+                            isBag: !!vehicle.is_bag,
                         };
                     }
 
@@ -335,6 +336,20 @@ export default function UseRosVehicles() {
         return latencyResultsRef.current[topicKey]?.average ?? null;
     };
 
+    // 차량 이동 경로(waypoints) 초기화. vehicleId 미지정 시 전체 차량.
+    const resetPath = (vehicleId) => {
+        setVehiclesData((prev) => {
+            const next = {};
+            for (const [id, data] of Object.entries(prev)) {
+                next[id] =
+                    !vehicleId || id === vehicleId
+                        ? { ...data, waypoints: [] }
+                        : data;
+            }
+            return next;
+        });
+    };
+
 
     return {
         vehiclesData,
@@ -343,6 +358,7 @@ export default function UseRosVehicles() {
         requestTopicList,
         subscribeTopic,
         unsubscribeTopic,
-        getAverageLatency
+        getAverageLatency,
+        resetPath
     };
 }

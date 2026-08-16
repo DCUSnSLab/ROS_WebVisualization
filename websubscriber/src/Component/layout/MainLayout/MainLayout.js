@@ -14,7 +14,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [vehicles, setVehicles] = useState([]);
 
     // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
-    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, subscribeTopic, unsubscribeTopic } = UseRosVehicles();
+    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, subscribeTopic, unsubscribeTopic, resetPath } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -149,7 +149,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
             </main>
 
             <Footer />
-            <InfoBox vehiclesData={vehiclesData} />
+            <InfoBox vehiclesData={vehiclesData} onResetPath={resetPath} />
         </div>
     );
 };

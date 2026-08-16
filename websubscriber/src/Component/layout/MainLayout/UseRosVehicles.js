@@ -9,6 +9,7 @@ const RELAY_WS_URL =
 export default function UseRosVehicles() {
     const [vehiclesData, setVehiclesData] = useState({});
     const [vehicleList, setVehicleList] = useState([]);
+    const [vehicleStatuses, setVehicleStatuses] = useState({}); // id -> { msAgo, receivedAt }
     const wsRef = useRef(null);
     const subscribedRef = useRef(new Set());
     const latencyStatsRef = useRef({});
@@ -112,6 +113,18 @@ export default function UseRosVehicles() {
             }
 
             const msg = JSON.parse(event.data);
+
+            // 차량 연결 상태(색상 표시용): 릴레이가 1초마다 보냄
+            if (msg.type === "vehicle_status") {
+                const now = Date.now();
+                const next = {};
+                for (const s of msg.statuses || []) {
+                    if (!s || !s.id) continue;
+                    next[s.id] = { msAgo: s.msAgo, receivedAt: now };
+                }
+                setVehicleStatuses(next);
+                return;
+            }
 
             if (msg.type === "vehicle_list") {
                 setVehicleList(msg.vehicles);
@@ -326,6 +339,7 @@ export default function UseRosVehicles() {
     return {
         vehiclesData,
         vehicleList,
+        vehicleStatuses,
         requestTopicList,
         subscribeTopic,
         unsubscribeTopic,

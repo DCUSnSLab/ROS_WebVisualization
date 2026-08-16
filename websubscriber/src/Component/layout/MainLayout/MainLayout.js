@@ -14,7 +14,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [vehicles, setVehicles] = useState([]);
 
     // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
-    const { vehiclesData, vehicleList, requestTopicList, subscribeTopic, unsubscribeTopic } = UseRosVehicles();
+    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, subscribeTopic, unsubscribeTopic } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -114,6 +114,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                                 (content || (
                                     <SidebarTop
                                         vehiclesData={vehiclesData}
+                                        vehicleStatuses={vehicleStatuses}
                                         onPanelSelect={handlePanelSelect}
                                         activePanelsByTopic={activePanelsByTopic}
                                         subscribeTopic={subscribeTopic}

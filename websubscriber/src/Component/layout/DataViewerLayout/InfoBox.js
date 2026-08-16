@@ -11,7 +11,7 @@ function formatNumber(value, digits = 1) {
     return typeof value === 'number' ? value.toFixed(digits) : 'N/A';
 }
 
-export default function InfoBox({ vehiclesData = {} }) {
+export default function InfoBox({ vehiclesData = {}, onResetPath }) {
     const dispatch = useDispatch();
     const { visible, position, vehicle } = useSelector((state) => state.infoBox);
 
@@ -79,9 +79,8 @@ export default function InfoBox({ vehiclesData = {} }) {
         return `${maxMotorTemp}C / ${maxDriverTemp}C`;
     }, [hunterStatus]);
 
-    const isRealVehicle = useMemo(() => {
-        return Boolean(vehicleData?.rosbridgeIp && hunterStatus);
-    }, [hunterStatus, vehicleData?.rosbridgeIp]);
+    // bag 여부는 소스가 register 때 보낸 명시적 플래그(is_bag)로 판단
+    const isBag = Boolean(vehicleData?.isBag);
 
     useEffect(() => {
         setLocalPos({ x: position.x, y: position.y });
@@ -183,7 +182,7 @@ export default function InfoBox({ vehiclesData = {} }) {
 
             <div>
                 <strong>Control:</strong> {controlMode}{' '}
-                {!isRealVehicle && (
+                {isBag && (
                     <span style={{ color: 'orange', marginLeft: '1px', fontWeight: 'bold' }}>
                         (bag)
                     </span>
@@ -245,6 +244,27 @@ export default function InfoBox({ vehiclesData = {} }) {
             <p>
                 <strong>Temperature:</strong> {temperature}
             </p>
+
+            <div
+                onClick={(event) => {
+                    event.stopPropagation();
+                    if (onResetPath) onResetPath(vehicle?.id);
+                }}
+                style={{
+                    marginTop: '8px',
+                    padding: '3px 8px',
+                    textAlign: 'center',
+                    background: '#f5f5f5',
+                    border: '1px solid #ccc',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    userSelect: 'none',
+                }}
+            >
+                이동 경로 초기화
+            </div>
         </div>
     );
 }

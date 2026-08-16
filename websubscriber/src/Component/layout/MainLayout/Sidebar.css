@@ -24,4 +24,6 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 10px;
+    /* 접기/펴기로 내용 높이가 바뀔 때 스크롤바가 생겼다 사라지며 내용이 좌우로 밀리는 것을 방지 */
+    scrollbar-gutter: stable;
 }

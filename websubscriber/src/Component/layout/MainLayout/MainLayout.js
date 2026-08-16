@@ -14,7 +14,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [vehicles, setVehicles] = useState([]);
 
     // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
-    const { vehiclesData, vehicleList, requestTopicList, subscribeTopic, unsubscribeTopic } = UseRosVehicles();
+    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, subscribeTopic, unsubscribeTopic, resetPath, disconnectVehicle } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -73,6 +73,20 @@ const MainLayout = ({ name, dropdownContent, content }) => {
         });
     };
 
+    // 이동체 연결 종료 확인 모달
+    const [disconnectTarget, setDisconnectTarget] = useState(null);
+
+    const handleDisconnectVehicle = (vehicleId) => {
+        setDisconnectTarget(vehicleId); // 모달 열기
+    };
+
+    const confirmDisconnect = () => {
+        if (!disconnectTarget) return;
+        disconnectVehicle(disconnectTarget);
+        setVisuals((prev) => prev.filter((v) => v.ip !== disconnectTarget));
+        setDisconnectTarget(null);
+    };
+
     const [sidebarWidth, setSidebarWidth] = useState(280);
     const isResizing = useRef(false);
     const handleMouseDown = () => (isResizing.current = true);
@@ -114,9 +128,11 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                                 (content || (
                                     <SidebarTop
                                         vehiclesData={vehiclesData}
+                                        vehicleStatuses={vehicleStatuses}
                                         onPanelSelect={handlePanelSelect}
                                         activePanelsByTopic={activePanelsByTopic}
                                         subscribeTopic={subscribeTopic}
+                                        onDisconnectVehicle={handleDisconnectVehicle}
                                     />
                                 ))}
                         </div>
@@ -148,7 +164,70 @@ const MainLayout = ({ name, dropdownContent, content }) => {
             </main>
 
             <Footer />
-            <InfoBox vehiclesData={vehiclesData} />
+            <InfoBox vehiclesData={vehiclesData} onResetPath={resetPath} />
+
+            {disconnectTarget && (
+                <div
+                    onClick={() => setDisconnectTarget(null)}
+                    style={{
+                        position: "fixed",
+                        inset: 0,
+                        background: "rgba(0,0,0,0.4)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 2000,
+                    }}
+                >
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                            background: "#1B1F3B",
+                            color: "#fff",
+                            borderRadius: 8,
+                            padding: "22px 24px",
+                            minWidth: 320,
+                            boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+                        }}
+                    >
+                        <div style={{ fontSize: 16, marginBottom: 6 }}>
+                            이동체와의 연결을 종료하시겠습니까?
+                        </div>
+                        <div style={{ fontSize: 13, opacity: 0.7, marginBottom: 20 }}>
+                            {disconnectTarget}
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
+                            <button
+                                onClick={() => setDisconnectTarget(null)}
+                                style={{
+                                    padding: "6px 16px",
+                                    borderRadius: 6,
+                                    border: "1px solid #57676E",
+                                    background: "transparent",
+                                    color: "#fff",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                취소
+                            </button>
+                            <button
+                                onClick={confirmDisconnect}
+                                style={{
+                                    padding: "6px 16px",
+                                    borderRadius: 6,
+                                    border: "none",
+                                    background: "#e53935",
+                                    color: "#fff",
+                                    cursor: "pointer",
+                                    fontWeight: "bold",
+                                }}
+                            >
+                                네
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

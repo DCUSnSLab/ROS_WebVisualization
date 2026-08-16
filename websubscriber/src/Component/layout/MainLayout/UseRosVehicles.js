@@ -9,6 +9,7 @@ const RELAY_WS_URL =
 export default function UseRosVehicles() {
     const [vehiclesData, setVehiclesData] = useState({});
     const [vehicleList, setVehicleList] = useState([]);
+    const [vehicleStatuses, setVehicleStatuses] = useState({}); // id -> { msAgo, receivedAt }
     const wsRef = useRef(null);
     const subscribedRef = useRef(new Set());
     const latencyStatsRef = useRef({});
@@ -113,6 +114,18 @@ export default function UseRosVehicles() {
 
             const msg = JSON.parse(event.data);
 
+            // 차량 연결 상태(색상 표시용): 릴레이가 1초마다 보냄
+            if (msg.type === "vehicle_status") {
+                const now = Date.now();
+                const next = {};
+                for (const s of msg.statuses || []) {
+                    if (!s || !s.id) continue;
+                    next[s.id] = { msAgo: s.msAgo, receivedAt: now };
+                }
+                setVehicleStatuses(next);
+                return;
+            }
+
             if (msg.type === "vehicle_list") {
                 setVehicleList(msg.vehicles);
                 setVehiclesData((prev) => {
@@ -126,6 +139,7 @@ export default function UseRosVehicles() {
                             id: vehicle.id,
                             name: vehicle.name || vehicle.id,
                             rosbridgeIp: vehicle.rosbridge_ip || vehicle.rosbridgeIp || "",
+                            isBag: !!vehicle.is_bag,
                         };
                     }
 
@@ -322,13 +336,61 @@ export default function UseRosVehicles() {
         return latencyResultsRef.current[topicKey]?.average ?? null;
     };
 
+    // 대시보드에서 이 차량 보기를 종료: 구독 해제 + topic_list 갱신 중단 + 사이드바에서 제거
+    const disconnectVehicle = (vehicleId) => {
+        if (!vehicleId) return;
+
+        // 이 차량의 모든 토픽 구독 해제
+        for (const key of Array.from(subscribedRef.current)) {
+            if (key.startsWith(`${vehicleId}::`)) {
+                const topic = key.slice(vehicleId.length + 2); // "::" = 2글자
+                unsubscribeTopic(vehicleId, topic);
+            }
+        }
+
+        // 릴레이에 topic_list 갱신 중단 요청(다시 나타나지 않게)
+        if (wsRef.current?.readyState === 1) {
+            wsRef.current.send(
+                JSON.stringify({ type: "stop_topic_list", vehicle_id: vehicleId })
+            );
+        }
+
+        // 사이드바에서 사라지도록 topics 관련 상태 제거(기본 정보는 유지 → 재연결 가능)
+        setVehiclesData((prev) => {
+            const v = prev[vehicleId];
+            if (!v) return prev;
+            const rest = { ...v };
+            delete rest.topics;
+            delete rest.topicsData;
+            delete rest.rawTopicsData;
+            return { ...prev, [vehicleId]: rest };
+        });
+    };
+
+    // 차량 이동 경로(waypoints) 초기화. vehicleId 미지정 시 전체 차량.
+    const resetPath = (vehicleId) => {
+        setVehiclesData((prev) => {
+            const next = {};
+            for (const [id, data] of Object.entries(prev)) {
+                next[id] =
+                    !vehicleId || id === vehicleId
+                        ? { ...data, waypoints: [] }
+                        : data;
+            }
+            return next;
+        });
+    };
+
 
     return {
         vehiclesData,
         vehicleList,
+        vehicleStatuses,
         requestTopicList,
         subscribeTopic,
         unsubscribeTopic,
-        getAverageLatency
+        getAverageLatency,
+        resetPath,
+        disconnectVehicle
     };
 }

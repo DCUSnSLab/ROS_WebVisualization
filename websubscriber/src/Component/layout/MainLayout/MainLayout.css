@@ -19,6 +19,8 @@
     min-height: 0;
     min-width: 0;
     position: relative;
+    /* 행 높이를 내용(토픽 목록)이 아니라 남는 높이로 고정 → 사이드바가 레이아웃을 밀지 않음 */
+    grid-template-rows: minmax(0, 1fr);
 }
 
 .sidebar-resizer {
@@ -38,6 +40,8 @@
     border-right: 1px solid #2a2f55;
     overflow-y: auto;
     overflow-x: hidden;
+    /* grid 셀이 내용만큼 커지지 않고, 고정 높이 안에서 내부 스크롤되도록 */
+    min-height: 0;
 }
 
 .content {
@@ -143,7 +147,7 @@
 /* ===== 푸터 유지 ===== */
 .footer-bar {
     height: 60px;
-    margin-top: auto;
+    flex: 0 0 60px;
     background-color: #1B1F3B;
 }
 

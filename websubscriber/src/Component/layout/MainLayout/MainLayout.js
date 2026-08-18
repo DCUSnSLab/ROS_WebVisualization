@@ -163,7 +163,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 </div>
             </main>
 
-            <Footer />
+            <Footer vehiclesData={vehiclesData} />
             <InfoBox vehiclesData={vehiclesData} onResetPath={resetPath} />
 
             {disconnectTarget && (

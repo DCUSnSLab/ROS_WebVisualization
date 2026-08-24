@@ -251,9 +251,43 @@
     opacity: 0.6;
 }
 
+.logging-topic-mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 28px;
+    margin: 8px 20px 0;
+    font-family: GMarketSans;
+    font-size: 14px;
+}
+
+.logging-all-topics-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.logging-all-topics-option input {
+    width: 16px;
+    height: 16px;
+    accent-color: #2e86de;
+    cursor: pointer;
+}
+
+.logging-all-topics-option input:disabled {
+    cursor: not-allowed;
+}
+
+.logging-all-topics-count,
+.logging-custom-topics-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+}
+
 .logging-topic-list {
-    height: calc(100% - 121px);
-    margin: 14px 20px 20px;
+    height: calc(100% - 157px);
+    margin: 8px 20px 20px;
     padding: 8px 14px;
     box-sizing: border-box;
     overflow-y: auto;
@@ -277,6 +311,14 @@
     height: 16px;
     accent-color: #2e86de;
     cursor: pointer;
+}
+
+.logging-topic-item input:disabled {
+    cursor: default;
+}
+
+.logging-topic-item.all-selected {
+    cursor: default;
 }
 
 .logging-topic-name {
@@ -321,6 +363,38 @@
     font-size: 22px;
 }
 
+.logging-bag-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.logging-bag-name-label {
+    flex: 0 0 auto;
+    font-size: 14px;
+}
+
+.logging-bag-name-input {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    color: #1B1F3B;
+    font-family: GMarketSans;
+}
+
+.logging-bag-name-input::placeholder {
+    color: #7c848b;
+}
+
+.logging-bag-name-input:focus {
+    border-color: #2e86de;
+}
+
 .logging-confirm-list {
     flex: 1;
     min-height: 0;
@@ -354,6 +428,11 @@
     color: #ffffff;
     cursor: pointer;
     font-family: GMarketSans;
+}
+
+.logging-confirm-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 .logging-confirm-no {

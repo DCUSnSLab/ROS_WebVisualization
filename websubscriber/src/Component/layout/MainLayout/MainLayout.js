@@ -7,6 +7,7 @@ import SidebarTop from "./SidebarTop";
 import DataSpace from "../DataViewerLayout/DataSpace";
 import InfoBox from "../DataViewerLayout/InfoBox";
 import UseRosVehicles from "./UseRosVehicles";
+import * as ROSLIB from "roslib";
 
 const MainLayout = ({ name, dropdownContent, content }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -28,6 +29,49 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const removeVehicle = (ip) => setVehicles((prev) => prev.filter((v) => v.ip !== ip));
 
     const [visuals, setVisuals] = useState([]);
+    const [loggingByVehicle, setLoggingByVehicle] = useState({});
+
+    const handleLoggingChange = ({ vehicleId, isLogging, bagName, topics }) => {
+        setLoggingByVehicle((current) => {
+            const next = { ...current };
+            if (isLogging) {
+                next[vehicleId] = { isLogging: true, bagName };
+            } else {
+                delete next[vehicleId];
+            }
+            return next;
+        });
+
+        // 해당 이동체의 rosbridge로 /logging 서비스 호출 (선택 토픽 + bag 이름 전달)
+        const rosbridgeUrl = vehiclesData?.[vehicleId]?.rosbridgeIp;
+        if (!rosbridgeUrl) {
+            console.warn("logging: no rosbridge url for", vehicleId);
+            return;
+        }
+
+        const ros = new ROSLIB.Ros({ url: rosbridgeUrl });
+        const loggingSrv = new ROSLIB.Service({
+            ros,
+            name: "/logging",
+            serviceType: "hardware_monitor2_interfaces/srv/Logging",
+        });
+        const request = new ROSLIB.ServiceRequest(
+            isLogging
+                ? { is_logging: "LoggingStart", topics: topics || [], bag_name: bagName || "" }
+                : { is_logging: "LoggingStop", topics: [], bag_name: "" }
+        );
+        loggingSrv.callService(
+            request,
+            (result) => {
+                console.log("logging result:", result);
+                ros.close();
+            },
+            (err) => {
+                console.error("logging service error:", err);
+                ros.close();
+            }
+        );
+    };
 
     const handleTopicSelect = (topic) => {
         setSelectedTopic((prev) => (prev === topic ? null : topic));
@@ -84,6 +128,11 @@ const MainLayout = ({ name, dropdownContent, content }) => {
         if (!disconnectTarget) return;
         disconnectVehicle(disconnectTarget);
         setVisuals((prev) => prev.filter((v) => v.ip !== disconnectTarget));
+        setLoggingByVehicle((current) => {
+            const next = { ...current };
+            delete next[disconnectTarget];
+            return next;
+        });
         setDisconnectTarget(null);
     };
 
@@ -133,6 +182,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                                         activePanelsByTopic={activePanelsByTopic}
                                         subscribeTopic={subscribeTopic}
                                         onDisconnectVehicle={handleDisconnectVehicle}
+                                        loggingByVehicle={loggingByVehicle}
                                     />
                                 ))}
                         </div>
@@ -163,7 +213,10 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 </div>
             </main>
 
-            <Footer vehiclesData={vehiclesData} />
+            <Footer
+                vehiclesData={vehiclesData}
+                onLoggingChange={handleLoggingChange}
+            />
             <InfoBox vehiclesData={vehiclesData} onResetPath={resetPath} />
 
             {disconnectTarget && (

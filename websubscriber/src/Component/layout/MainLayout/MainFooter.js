@@ -14,6 +14,7 @@ function MainFooter({vehiclesData}){
     const [selectedTopicKeys, setSelectedTopicKeys] = useState([]);
     const [pendingTopics, setPendingTopics] = useState([]);
     const [selectedVehicleId, setSelectedVehicleId] = useState("");
+    const [topicSearch, setTopicSearch] = useState("");
 
     const vehicleEntries = useMemo(() => (
         Object.entries(vehiclesData || {}).filter(([, vehicleData]) =>
@@ -35,6 +36,15 @@ function MainFooter({vehiclesData}){
         }));
     }, [activeVehicleId, vehiclesData]);
 
+    const filteredTopicEntries = useMemo(() => {
+        const keyword = topicSearch.trim().toLocaleLowerCase();
+        if (!keyword) return topicEntries;
+
+        return topicEntries.filter((topic) =>
+            topic.name.toLocaleLowerCase().includes(keyword)
+        );
+    }, [topicEntries, topicSearch]);
+
     const selectedTopicCount = topicEntries.filter((topic) =>
         selectedTopicKeys.includes(topic.key)
     ).length;
@@ -50,6 +60,7 @@ function MainFooter({vehiclesData}){
     const handleVehicleChange = (event) => {
         setSelectedVehicleId(event.target.value);
         setSelectedTopicKeys([]);
+        setTopicSearch("");
     };
 
     const handleStart = () => {
@@ -126,9 +137,19 @@ function MainFooter({vehiclesData}){
                                 <option value=''>연결된 차량 없음</option>
                             )}
                         </select>
+                        <label htmlFor='logging-topic-search'>토픽 검색</label>
+                        <input
+                            id='logging-topic-search'
+                            className='logging-topic-search'
+                            type='search'
+                            value={topicSearch}
+                            onChange={(event) => setTopicSearch(event.target.value)}
+                            placeholder='토픽 이름 검색'
+                            disabled={!activeVehicleId}
+                        />
                     </div>
                     <div className='logging-topic-list' role='group' aria-label='로깅 토픽 목록'>
-                        {topicEntries.length > 0 ? topicEntries.map((topic) => {
+                        {filteredTopicEntries.length > 0 ? filteredTopicEntries.map((topic) => {
                             const checked = selectedTopicKeys.includes(topic.key);
                             return (
                                 <label className='logging-topic-item' key={topic.key}>
@@ -144,7 +165,11 @@ function MainFooter({vehiclesData}){
                                 </label>
                             );
                         }) : (
-                            <p className='logging-topic-empty'>현재 출력할 수 있는 토픽이 없습니다.</p>
+                            <p className='logging-topic-empty'>
+                                {topicEntries.length > 0
+                                    ? '검색 결과가 없습니다.'
+                                    : '현재 출력할 수 있는 토픽이 없습니다.'}
+                            </p>
                         )}
                     </div>
                 </Modal>

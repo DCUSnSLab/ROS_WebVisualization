@@ -209,7 +209,7 @@
 }
 
 .logging-vehicle-select {
-    flex: 1;
+    flex: 1 1 35%;
     min-width: 0;
     padding: 8px 10px;
     border: 1px solid rgba(255, 255, 255, 0.35);
@@ -222,6 +222,31 @@
 }
 
 .logging-vehicle-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.logging-topic-search {
+    flex: 1 1 45%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    color: #1B1F3B;
+    font-family: GMarketSans;
+}
+
+.logging-topic-search::placeholder {
+    color: #7c848b;
+}
+
+.logging-topic-search:focus {
+    border-color: #2e86de;
+}
+
+.logging-topic-search:disabled {
     cursor: not-allowed;
     opacity: 0.6;
 }

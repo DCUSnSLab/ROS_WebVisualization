@@ -18,7 +18,11 @@ const createCurrentTimeBagName = () => {
 function MainFooter({vehiclesData, onLoggingChange}){
     const [open, setOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const [logging, setLogging] = useState(false);
+    const [loggingSession, setLoggingSession] = useState(null);
+    const [lastBagPath, setLastBagPath] = useState("");
+    const logging = loggingSession !== null;
+    const [loggingPending, setLoggingPending] = useState(false);
+    const [loggingError, setLoggingError] = useState("");
     const [selectedTopicKeys, setSelectedTopicKeys] = useState([]);
     const [pendingTopics, setPendingTopics] = useState([]);
     const [selectedVehicleId, setSelectedVehicleId] = useState("");
@@ -89,23 +93,48 @@ function MainFooter({vehiclesData, onLoggingChange}){
         setConfirmOpen(true);
     };
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         const vehicleId = pendingTopics[0]?.vehicleId;
-        if (!vehicleId) return;
+        if (!vehicleId || loggingPending) return;
         const resolvedBagName = bagName.trim() ? bagName : createCurrentTimeBagName();
 
-        setLogging(true);
-        setConfirmOpen(false);
-        setSelectedTopicKeys([]);
-        setTopicSearch("");
-        setLogAllTopics(false);
-        setBagName("");
-        onLoggingChange?.({
-            vehicleId,
-            isLogging: true,
-            bagName: resolvedBagName,
-            topics: pendingTopics.map((topic) => topic.name),
-        });
+        setLoggingPending(true);
+        setLoggingError("");
+        try {
+            if (typeof onLoggingChange !== "function") {
+                throw new Error("Logging handler is not configured");
+            }
+
+            const topicNames = pendingTopics.map((topic) => topic.name);
+            const result = await onLoggingChange({
+                vehicleId,
+                isLogging: true,
+                bagName: resolvedBagName,
+                topics: topicNames,
+            });
+            if (result?.is_logging !== true) {
+                throw new Error(result?.message || "The vehicle did not enter logging state");
+            }
+
+            const activeSession = {
+                vehicleId,
+                bagName: resolvedBagName,
+                bagPath: result.bag_path || "",
+                topics: topicNames,
+            };
+            setLoggingSession(activeSession);
+            setLastBagPath(activeSession.bagPath);
+            setConfirmOpen(false);
+            setPendingTopics([]);
+            setSelectedTopicKeys([]);
+            setTopicSearch("");
+            setLogAllTopics(false);
+            setBagName("");
+        } catch (error) {
+            setLoggingError(error?.message || "Logging request failed");
+        } finally {
+            setLoggingPending(false);
+        }
     };
 
     const handleCancelConfirm = () => {
@@ -135,22 +164,46 @@ function MainFooter({vehiclesData, onLoggingChange}){
                 <button
                     type='button'
                     className='logging-btn'
-                    onClick={(e) => {
+                    onClick={async (e) => {
                         e.stopPropagation();
                         if (logging) {
-                            const vehicleId = pendingTopics[0]?.vehicleId;
-                            setLogging(false);
-                            setPendingTopics([]);
-                            if (vehicleId) {
-                                onLoggingChange?.({vehicleId, isLogging: false});
+                            const vehicleId = loggingSession?.vehicleId;
+                            if (!vehicleId || loggingPending) return;
+
+                            setLoggingPending(true);
+                            setLoggingError("");
+                            try {
+                                if (typeof onLoggingChange !== "function") {
+                                    throw new Error("Logging handler is not configured");
+                                }
+                                const result = await onLoggingChange({vehicleId, isLogging: false});
+                                if (result?.is_logging === true) {
+                                    throw new Error(result?.message || "The vehicle is still logging");
+                                }
+                                setLastBagPath(result?.bag_path || loggingSession?.bagPath || "");
+                                setLoggingSession(null);
+                                setPendingTopics([]);
+                            } catch (error) {
+                                setLoggingError(error?.message || "Logging request failed");
+                            } finally {
+                                setLoggingPending(false);
                             }
                         }
                         else {
                             setOpen(true);
                         }
                     }}
-                >{logging ? "Logging Stop" : "Logging"}
+                    disabled={loggingPending}
+                >{loggingPending ? "Processing..." : logging ? "Logging Stop" : "Logging"}
                 </button>
+                {!loggingError && (loggingSession?.bagPath || lastBagPath) && (
+                    <span className='logging-bag-path' role='status'>
+                        {logging ? "저장 중" : "저장 완료"}: {loggingSession?.bagPath || lastBagPath}
+                    </span>
+                )}
+                {loggingError && (
+                    <span className='logging-footer-error' role="alert">{loggingError}</span>
+                )}
 
                 <Modal isOpen={open} onClose={handleCloseLoggingModal}>
                     <div className='logging-modal-header'>
@@ -258,16 +311,27 @@ function MainFooter({vehiclesData, onLoggingChange}){
                                 </div>
                             ))}
                         </div>
+                        {loggingError && (
+                            <div className='logging-confirm-error' role='alert'>
+                                {loggingError}
+                            </div>
+                        )}
                         <div className='logging-confirm-actions'>
-                            <button type='button' className='logging-confirm-no' onClick={handleCancelConfirm}>
+                            <button
+                                type='button'
+                                className='logging-confirm-no'
+                                onClick={handleCancelConfirm}
+                                disabled={loggingPending}
+                            >
                                 아니요
                             </button>
                             <button
                                 type='button'
                                 className='logging-confirm-yes'
                                 onClick={handleConfirm}
+                                disabled={loggingPending}
                             >
-                                네
+                                {loggingPending ? "처리 중..." : "네"}
                             </button>
                         </div>
                     </div>

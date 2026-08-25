@@ -7,7 +7,6 @@ import SidebarTop from "./SidebarTop";
 import DataSpace from "../DataViewerLayout/DataSpace";
 import InfoBox from "../DataViewerLayout/InfoBox";
 import UseRosVehicles from "./UseRosVehicles";
-import * as ROSLIB from "roslib";
 
 const MainLayout = ({ name, dropdownContent, content }) => {
     const [isOpen, setIsOpen] = useState(true);
@@ -15,7 +14,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [vehicles, setVehicles] = useState([]);
 
     // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
-    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, subscribeTopic, unsubscribeTopic, resetPath, disconnectVehicle } = UseRosVehicles();
+    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, requestLogging, subscribeTopic, unsubscribeTopic, resetPath, disconnectVehicle } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -31,46 +30,45 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [visuals, setVisuals] = useState([]);
     const [loggingByVehicle, setLoggingByVehicle] = useState({});
 
-    const handleLoggingChange = ({ vehicleId, isLogging, bagName, topics }) => {
+    const handleLoggingChange = async ({ vehicleId, isLogging, bagName, topics }) => {
+        const result = await requestLogging({
+            vehicleId,
+            isLogging,
+            bagName: bagName || "",
+            topics: topics || [],
+        });
+
+        const actualLogging = result?.is_logging === true;
+        if (isLogging !== actualLogging) {
+            throw new Error(
+                result?.message ||
+                (isLogging
+                    ? "The vehicle did not start logging"
+                    : "The vehicle did not stop logging")
+            );
+        }
+
         setLoggingByVehicle((current) => {
             const next = { ...current };
-            if (isLogging) {
-                next[vehicleId] = { isLogging: true, bagName };
+            if (actualLogging) {
+                next[vehicleId] = {
+                    isLogging: true,
+                    bagName,
+                    bagPath: result.bag_path || "",
+                };
             } else {
                 delete next[vehicleId];
             }
             return next;
         });
 
-        // 해당 이동체의 rosbridge로 /logging 서비스 호출 (선택 토픽 + bag 이름 전달)
-        const rosbridgeUrl = vehiclesData?.[vehicleId]?.rosbridgeIp;
-        if (!rosbridgeUrl) {
-            console.warn("logging: no rosbridge url for", vehicleId);
-            return;
-        }
-
-        const ros = new ROSLIB.Ros({ url: rosbridgeUrl });
-        const loggingSrv = new ROSLIB.Service({
-            ros,
-            name: "/logging",
-            serviceType: "hardware_monitor2_interfaces/srv/Logging",
+        console.log("logging result:", {
+            vehicleId,
+            status: result.logging_status,
+            isLogging: actualLogging,
+            bagPath: result.bag_path,
         });
-        const request = new ROSLIB.ServiceRequest(
-            isLogging
-                ? { is_logging: "LoggingStart", topics: topics || [], bag_name: bagName || "" }
-                : { is_logging: "LoggingStop", topics: [], bag_name: "" }
-        );
-        loggingSrv.callService(
-            request,
-            (result) => {
-                console.log("logging result:", result);
-                ros.close();
-            },
-            (err) => {
-                console.error("logging service error:", err);
-                ros.close();
-            }
-        );
+        return result;
     };
 
     const handleTopicSelect = (topic) => {

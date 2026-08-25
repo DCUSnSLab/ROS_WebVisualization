@@ -40,7 +40,6 @@ const Kakaomap = ({ vehiclesData, leftPanelWidth }) => {
                 ...vehicle,
                 id: vehicleId,
                 name: vehicle?.name || vehicleId,
-                rosbridgeIp: vehicle?.rosbridgeIp || "",
             },
         }));
     };

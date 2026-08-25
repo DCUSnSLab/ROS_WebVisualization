@@ -6,7 +6,7 @@ import Stream from "../../../Component/StreamChart";
 import RawMessageComponent from "../../../Component/RawMessageComponent";
 import "./DataSpace.css";
 
-function VisualRenderer({ panel, topic, vehicleId, rosbridgeUrl, data, rawData, onClose }) {
+function VisualRenderer({ panel, topic, vehicleId, data, rawData, onClose }) {
     return (
         <div className="visual-card">
             <div className="visual-card-header">
@@ -94,7 +94,6 @@ export default function DataSpace({ vehicles, vehiclesData, visuals = [], onClos
                             topic={topic}
                             panel={panel}
                             vehicleId={ip}
-                            rosbridgeUrl={vehicle?.rosbridgeIp}
                             data={data}
                             rawData={rawData}
                             onClose={() => onCloseVisual(id)}

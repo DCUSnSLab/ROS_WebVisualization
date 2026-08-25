@@ -7,7 +7,6 @@ import { ProSidebarProvider } from "react-pro-sidebar";
 import { store } from "./app/store";
 
 import App from "./App";
-import Start from "./Page/Start";
 import Login from "./Page/Login";
 import SignUp from "./Page/SignUp";
 import Password from "./Page/Password";

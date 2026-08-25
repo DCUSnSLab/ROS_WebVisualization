@@ -14,6 +14,7 @@ export default function UseRosVehicles() {
     const subscribedRef = useRef(new Set());
     const latencyStatsRef = useRef({});
     const latencyResultsRef = useRef({});
+    const pendingLoggingRequestsRef = useRef(new Map());
 
     // 실험 시간
     const LATENCY_WARMUP_MS = 10_000;
@@ -113,6 +114,33 @@ export default function UseRosVehicles() {
             }
 
             const msg = JSON.parse(event.data);
+            if (msg.type === "logging_response") {
+                const pending = pendingLoggingRequestsRef.current.get(msg.request_id);
+                if (!pending) return;
+
+                clearTimeout(pending.timeout);
+                pendingLoggingRequestsRef.current.delete(msg.request_id);
+
+                console.log("LOGGING_RESPONSE:", {
+                    requestId: msg.request_id,
+                    vehicleId: msg.vehicle_id,
+                    success: msg.success,
+                    isLogging: msg.is_logging,
+                    status: msg.logging_status,
+                    bagPath: msg.bag_path,
+                    message: msg.message,
+                    error: msg.error,
+                });
+
+                if (msg.success) {
+                    pending.resolve(msg);
+                } else {
+                    pending.reject(
+                        new Error(msg.error || msg.message || "Logging request failed")
+                    );
+                }
+                return;
+            }
 
             // 차량 연결 상태(색상 표시용): 릴레이가 1초마다 보냄
             if (msg.type === "vehicle_status") {
@@ -138,7 +166,6 @@ export default function UseRosVehicles() {
                             ...(prev[vehicle.id] || {}),
                             id: vehicle.id,
                             name: vehicle.name || vehicle.id,
-                            rosbridgeIp: vehicle.rosbridge_ip || vehicle.rosbridgeIp || "",
                             isBag: !!vehicle.is_bag,
                         };
                     }
@@ -265,8 +292,58 @@ export default function UseRosVehicles() {
 
         ws.onclose = () => {
             console.warn("WS closed");
+            for (const pending of pendingLoggingRequestsRef.current.values()) {
+                clearTimeout(pending.timeout);
+                pending.reject(new Error("Relay server connection closed"));
+            }
+            pendingLoggingRequestsRef.current.clear();
         };
     }, []);
+
+    const requestLogging = ({ vehicleId, isLogging, bagName = "", topics = [] }) => {
+        return new Promise((resolve, reject) => {
+            const ws = wsRef.current;
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                reject(new Error("Relay server connection is not ready"));
+                return;
+            }
+            if (!vehicleId) {
+                reject(new Error("vehicleId is required"));
+                return;
+            }
+
+            const requestId =
+                `logging_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+            const timeout = setTimeout(() => {
+                pendingLoggingRequestsRef.current.delete(requestId);
+                reject(new Error("Logging request timed out after 35 seconds"));
+            }, 35000);
+
+            pendingLoggingRequestsRef.current.set(requestId, { resolve, reject, timeout });
+
+            try {
+                console.log("LOGGING_REQUEST:", {
+                    requestId,
+                    vehicleId,
+                    command: isLogging ? "LoggingStart" : "LoggingStop",
+                    topicCount: isLogging ? topics.length : 0,
+                    bagName: isLogging ? bagName : "",
+                });
+                ws.send(JSON.stringify({
+                    type: "logging_request",
+                    request_id: requestId,
+                    vehicle_id: vehicleId,
+                    is_logging: isLogging ? "LoggingStart" : "LoggingStop",
+                    topics: isLogging ? topics : [],
+                    bag_name: isLogging ? bagName : "",
+                }));
+            } catch (error) {
+                clearTimeout(timeout);
+                pendingLoggingRequestsRef.current.delete(requestId);
+                reject(error);
+            }
+        });
+    };
 
     const requestTopicList = (vehicleId) => {
         if (!wsRef.current || wsRef.current.readyState !== 1) {
@@ -386,6 +463,7 @@ export default function UseRosVehicles() {
         vehiclesData,
         vehicleList,
         vehicleStatuses,
+        requestLogging,
         requestTopicList,
         subscribeTopic,
         unsubscribeTopic,

@@ -40,8 +40,45 @@
     margin-bottom: 10px;
 }
 
+.sensor-topic-group {
+    margin: 4px 0 10px;
+    border: 1px solid #dde1e5;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.sensor-topic-group-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px;
+    background: #e6e9ed;
+    color: #1B1F3B;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.sensor-topic-group-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    background: #1B1F3B;
+    color: #ffffff;
+    font-size: 11px;
+}
+
+.sensor-topic-group-list {
+    padding: 3px;
+    background: #ffffff;
+}
+
 .topic-chip {
-    width: 100%;
+    width: calc(100% - 4px);
     display: block;
     background: whitesmoke;
     border: 1px solid rgba(255, 255, 255, 0.15);

@@ -1,17 +1,4 @@
 
-// 원래 하던 방식과 비교
-// export const IpServer = createSlice({
-//     name: 'IpServer',
-//     initialState: {
-//       // VisualizeSystemAddress: 'ws://203.250.33.143:9090'
-//       VisualizeSystemAddress: ''
-//     },
-//     reducers: {
-//         addServer: (state, action) => {
-//           state.VisualizeSystemAddress = action.payload;
-//       }
-//     }
-// })
 
 // action type setting
 const SHOW_COMPONENT_ON_MARKER_CLICK = 'SHOW_COMPONENT_ON_MARKER_CLICK';

@@ -48,16 +48,31 @@ function statusColor(status) {
     return "#e53935";                  // red
 }
 
+// 로깅 표시는 정상 데이터 수신 중이면 초록, 응답 단절이면 빨강
+function loggingStatusColor(status) {
+    if (!status || status.msAgo == null) return "#e53935";
+    const age = status.msAgo + (Date.now() - status.receivedAt);
+    return age < 5000 ? "#43a047" : "#e53935";
+}
+
 export default function SidebarTop({
                                        vehiclesData,
                                        vehicleStatuses,
                                        onPanelSelect,
                                        activePanelsByTopic,
                                        subscribeTopic,
-                                       onDisconnectVehicle
+                                       onDisconnectVehicle,
+                                       loggingByVehicle = {},
+                                       topicSearch = ""
                                      }) {
     // 색상이 시간 경과에 따라 갱신되도록 1초마다 리렌더
     const [, setTick] = useState(0);
+    const [openTopicKey, setOpenTopicKey] = useState(null);
+
+    const handleTopicToggle = (topicKey) => {
+        setOpenTopicKey((current) => current === topicKey ? null : topicKey);
+    };
+
     useEffect(() => {
         const t = setInterval(() => setTick((n) => n + 1), 1000);
         return () => clearInterval(t);
@@ -71,7 +86,7 @@ export default function SidebarTop({
 
     return (
         <div className="siderbar-scroll">
-            {connectedVehicles.map(([vehicleId]) => (
+            {connectedVehicles.map(([vehicleId, vehicleData]) => (
                 <AccordionItem
                     key={vehicleId}
                     onClose={
@@ -81,18 +96,41 @@ export default function SidebarTop({
                     }
                     title={
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                            <span
-                                title="차량 연결 상태"
-                                style={{
-                                    width: 10,
-                                    height: 10,
-                                    borderRadius: "50%",
-                                    background: statusColor(vehicleStatuses?.[vehicleId]),
-                                    display: "inline-block",
-                                    flexShrink: 0,
-                                }}
-                            />
+                            {vehicleData?.isBag ? (
+                                <span
+                                    title="bag 데이터"
+                                    style={{
+                                        width: 10,
+                                        display: "inline-block",
+                                        flexShrink: 0,
+                                        textAlign: "center",
+                                        fontWeight: "bold",
+                                    }}
+                                >
+                                    -
+                                </span>
+                            ) : (
+                                <span
+                                    title="차량 연결 상태"
+                                    style={{
+                                        width: 10,
+                                        height: 10,
+                                        borderRadius: "50%",
+                                        background: statusColor(vehicleStatuses?.[vehicleId]),
+                                        display: "inline-block",
+                                        flexShrink: 0,
+                                    }}
+                                />
+                            )}
                             {vehicleId}
+                            {loggingByVehicle[vehicleId] && (
+                                <span
+                                    className="vehicle-logging-label"
+                                    style={{ color: loggingStatusColor(vehicleStatuses?.[vehicleId]) }}
+                                >
+                                    (Logging)
+                                </span>
+                            )}
                         </span>
                     }
                     content={
@@ -102,6 +140,9 @@ export default function SidebarTop({
                             onPanelSelect={onPanelSelect}
                             activePanelsByTopic={activePanelsByTopic}
                             subscribeTopic={subscribeTopic}
+                            topicSearch={topicSearch}
+                            openTopicKey={openTopicKey}
+                            onTopicToggle={handleTopicToggle}
                         />
                     }
                 />

@@ -9,12 +9,11 @@ import InfoBox from "../DataViewerLayout/InfoBox";
 import UseRosVehicles from "./UseRosVehicles";
 
 const MainLayout = ({ name, dropdownContent, content }) => {
-    const [isOpen, setIsOpen] = useState(true);
     const [isOpenVehicle, setIsOpenVehicle] = useState(true);
     const [vehicles, setVehicles] = useState([]);
 
     // const { vehiclesData, vehicleList } = UseRosVehicles(vehicles);
-    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, subscribeTopic, unsubscribeTopic, resetPath, disconnectVehicle } = UseRosVehicles();
+    const { vehiclesData, vehicleList, vehicleStatuses, requestTopicList, requestLogging, subscribeTopic, unsubscribeTopic, resetPath, disconnectVehicle } = UseRosVehicles();
 
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [selectedPanel, setSelectedPanel] = useState("");
@@ -28,6 +27,49 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const removeVehicle = (ip) => setVehicles((prev) => prev.filter((v) => v.ip !== ip));
 
     const [visuals, setVisuals] = useState([]);
+    const [loggingByVehicle, setLoggingByVehicle] = useState({});
+    const [sidebarTopicSearch, setSidebarTopicSearch] = useState("");
+
+    const handleLoggingChange = async ({ vehicleId, isLogging, bagName, topics }) => {
+        const result = await requestLogging({
+            vehicleId,
+            isLogging,
+            bagName: bagName || "",
+            topics: topics || [],
+        });
+
+        const actualLogging = result?.is_logging === true;
+        if (isLogging !== actualLogging) {
+            throw new Error(
+                result?.message ||
+                (isLogging
+                    ? "The vehicle did not start logging"
+                    : "The vehicle did not stop logging")
+            );
+        }
+
+        setLoggingByVehicle((current) => {
+            const next = { ...current };
+            if (actualLogging) {
+                next[vehicleId] = {
+                    isLogging: true,
+                    bagName,
+                    bagPath: result.bag_path || "",
+                };
+            } else {
+                delete next[vehicleId];
+            }
+            return next;
+        });
+
+        console.log("logging result:", {
+            vehicleId,
+            status: result.logging_status,
+            isLogging: actualLogging,
+            bagPath: result.bag_path,
+        });
+        return result;
+    };
 
     const handleTopicSelect = (topic) => {
         setSelectedTopic((prev) => (prev === topic ? null : topic));
@@ -84,6 +126,11 @@ const MainLayout = ({ name, dropdownContent, content }) => {
         if (!disconnectTarget) return;
         disconnectVehicle(disconnectTarget);
         setVisuals((prev) => prev.filter((v) => v.ip !== disconnectTarget));
+        setLoggingByVehicle((current) => {
+            const next = { ...current };
+            delete next[disconnectTarget];
+            return next;
+        });
         setDisconnectTarget(null);
     };
 
@@ -119,22 +166,29 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 <div className="main-grid" style={{ gridTemplateColumns: `${sidebarWidth}px 6px 1fr` }}>
                     <aside className="side-bar-topic">
                         <div className="side-bar-topic-list">
-                            <button className="side-btn" onClick={() => setIsOpen(!isOpen)}>
-                                <span>{isOpen ? "▲ " : "▼ "}</span>
-                                Topic
-                            </button>
-                            <div className="side-title" />
-                            {isOpen &&
-                                (content || (
-                                    <SidebarTop
-                                        vehiclesData={vehiclesData}
-                                        vehicleStatuses={vehicleStatuses}
-                                        onPanelSelect={handlePanelSelect}
-                                        activePanelsByTopic={activePanelsByTopic}
-                                        subscribeTopic={subscribeTopic}
-                                        onDisconnectVehicle={handleDisconnectVehicle}
-                                    />
-                                ))}
+                            <div className="sidebar-topic-search-wrap">
+                                <span className="sidebar-topic-search-icon" aria-hidden="true">🔍</span>
+                                <input
+                                    type="search"
+                                    className="sidebar-topic-search"
+                                    value={sidebarTopicSearch}
+                                    onChange={(event) => setSidebarTopicSearch(event.target.value)}
+                                    placeholder="토픽명 검색"
+                                    aria-label="토픽명 검색"
+                                />
+                            </div>
+                            {content || (
+                                <SidebarTop
+                                    vehiclesData={vehiclesData}
+                                    vehicleStatuses={vehicleStatuses}
+                                    onPanelSelect={handlePanelSelect}
+                                    activePanelsByTopic={activePanelsByTopic}
+                                    subscribeTopic={subscribeTopic}
+                                    onDisconnectVehicle={handleDisconnectVehicle}
+                                    loggingByVehicle={loggingByVehicle}
+                                    topicSearch={sidebarTopicSearch}
+                                />
+                            )}
                         </div>
                     </aside>
 
@@ -144,6 +198,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                         <DataSpace
                             vehicles={vehicles}
                             vehiclesData={vehiclesData}
+                            vehicleStatuses={vehicleStatuses}
                             visuals={visuals}
                             onCloseVisual={(id) =>
                                 setVisuals((prev) => {
@@ -163,7 +218,10 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 </div>
             </main>
 
-            <Footer />
+            <Footer
+                vehiclesData={vehiclesData}
+                onLoggingChange={handleLoggingChange}
+            />
             <InfoBox vehiclesData={vehiclesData} onResetPath={resetPath} />
 
             {disconnectTarget && (

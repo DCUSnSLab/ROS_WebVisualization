@@ -44,6 +44,44 @@
     min-height: 0;
 }
 
+.sidebar-topic-search-wrap {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding: 10px;
+    background: #1B1F3B;
+}
+
+.sidebar-topic-search-icon {
+    position: absolute;
+    left: 21px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7c848b;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.sidebar-topic-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 10px 8px 34px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 5px;
+    outline: none;
+    background: #ffffff;
+    color: #1B1F3B;
+    font-family: GMarketSans;
+}
+
+.sidebar-topic-search::placeholder {
+    color: #7c848b;
+}
+
+.sidebar-topic-search:focus {
+    border-color: #2e86de;
+}
+
 .content {
     background: rgba(255,255,255,0.05);
     padding: 16px;
@@ -171,6 +209,280 @@
     font-family: GMarketSans;
 }
 
+.logging-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid white;
+    margin: 10px 10px 0 20px;
+    padding-bottom: 6px;
+}
+
+.logging-modal-header .modal-title {
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.logging-start-btn {
+    flex: 0 0 auto;
+    margin: 0;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.logging-start-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.logging-vehicle-select-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 14px 20px 0;
+    font-family: GMarketSans;
+    font-size: 14px;
+}
+
+.logging-vehicle-select {
+    flex: 1 1 35%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    outline: none;
+    background: #303652;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: GMarketSans;
+}
+
+.logging-vehicle-select:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.logging-topic-search {
+    flex: 1 1 45%;
+    min-width: 0;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    color: #1B1F3B;
+    font-family: GMarketSans;
+}
+
+.logging-topic-search::placeholder {
+    color: #7c848b;
+}
+
+.logging-topic-search:focus {
+    border-color: #2e86de;
+}
+
+.logging-topic-search:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.logging-topic-mode-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 28px;
+    margin: 8px 20px 0;
+    font-family: GMarketSans;
+    font-size: 14px;
+}
+
+.logging-all-topics-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.logging-all-topics-option input {
+    width: 16px;
+    height: 16px;
+    accent-color: #2e86de;
+    cursor: pointer;
+}
+
+.logging-all-topics-option input:disabled {
+    cursor: not-allowed;
+}
+
+.logging-all-topics-count,
+.logging-custom-topics-count {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+}
+
+.logging-topic-list {
+    height: calc(100% - 157px);
+    margin: 8px 20px 20px;
+    padding: 8px 14px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    background: rgba(176, 190, 197, 0.12);
+}
+
+.logging-topic-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    cursor: pointer;
+    font-family: GMarketSans;
+}
+
+.logging-topic-item input {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    accent-color: #2e86de;
+    cursor: pointer;
+}
+
+.logging-topic-item input:disabled {
+    cursor: default;
+}
+
+.logging-topic-item.all-selected {
+    cursor: default;
+}
+
+.logging-topic-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: #8f969d;
+    transition: color 0.18s ease;
+}
+
+.logging-topic-name.selected {
+    color: #ffffff;
+}
+
+.logging-topic-vehicle,
+.logging-confirm-topic span:last-child {
+    flex: 0 0 auto;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+}
+
+.logging-topic-empty {
+    margin: 12px 0;
+    color: #8f969d;
+    text-align: center;
+    font-family: GMarketSans;
+}
+
+.logging-confirm-modal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    font-family: GMarketSans;
+}
+
+.logging-confirm-title {
+    margin: 0 0 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+    font-size: 22px;
+}
+
+.logging-bag-name-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.logging-bag-name-label {
+    flex: 0 0 auto;
+    font-size: 14px;
+}
+
+.logging-bag-name-input {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 11px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    outline: none;
+    background: #ffffff;
+    color: #1B1F3B;
+    font-family: GMarketSans;
+}
+
+.logging-bag-name-input::placeholder {
+    color: #7c848b;
+}
+
+.logging-bag-name-input:focus {
+    border-color: #2e86de;
+}
+
+.logging-confirm-list {
+    flex: 1;
+    min-height: 0;
+    padding: 8px 14px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 6px;
+    background: rgba(176, 190, 197, 0.12);
+}
+
+.logging-confirm-topic {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 32px;
+    overflow-wrap: anywhere;
+}
+
+.logging-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.logging-confirm-actions button {
+    min-width: 72px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: GMarketSans;
+}
+
+.logging-confirm-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.logging-confirm-no {
+    border: 1px solid #57676E;
+    background: transparent;
+}
+
+.logging-confirm-yes {
+    border: 1px solid #2e86de;
+    background: #2e86de;
+}
+
 .footer-contents {
     grid-column: 2;
     text-align: center;
@@ -182,4 +494,32 @@
 
 ::-webkit-scrollbar{
     display: none;
+}
+
+.logging-bag-path,
+.logging-footer-error {
+    grid-column: 1;
+    justify-self: start;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.82);
+    font-family: GMarketSans;
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.logging-footer-error,
+.logging-confirm-error {
+    color: #ff8a80;
+}
+
+.logging-confirm-error {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 138, 128, 0.55);
+    border-radius: 6px;
+    background: rgba(183, 28, 28, 0.18);
+    overflow-wrap: anywhere;
 }

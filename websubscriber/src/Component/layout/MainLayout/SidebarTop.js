@@ -62,10 +62,17 @@ export default function SidebarTop({
                                        activePanelsByTopic,
                                        subscribeTopic,
                                        onDisconnectVehicle,
-                                       loggingByVehicle = {}
+                                       loggingByVehicle = {},
+                                       topicSearch = ""
                                      }) {
     // 색상이 시간 경과에 따라 갱신되도록 1초마다 리렌더
     const [, setTick] = useState(0);
+    const [openTopicKey, setOpenTopicKey] = useState(null);
+
+    const handleTopicToggle = (topicKey) => {
+        setOpenTopicKey((current) => current === topicKey ? null : topicKey);
+    };
+
     useEffect(() => {
         const t = setInterval(() => setTick((n) => n + 1), 1000);
         return () => clearInterval(t);
@@ -133,6 +140,9 @@ export default function SidebarTop({
                             onPanelSelect={onPanelSelect}
                             activePanelsByTopic={activePanelsByTopic}
                             subscribeTopic={subscribeTopic}
+                            topicSearch={topicSearch}
+                            openTopicKey={openTopicKey}
+                            onTopicToggle={handleTopicToggle}
                         />
                     }
                 />

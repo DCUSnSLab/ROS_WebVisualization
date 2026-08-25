@@ -9,7 +9,6 @@ import InfoBox from "../DataViewerLayout/InfoBox";
 import UseRosVehicles from "./UseRosVehicles";
 
 const MainLayout = ({ name, dropdownContent, content }) => {
-    const [isOpen, setIsOpen] = useState(true);
     const [isOpenVehicle, setIsOpenVehicle] = useState(true);
     const [vehicles, setVehicles] = useState([]);
 
@@ -29,6 +28,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
 
     const [visuals, setVisuals] = useState([]);
     const [loggingByVehicle, setLoggingByVehicle] = useState({});
+    const [sidebarTopicSearch, setSidebarTopicSearch] = useState("");
 
     const handleLoggingChange = async ({ vehicleId, isLogging, bagName, topics }) => {
         const result = await requestLogging({
@@ -166,23 +166,29 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 <div className="main-grid" style={{ gridTemplateColumns: `${sidebarWidth}px 6px 1fr` }}>
                     <aside className="side-bar-topic">
                         <div className="side-bar-topic-list">
-                            <button className="side-btn" onClick={() => setIsOpen(!isOpen)}>
-                                <span>{isOpen ? "▲ " : "▼ "}</span>
-                                Topic
-                            </button>
-                            <div className="side-title" />
-                            {isOpen &&
-                                (content || (
-                                    <SidebarTop
-                                        vehiclesData={vehiclesData}
-                                        vehicleStatuses={vehicleStatuses}
-                                        onPanelSelect={handlePanelSelect}
-                                        activePanelsByTopic={activePanelsByTopic}
-                                        subscribeTopic={subscribeTopic}
-                                        onDisconnectVehicle={handleDisconnectVehicle}
-                                        loggingByVehicle={loggingByVehicle}
-                                    />
-                                ))}
+                            <div className="sidebar-topic-search-wrap">
+                                <span className="sidebar-topic-search-icon" aria-hidden="true">🔍</span>
+                                <input
+                                    type="search"
+                                    className="sidebar-topic-search"
+                                    value={sidebarTopicSearch}
+                                    onChange={(event) => setSidebarTopicSearch(event.target.value)}
+                                    placeholder="토픽명 검색"
+                                    aria-label="토픽명 검색"
+                                />
+                            </div>
+                            {content || (
+                                <SidebarTop
+                                    vehiclesData={vehiclesData}
+                                    vehicleStatuses={vehicleStatuses}
+                                    onPanelSelect={handlePanelSelect}
+                                    activePanelsByTopic={activePanelsByTopic}
+                                    subscribeTopic={subscribeTopic}
+                                    onDisconnectVehicle={handleDisconnectVehicle}
+                                    loggingByVehicle={loggingByVehicle}
+                                    topicSearch={sidebarTopicSearch}
+                                />
+                            )}
                         </div>
                     </aside>
 
@@ -192,6 +198,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                         <DataSpace
                             vehicles={vehicles}
                             vehiclesData={vehiclesData}
+                            vehicleStatuses={vehicleStatuses}
                             visuals={visuals}
                             onCloseVisual={(id) =>
                                 setVisuals((prev) => {

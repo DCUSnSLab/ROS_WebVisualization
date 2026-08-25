@@ -6,6 +6,8 @@ import { publishBinary } from "../../../binaryStreamBus";
 const RELAY_WS_URL =
     process.env.REACT_APP_RELAY_WS_URL || "ws://203.250.32.54:8080";
 
+const PERSISTENT_TOPICS = new Set(["/ublox_gps_node/fix"]);
+
 export default function UseRosVehicles() {
     const [vehiclesData, setVehiclesData] = useState({});
     const [vehicleList, setVehicleList] = useState([]);
@@ -384,13 +386,18 @@ export default function UseRosVehicles() {
         console.log("SUBSCRIBE:", topicKey, topicType);
     };
 
-    const unsubscribeTopic = (vehicleId, topic) => {
+    const unsubscribeTopic = (vehicleId, topic, { force = false } = {}) => {
         if (!wsRef.current || wsRef.current.readyState !== 1) {
             console.warn("ws not ready");
             return;
         }
 
         const topicKey = makeTopicKey(vehicleId, topic);
+
+        if (PERSISTENT_TOPICS.has(topic) && !force) {
+            console.log("KEEP SUBSCRIBED (persistent):", topicKey);
+            return;
+        }
 
         if (!subscribedRef.current.has(topicKey)) {
             console.warn("Not subscribed:", topicKey);
@@ -402,7 +409,8 @@ export default function UseRosVehicles() {
         wsRef.current.send(JSON.stringify({
             type: "unsubscribe",
             vehicle_id: vehicleId,
-            topic
+            topic,
+            force,
         }));
 
         console.log("UNSUBSCRIBE:", topicKey);
@@ -421,7 +429,7 @@ export default function UseRosVehicles() {
         for (const key of Array.from(subscribedRef.current)) {
             if (key.startsWith(`${vehicleId}::`)) {
                 const topic = key.slice(vehicleId.length + 2); // "::" = 2글자
-                unsubscribeTopic(vehicleId, topic);
+                unsubscribeTopic(vehicleId, topic, { force: true });
             }
         }
 

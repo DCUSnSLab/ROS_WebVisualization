@@ -13,7 +13,10 @@ export default function UseRosVehicles() {
     const [vehicleList, setVehicleList] = useState([]);
     const [vehicleStatuses, setVehicleStatuses] = useState({}); // id -> { msAgo, receivedAt }
     const wsRef = useRef(null);
+    // 실제로 중계서버에 구독 요청을 보낸 토픽과, 화면과 무관하게 유지할 자동 구독을 분리한다.
+    // 둘 다 Set이므로 topic_list를 반복 수신해도 구독 상태가 중복 누적되지 않는다.
     const subscribedRef = useRef(new Set());
+    const persistentSubscribedRef = useRef(new Set());
     const latencyStatsRef = useRef({});
     const latencyResultsRef = useRef({});
     const pendingLoggingRequestsRef = useRef(new Map());
@@ -197,14 +200,17 @@ export default function UseRosVehicles() {
                 );
 
                 if (gpsTopic) {
-                    subscribeTopic(vid, gpsTopic.name, gpsTopic.type);
+                    subscribeTopic(vid, gpsTopic.name, gpsTopic.type, {
+                        persistent: true,
+                    });
                 }
 
                 if (hunterStatusTopic) {
                     subscribeTopic(
                         vid,
                         hunterStatusTopic.name,
-                        hunterStatusTopic.type
+                        hunterStatusTopic.type,
+                        { persistent: true }
                     );
                 }
             }
@@ -361,7 +367,12 @@ export default function UseRosVehicles() {
         console.log("GET_TOPIC_LIST:", vehicleId);
     };
 
-    const subscribeTopic = (vehicleId, topic, topicType) => {
+    const subscribeTopic = (
+        vehicleId,
+        topic,
+        topicType,
+        { persistent = false } = {}
+    ) => {
         if (!wsRef.current || wsRef.current.readyState !== 1) {
             console.warn("ws not ready");
             return;
@@ -369,13 +380,16 @@ export default function UseRosVehicles() {
 
         const topicKey = makeTopicKey(vehicleId, topic);
 
+        if (persistent || PERSISTENT_TOPICS.has(topic)) {
+            persistentSubscribedRef.current.add(topicKey);
+        }
+
         if (subscribedRef.current.has(topicKey)) {
-            console.warn("Already subscribed:", topicKey);
+            console.log("Already subscribed:", topicKey);
             return;
         }
 
         subscribedRef.current.add(topicKey);
-
         wsRef.current.send(JSON.stringify({
             type: "subscribe",
             vehicle_id: vehicleId,
@@ -394,7 +408,10 @@ export default function UseRosVehicles() {
 
         const topicKey = makeTopicKey(vehicleId, topic);
 
-        if (PERSISTENT_TOPICS.has(topic) && !force) {
+        if (
+            !force &&
+            (PERSISTENT_TOPICS.has(topic) || persistentSubscribedRef.current.has(topicKey))
+        ) {
             console.log("KEEP SUBSCRIBED (persistent):", topicKey);
             return;
         }
@@ -405,6 +422,7 @@ export default function UseRosVehicles() {
         }
 
         subscribedRef.current.delete(topicKey);
+        persistentSubscribedRef.current.delete(topicKey);
 
         wsRef.current.send(JSON.stringify({
             type: "unsubscribe",
@@ -413,7 +431,7 @@ export default function UseRosVehicles() {
             force,
         }));
 
-        console.log("UNSUBSCRIBE:", topicKey);
+        console.log("UNSUBSCRIBE:", topicKey, force ? "(force)" : "");
     };
 
     const getAverageLatency = (vehicleId, topic) => {
@@ -425,7 +443,7 @@ export default function UseRosVehicles() {
     const disconnectVehicle = (vehicleId) => {
         if (!vehicleId) return;
 
-        // 이 차량의 모든 토픽 구독 해제
+        // 이 차량의 모든 토픽 구독 해제(상시 구독도 차량 연결 종료에서는 정리)
         for (const key of Array.from(subscribedRef.current)) {
             if (key.startsWith(`${vehicleId}::`)) {
                 const topic = key.slice(vehicleId.length + 2); // "::" = 2글자

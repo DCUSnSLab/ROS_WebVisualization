@@ -1,25 +1,40 @@
 .drop-pg{
     display: flex;
-    position: absolute;
     flex-direction: column;
-    align-items: center;
-    background: #DEDEDE;
-    padding: 5px;
-
+    align-items: stretch;
+    width: 100%;
+    box-sizing: border-box;
+    background: #252b4b;
+    padding: 7px;
+    border-radius: inherit;
 }
 
 .drop-link{
-    font-size: 15px;
-    color: #1B1F3B;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border-radius: 7px;
+    font-size: 14px;
+    line-height: 1.2;
+    text-align: left;
+    color: #f2f4ff;
     text-decoration: none;
     font-family: GMarketSans;
     cursor: pointer;
     border: none;
-    background: #DEDEDE;
+    background: transparent;
+    transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.drop-link:hover,
+.drop-link:focus-visible {
+    color: #ffffff;
+    background: #39436f;
+    outline: none;
 }
 
 .drop-btn{
-    background: #DEDEDE;
+    background: transparent;
     font-size: 15px;
     border: none;
 }

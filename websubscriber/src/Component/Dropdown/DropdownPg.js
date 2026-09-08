@@ -25,7 +25,7 @@ function DropdownPg() {
             >Group
             </button>
 
-            <Link to="/qna" className="drop-link">Q&A</Link>
+            <Link to="/dashboard" className="drop-link">Dashboard</Link>
             <Link to="/" className="drop-link">Logout</Link>
 
             <Modal isOpen={open} onClose={() => setOpen(false)}>

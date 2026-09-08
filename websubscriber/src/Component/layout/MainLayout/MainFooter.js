@@ -1,11 +1,19 @@
 // 메인화면 하단 푸터 컴포넌트
-import { FaPlay } from "react-icons/fa";
+import { FaPlay, FaPause } from "react-icons/fa";
 import { IoPlaySkipBackSharp } from "react-icons/io5";
 import { IoPlaySkipForward } from "react-icons/io5";
 import './MainLayout.css';
 import React, {useMemo, useState} from "react";
 import Modal from "../../Modal/Modal";
 import '../../Modal/Modal.css';
+
+// 초 → mm:ss
+const formatPlaybackTime = (totalSeconds) => {
+    const safe = Number.isFinite(totalSeconds) ? Math.max(0, totalSeconds) : 0;
+    const m = Math.floor(safe / 60);
+    const s = Math.floor(safe % 60);
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+};
 
 const createCurrentTimeBagName = () => {
     const now = new Date();
@@ -29,6 +37,12 @@ function MainFooter({vehiclesData, onLoggingChange}){
     const [topicSearch, setTopicSearch] = useState("");
     const [bagName, setBagName] = useState("");
     const [logAllTopics, setLogAllTopics] = useState(false);
+
+    // bag 재생 바 (UI 전용, 동작은 추후 연결)
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [playbackSeek, setPlaybackSeek] = useState(0); // 0~100 (%)
+    const playbackDurationSec = 0; // TODO: 실제 bag 길이 연결
+    const playbackCurrentSec = (playbackSeek / 100) * playbackDurationSec;
 
     const vehicleEntries = useMemo(() => (
         Object.entries(vehiclesData || {}).filter(([, vehicleData]) =>
@@ -154,11 +168,48 @@ function MainFooter({vehiclesData, onLoggingChange}){
         <footer className='footer-bar'>
             <div className='footer-button'>
                 <div className='footer-contents'>
-                    <p>재생 바 들어길 자리</p>
-                    <div className='footer-play'>
-                        <IoPlaySkipBackSharp style={{color: 'white'}} />
-                        <FaPlay style={{color: 'white', marginLeft: '15px'}}/>
-                        <IoPlaySkipForward style={{color: 'white', marginLeft: '15px'}}/>
+                    <div className='playback-bar'>
+                        <div className='playback-track-row'>
+                            <span className='playback-time'>{formatPlaybackTime(playbackCurrentSec)}</span>
+                            <input
+                                type='range'
+                                className='playback-seek'
+                                min={0}
+                                max={100}
+                                step={0.1}
+                                value={playbackSeek}
+                                onChange={(e) => setPlaybackSeek(Number(e.target.value))}
+                                aria-label='재생 위치'
+                                style={{
+                                    background: `linear-gradient(to right, #ffffff ${playbackSeek}%, rgba(255,255,255,0.25) ${playbackSeek}%)`,
+                                }}
+                            />
+                            <span className='playback-time'>{formatPlaybackTime(playbackDurationSec)}</span>
+                        </div>
+                        <div className='playback-controls'>
+                            <button
+                                type='button'
+                                className='playback-btn'
+                                aria-label='이전'
+                            >
+                                <IoPlaySkipBackSharp />
+                            </button>
+                            <button
+                                type='button'
+                                className='playback-btn playback-play'
+                                onClick={() => setIsPlaying((v) => !v)}
+                                aria-label={isPlaying ? '일시정지' : '재생'}
+                            >
+                                {isPlaying ? <FaPause /> : <FaPlay />}
+                            </button>
+                            <button
+                                type='button'
+                                className='playback-btn'
+                                aria-label='다음'
+                            >
+                                <IoPlaySkipForward />
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <button

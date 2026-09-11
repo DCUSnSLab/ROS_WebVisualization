@@ -27,7 +27,7 @@ export default function SelectOutput({ topic, vehicleId, topicType, subscribeTop
                                 padding: "8px 12px",
                                 borderRadius: "6px",
                                 border: "1px solid #ccc",
-                                backgroundColor: isActive ? "#1B1F3B" : "white",
+                                backgroundColor: isActive ? "var(--mode-dark, #1B1F3B)" : "white",
                                 color: isActive ? "white" : "black",
                                 cursor: "pointer",
                                 fontWeight: "bold",

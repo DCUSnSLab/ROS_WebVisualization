@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "./Sidebar.css";
 import SidebarTopic from "../../Sidebar/SidebarTopic";
 
-const AccordionItem = ({ title, content, onClose }) => {
+const AccordionItem = ({ title, content, onClose, onRefresh }) => {
     const [isOpen, setIsOpen] = useState(true);
     const toggle = () => setIsOpen((v) => !v);
     return (
@@ -19,9 +19,19 @@ const AccordionItem = ({ title, content, onClose }) => {
                     {title}
                 </span>
                 <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <span onClick={toggle} style={{ cursor: "pointer" }}>
-                        {isOpen ? "▲" : "▼"}
-                    </span>
+                    {/* 화살표 대신 새로고침 버튼(다른 bag 불러오기) */}
+                    {onRefresh && (
+                        <span
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onRefresh();
+                            }}
+                            title="다른 bag 불러오기"
+                            style={{ cursor: "pointer", fontSize: 15, lineHeight: 1 }}
+                        >
+                            ⟳
+                        </span>
+                    )}
                     {onClose && (
                         <span
                             onClick={onClose}
@@ -63,7 +73,9 @@ export default function SidebarTop({
                                        subscribeTopic,
                                        onDisconnectVehicle,
                                        loggingByVehicle = {},
-                                       topicSearch = ""
+                                       topicSearch = "",
+                                       onRefreshBag,
+                                       bagPlayback = {}
                                      }) {
     // 색상이 시간 경과에 따라 갱신되도록 1초마다 리렌더
     const [, setTick] = useState(0);
@@ -86,7 +98,12 @@ export default function SidebarTop({
 
     return (
         <div className="siderbar-scroll">
-            {connectedVehicles.map(([vehicleId, vehicleData]) => (
+            {connectedVehicles.map(([vehicleId, vehicleData]) => {
+                const runningBagName =
+                    bagPlayback?.vehicleId === vehicleId && bagPlayback?.state !== "idle"
+                        ? (bagPlayback?.bagName || bagPlayback?.bagPath)
+                        : "";
+                return (
                 <AccordionItem
                     key={vehicleId}
                     onClose={
@@ -94,7 +111,11 @@ export default function SidebarTop({
                             ? () => onDisconnectVehicle(vehicleId)
                             : undefined
                     }
+                    onRefresh={
+                        onRefreshBag ? () => onRefreshBag(vehicleId) : undefined
+                    }
                     title={
+                        <span style={{ display: "inline-flex", flexDirection: "column", gap: 2 }}>
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                             {vehicleData?.isBag ? (
                                 <span
@@ -132,6 +153,15 @@ export default function SidebarTop({
                                 </span>
                             )}
                         </span>
+                        {runningBagName && (
+                            <span
+                                style={{ fontSize: 11, color: "#8a8f9a", paddingLeft: 18 }}
+                                title="실행 중인 bag"
+                            >
+                                {runningBagName}
+                            </span>
+                        )}
+                        </span>
                     }
                     content={
                         <SidebarTopic
@@ -146,7 +176,8 @@ export default function SidebarTop({
                         />
                     }
                 />
-            ))}
+                );
+            })}
         </div>
     );
 }

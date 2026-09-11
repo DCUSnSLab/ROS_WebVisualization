@@ -1,5 +1,6 @@
 /* ===== 전체 레이아웃 유지 부분 ===== */
 .layout{
+    --mode-dark: #1B1F3B;
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -286,8 +287,6 @@
 }
 
 .logging-btn {
-    grid-column: 3;
-    justify-self: end;
     color: white;
     background: transparent;
     border: 1px solid white;
@@ -295,6 +294,35 @@
     border-radius: 4px;
     cursor: pointer;
     font-family: GMarketSans;
+}
+
+.layout.bag-mode {
+    --mode-dark: #593E2E;
+}
+
+.footer-mode-actions {
+    grid-column: 3;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mode-switch-btn {
+    min-width: 62px;
+    padding: 6px 14px;
+    border: 1px solid white;
+    border-radius: 4px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: GMarketSans;
+}
+
+.logging-btn:disabled,
+.mode-switch-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
 }
 
 .logging-modal-header {
@@ -589,6 +617,10 @@
     min-width: 640px; /* 재생 바 길이 늘림 */
 }
 
+.playback-bar.disabled {
+    opacity: 0.58;
+}
+
 /* 탐색 바 줄: 시간 - 슬라이더 - 시간 */
 .playback-track-row {
     display: flex;
@@ -598,6 +630,14 @@
 
 /* 재생바 아래 버튼 3개 (가운데 정렬) */
 .playback-controls {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+}
+
+.playback-transport {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -624,6 +664,41 @@
 
 .playback-btn:hover {
     color: #aeb8e6;
+}
+
+.playback-btn:disabled {
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+}
+
+.playback-rate {
+    position: absolute;
+    right: 0;
+    width: 62px;
+    height: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 4px;
+    outline: none;
+    background: #252b4b;
+    color: #ffffff;
+    font-family: GMarketSans;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.playback-rate:disabled {
+    cursor: not-allowed;
+}
+
+.playback-context {
+    max-width: 640px;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.62);
+    font-family: GMarketSans;
+    font-size: 10px;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .playback-time {
@@ -697,4 +772,168 @@
     border-radius: 6px;
     background: rgba(183, 28, 28, 0.18);
     overflow-wrap: anywhere;
+}
+
+/* ===== Bag 파일 선택 ===== */
+.bag-browser-modal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 22px;
+    box-sizing: border-box;
+    font-family: GMarketSans;
+}
+
+.bag-browser-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.bag-browser-header h3 {
+    margin: 0 0 5px;
+    font-size: 23px;
+}
+
+.bag-browser-header p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 12px;
+}
+
+.bag-browser-close {
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    font-size: 25px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.bag-browser-list {
+    flex: 1;
+    min-height: 0;
+    margin-top: 14px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    background: rgba(176, 190, 197, 0.08);
+}
+
+.bag-browser-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 0 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    cursor: pointer;
+}
+
+.bag-browser-item:last-child {
+    border-bottom: none;
+}
+
+.bag-browser-item:hover,
+.bag-browser-item.selected {
+    background: rgba(94, 169, 255, 0.18);
+}
+
+.bag-browser-item input {
+    accent-color: #2e86de;
+}
+
+.bag-browser-name {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.bag-browser-meta {
+    flex: 0 0 auto;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 12px;
+}
+
+.bag-browser-empty {
+    margin: 28px 12px;
+    color: rgba(255, 255, 255, 0.58);
+    text-align: center;
+}
+
+.bag-browser-error {
+    margin-top: 10px;
+    color: #ff8a80;
+    font-size: 13px;
+}
+
+.bag-browser-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 14px;
+}
+
+.bag-browser-actions button {
+    min-width: 76px;
+    padding: 8px 16px;
+    border-radius: 5px;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: GMarketSans;
+}
+
+.bag-browser-actions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.bag-browser-cancel {
+    border: 1px solid #57676e;
+    background: transparent;
+}
+
+.bag-browser-open {
+    border: 1px solid #2e86de;
+    background: #2e86de;
+}
+
+/* Bag 화면에서만 실시간 화면의 남색 크롬을 구분한다. */
+.layout.bag-mode .header-bar,
+.layout.bag-mode .side-bar-topic,
+.layout.bag-mode .sidebar-topic-search-wrap,
+.layout.bag-mode .footer-bar,
+.layout.bag-mode .modal-space,
+.layout.bag-mode .vehicle-select,
+.layout.bag-mode .dropdown-menu,
+.layout.bag-mode .drop-pg,
+.layout.bag-mode .playback-rate,
+.layout.bag-mode .sensor-topic-group-count {
+    background-color: #593E2E;
+}
+
+.layout.bag-mode .side-bar-topic {
+    border-right-color: #384032;
+}
+
+.layout.bag-mode .topic-chip.active {
+    border-color: #593E2E;
+}
+
+.layout.bag-mode .drop-link:hover,
+.layout.bag-mode .drop-link:focus-visible {
+    background-color: #394235;
+}
+
+@media (max-width: 1000px) {
+    .playback-bar {
+        min-width: 420px;
+    }
+
+    .footer-button {
+        padding: 0 10px;
+    }
 }

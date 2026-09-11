@@ -12,6 +12,16 @@ export default function UseRosVehicles() {
     const [vehiclesData, setVehiclesData] = useState({});
     const [vehicleList, setVehicleList] = useState([]);
     const [vehicleStatuses, setVehicleStatuses] = useState({}); // id -> { msAgo, receivedAt }
+    const [bagFilesByVehicle, setBagFilesByVehicle] = useState({});
+    const [bagPlayback, setBagPlayback] = useState({
+        vehicleId: "",
+        bagPath: "",
+        bagName: "",
+        state: "idle",
+        currentTime: 0,
+        duration: 0,
+        rate: 1,
+    });
     const wsRef = useRef(null);
     // 실제로 중계서버에 구독 요청을 보낸 토픽과, 화면과 무관하게 유지할 자동 구독을 분리한다.
     // 둘 다 Set이므로 topic_list를 반복 수신해도 구독 상태가 중복 누적되지 않는다.
@@ -20,12 +30,46 @@ export default function UseRosVehicles() {
     const latencyStatsRef = useRef({});
     const latencyResultsRef = useRef({});
     const pendingLoggingRequestsRef = useRef(new Map());
+    const pendingBagRequestsRef = useRef(new Map());
+    const subscribedTypesRef = useRef(new Map());     // topicKey -> msg_type (재구독용)
+    const modeSubsRef = useRef({ real: [], bag: [] }); // 모드별 구독 스냅샷
+    const currentDataModeRef = useRef("real");        // 현재 데이터 모드
 
     // 실험 시간
     const LATENCY_WARMUP_MS = 10_000;
     const LATENCY_MEASURE_MS = 60_000;
 
     const makeTopicKey = (vehicleId, topic) => `${vehicleId}::${topic}`;
+
+    const makeRequestId = (prefix) =>
+        `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+
+    const updateBagPlayback = (message) => {
+        setBagPlayback((current) => {
+            const nextState = message.state || message.playback_state || current.state;
+            const isPlaying = message.is_playing;
+
+            return {
+                vehicleId: message.vehicle_id ?? current.vehicleId,
+                bagPath: message.bag_path ?? current.bagPath,
+                bagName: message.bag_name ?? message.name ?? current.bagName,
+                state:
+                    typeof isPlaying === "boolean"
+                        ? (isPlaying ? "playing" : nextState === "idle" ? "idle" : "paused")
+                        : nextState,
+                currentTime:
+                    message.current_time ??
+                    message.position_seconds ??
+                    message.position ??
+                    current.currentTime,
+                duration:
+                    message.duration ??
+                    message.duration_seconds ??
+                    current.duration,
+                rate: message.rate ?? message.playback_rate ?? current.rate,
+            };
+        });
+    };
 
     useEffect(() => {
         if (wsRef.current) return;
@@ -119,6 +163,75 @@ export default function UseRosVehicles() {
             }
 
             const msg = JSON.parse(event.data);
+            if (msg.type === "bag_list_response") {
+                const pending = pendingBagRequestsRef.current.get(msg.request_id);
+                if (pending) {
+                    clearTimeout(pending.timeout);
+                    pendingBagRequestsRef.current.delete(msg.request_id);
+                }
+
+                const files = Array.isArray(msg.bags)
+                    ? msg.bags
+                    : Array.isArray(msg.files)
+                        ? msg.files
+                        : [];
+                const vehicleId = msg.vehicle_id || pending?.vehicleId || "";
+
+                if (vehicleId) {
+                    setBagFilesByVehicle((current) => ({
+                        ...current,
+                        [vehicleId]: files,
+                    }));
+                }
+
+                if (msg.success === false) {
+                    pending?.reject(new Error(msg.error || msg.message || "Bag list request failed"));
+                } else {
+                    pending?.resolve(files);
+                }
+                return;
+            }
+
+            if (msg.type === "bag_playback_response") {
+                const pending = pendingBagRequestsRef.current.get(msg.request_id);
+                if (pending) {
+                    clearTimeout(pending.timeout);
+                    pendingBagRequestsRef.current.delete(msg.request_id);
+                }
+
+                if (msg.success === false) {
+                    pending?.reject(new Error(msg.error || msg.message || "Bag playback request failed"));
+                } else {
+                    const request = pending?.payload || {};
+                    const fallbackState = {
+                        open: "playing",
+                        play: "playing",
+                        pause: "paused",
+                        stop: "idle",
+                    }[request.action];
+                    const openedBagPath = request.bag_path || "";
+
+                    updateBagPlayback({
+                        vehicle_id: request.vehicle_id,
+                        bag_path: openedBagPath || undefined,
+                        bag_name: openedBagPath
+                            ? openedBagPath.split(/[\\/]/).filter(Boolean).pop()
+                            : undefined,
+                        state: fallbackState,
+                        position_seconds: request.position_seconds,
+                        rate: request.rate,
+                        ...msg,
+                    });
+                    pending?.resolve(msg);
+                }
+                return;
+            }
+
+            if (msg.type === "bag_playback_status") {
+                updateBagPlayback(msg);
+                return;
+            }
+
             if (msg.type === "logging_response") {
                 const pending = pendingLoggingRequestsRef.current.get(msg.request_id);
                 if (!pending) return;
@@ -199,6 +312,8 @@ export default function UseRosVehicles() {
                         topicInfo?.name === "vehicle_status_sampled"
                 );
 
+                // GPS/hunter는 real·bag 모두에서 자동구독(현재 활성 소스의 데이터를 자동 표시).
+                // bag 모드에선 real이 이미 중단돼 있어 bag의 GPS/hunter가 잡힌다.
                 if (gpsTopic) {
                     subscribeTopic(vid, gpsTopic.name, gpsTopic.type, {
                         persistent: true,
@@ -305,8 +420,77 @@ export default function UseRosVehicles() {
                 pending.reject(new Error("Relay server connection closed"));
             }
             pendingLoggingRequestsRef.current.clear();
+            for (const pending of pendingBagRequestsRef.current.values()) {
+                clearTimeout(pending.timeout);
+                pending.reject(new Error("Relay server connection closed"));
+            }
+            pendingBagRequestsRef.current.clear();
         };
     }, []);
+
+    const sendBagRequest = (type, payload, timeoutMessage) => {
+        return new Promise((resolve, reject) => {
+            const ws = wsRef.current;
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                reject(new Error("Relay server connection is not ready"));
+                return;
+            }
+
+            const requestId = makeRequestId(type);
+            const timeout = setTimeout(() => {
+                pendingBagRequestsRef.current.delete(requestId);
+                reject(new Error(timeoutMessage));
+            }, 15000);
+
+            pendingBagRequestsRef.current.set(requestId, {
+                resolve,
+                reject,
+                timeout,
+                vehicleId: payload.vehicle_id,
+                payload,
+            });
+
+            try {
+                ws.send(JSON.stringify({
+                    type,
+                    request_id: requestId,
+                    ...payload,
+                }));
+            } catch (error) {
+                clearTimeout(timeout);
+                pendingBagRequestsRef.current.delete(requestId);
+                reject(error);
+            }
+        });
+    };
+
+    const requestBagList = (vehicleId) => {
+        if (!vehicleId) return Promise.reject(new Error("vehicleId is required"));
+        return sendBagRequest(
+            "bag_list_request",
+            { vehicle_id: vehicleId },
+            "Bag list request timed out after 15 seconds"
+        );
+    };
+
+    const requestBagPlayback = ({ vehicleId, action, bagPath, position, rate }) => {
+        if (!vehicleId) return Promise.reject(new Error("vehicleId is required"));
+        if (!action) return Promise.reject(new Error("playback action is required"));
+
+        const payload = {
+            vehicle_id: vehicleId,
+            action,
+        };
+        if (bagPath != null) payload.bag_path = bagPath;
+        if (position != null) payload.position_seconds = position;
+        if (rate != null) payload.rate = rate;
+
+        return sendBagRequest(
+            "bag_playback_request",
+            payload,
+            "Bag playback request timed out after 15 seconds"
+        );
+    };
 
     const requestLogging = ({ vehicleId, isLogging, bagName = "", topics = [] }) => {
         return new Promise((resolve, reject) => {
@@ -379,6 +563,7 @@ export default function UseRosVehicles() {
         }
 
         const topicKey = makeTopicKey(vehicleId, topic);
+        subscribedTypesRef.current.set(topicKey, topicType); // 재구독 시 msg_type 필요
 
         if (persistent || PERSISTENT_TOPICS.has(topic)) {
             persistentSubscribedRef.current.add(topicKey);
@@ -471,6 +656,55 @@ export default function UseRosVehicles() {
     };
 
     // 차량 이동 경로(waypoints) 초기화. vehicleId 미지정 시 전체 차량.
+    // 현재 구독 스냅샷(재구독에 필요한 type/persistent 포함)
+    const captureCurrentSubscriptions = () => {
+        const snap = [];
+        for (const key of Array.from(subscribedRef.current)) {
+            const idx = key.indexOf("::");
+            const vehicleId = idx >= 0 ? key.slice(0, idx) : key;
+            const topic = idx >= 0 ? key.slice(idx + 2) : "";
+            if (!topic) continue;
+            snap.push({
+                vehicleId,
+                topic,
+                type: subscribedTypesRef.current.get(key) || "",
+                persistent: persistentSubscribedRef.current.has(key),
+            });
+        }
+        return snap;
+    };
+
+    const clearAllSubscriptions = () => {
+        for (const key of Array.from(subscribedRef.current)) {
+            const idx = key.indexOf("::");
+            const vehicleId = idx >= 0 ? key.slice(0, idx) : key;
+            const topic = idx >= 0 ? key.slice(idx + 2) : "";
+            if (!topic) continue;
+            unsubscribeTopic(vehicleId, topic, { force: true });
+        }
+    };
+
+    const restoreSubscriptions = (snapshot) => {
+        for (const s of (snapshot || [])) {
+            subscribeTopic(s.vehicleId, s.topic, s.type, { persistent: s.persistent });
+        }
+    };
+
+    // real ↔ bag 데이터 모드 전환:
+    //  - 현재 모드의 구독을 스냅샷에 저장하고 전부 해제(라이브/재생 전송 중단)
+    //  - 대상 모드의 스냅샷을 복원(다시 연결) → 한 번에 한 소스만 흘러 토픽 충돌 방지
+    const switchDataMode = (toMode) => {
+        const from = currentDataModeRef.current;
+        if (from === toMode) return;
+
+        modeSubsRef.current[from] = captureCurrentSubscriptions();
+        clearAllSubscriptions();
+
+        currentDataModeRef.current = toMode;
+        restoreSubscriptions(modeSubsRef.current[toMode] || []);
+        console.log(`switchDataMode: ${from} -> ${toMode}`);
+    };
+
     const resetPath = (vehicleId) => {
         setVehiclesData((prev) => {
             const next = {};
@@ -489,10 +723,15 @@ export default function UseRosVehicles() {
         vehiclesData,
         vehicleList,
         vehicleStatuses,
+        bagFilesByVehicle,
+        bagPlayback,
         requestLogging,
+        requestBagList,
+        requestBagPlayback,
         requestTopicList,
         subscribeTopic,
         unsubscribeTopic,
+        switchDataMode,
         getAverageLatency,
         resetPath,
         disconnectVehicle

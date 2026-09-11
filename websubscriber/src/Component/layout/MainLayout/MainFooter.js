@@ -3,7 +3,7 @@ import { FaPlay, FaPause } from "react-icons/fa";
 import { IoPlaySkipBackSharp } from "react-icons/io5";
 import { IoPlaySkipForward } from "react-icons/io5";
 import './MainLayout.css';
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import Modal from "../../Modal/Modal";
 import '../../Modal/Modal.css';
 
@@ -23,7 +23,15 @@ const createCurrentTimeBagName = () => {
         `_${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
 };
 
-function MainFooter({vehiclesData, onLoggingChange}){
+function MainFooter({
+                        vehiclesData,
+                        onLoggingChange,
+                        viewMode = "real",
+                        onViewModeChange,
+                        bagPlayback = {},
+                        onPlaybackControl,
+                        bagConnecting = false
+                    }){
     const [open, setOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [loggingSession, setLoggingSession] = useState(null);
@@ -38,11 +46,64 @@ function MainFooter({vehiclesData, onLoggingChange}){
     const [bagName, setBagName] = useState("");
     const [logAllTopics, setLogAllTopics] = useState(false);
 
-    // bag 재생 바 (UI 전용, 동작은 추후 연결)
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [playbackSeek, setPlaybackSeek] = useState(0); // 0~100 (%)
-    const playbackDurationSec = 0; // TODO: 실제 bag 길이 연결
-    const playbackCurrentSec = (playbackSeek / 100) * playbackDurationSec;
+    const [seekValue, setSeekValue] = useState(0);
+    const [isSeeking, setIsSeeking] = useState(false);
+    const [playbackPending, setPlaybackPending] = useState(false);
+    const [playbackError, setPlaybackError] = useState("");
+
+    const playbackCurrentSec = Number(bagPlayback.currentTime) || 0;
+    const playbackDurationSec = Number(bagPlayback.duration) || 0;
+    const playbackRate = Number(bagPlayback.rate) || 1;
+    const isPlaying = bagPlayback.state === "playing";
+    const hasOpenBag = Boolean(
+        bagPlayback.vehicleId &&
+        (bagPlayback.bagPath || bagPlayback.bagName || bagPlayback.state !== "idle")
+    );
+    // 재생이 끝까지 간 상태(정지·끝 위치) → 재생 버튼을 '다시 재생'으로 표시
+    const isFinished = hasOpenBag && !isPlaying && playbackDurationSec > 0
+        && playbackCurrentSec >= playbackDurationSec - 0.3;
+
+    useEffect(() => {
+        if (!isSeeking) setSeekValue(playbackCurrentSec);
+    }, [isSeeking, playbackCurrentSec]);
+
+    const runPlaybackControl = async (action, extra = {}) => {
+        if (!bagPlayback.vehicleId || playbackPending) return;
+
+        setPlaybackPending(true);
+        setPlaybackError("");
+        try {
+            await onPlaybackControl?.({
+                vehicleId: bagPlayback.vehicleId,
+                action,
+                ...extra,
+            });
+        } catch (error) {
+            setPlaybackError(error?.message || "Bag 재생 제어에 실패했습니다.");
+        } finally {
+            setPlaybackPending(false);
+        }
+    };
+
+    const commitSeek = () => {
+        setIsSeeking(false);
+        runPlaybackControl("seek", { position: seekValue });
+    };
+
+    // 처음(0초)으로 되돌려 다시 재생
+    const replay = async () => {
+        if (!bagPlayback.vehicleId || playbackPending) return;
+        setPlaybackPending(true);
+        setPlaybackError("");
+        try {
+            await onPlaybackControl?.({ vehicleId: bagPlayback.vehicleId, action: "seek", position: 0 });
+            await onPlaybackControl?.({ vehicleId: bagPlayback.vehicleId, action: "play" });
+        } catch (error) {
+            setPlaybackError(error?.message || "다시 재생에 실패했습니다.");
+        } finally {
+            setPlaybackPending(false);
+        }
+    };
 
     const vehicleEntries = useMemo(() => (
         Object.entries(vehiclesData || {}).filter(([, vehicleData]) =>
@@ -168,50 +229,99 @@ function MainFooter({vehiclesData, onLoggingChange}){
         <footer className='footer-bar'>
             <div className='footer-button'>
                 <div className='footer-contents'>
-                    <div className='playback-bar'>
+                    {viewMode === "bag" && (
+                    <div className={`playback-bar ${hasOpenBag ? "" : "disabled"}`}>
                         <div className='playback-track-row'>
-                            <span className='playback-time'>{formatPlaybackTime(playbackCurrentSec)}</span>
+                            <span className='playback-time'>{formatPlaybackTime(isSeeking ? seekValue : playbackCurrentSec)}</span>
                             <input
                                 type='range'
                                 className='playback-seek'
                                 min={0}
-                                max={100}
+                                max={playbackDurationSec || 1}
                                 step={0.1}
-                                value={playbackSeek}
-                                onChange={(e) => setPlaybackSeek(Number(e.target.value))}
+                                value={Math.min(seekValue, playbackDurationSec || 1)}
+                                onPointerDown={() => setIsSeeking(true)}
+                                onChange={(e) => {
+                                    setIsSeeking(true);
+                                    setSeekValue(Number(e.target.value));
+                                }}
+                                onPointerUp={commitSeek}
+                                onKeyUp={(event) => {
+                                    if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
+                                        commitSeek();
+                                    }
+                                }}
                                 aria-label='재생 위치'
+                                disabled={!hasOpenBag || playbackDurationSec <= 0 || playbackPending || bagConnecting}
                                 style={{
-                                    background: `linear-gradient(to right, #ffffff ${playbackSeek}%, rgba(255,255,255,0.25) ${playbackSeek}%)`,
+                                    background: `linear-gradient(to right, #ffffff ${playbackDurationSec > 0 ? ((isSeeking ? seekValue : playbackCurrentSec) / playbackDurationSec) * 100 : 0}%, rgba(255,255,255,0.25) 0%)`,
                                 }}
                             />
                             <span className='playback-time'>{formatPlaybackTime(playbackDurationSec)}</span>
                         </div>
                         <div className='playback-controls'>
+                            <div className='playback-transport'>
                             <button
                                 type='button'
                                 className='playback-btn'
-                                aria-label='이전'
+                                onClick={() => runPlaybackControl("seek", {
+                                    position: Math.max(0, playbackCurrentSec - 10),
+                                })}
+                                aria-label='10초 뒤로'
+                                title='10초 뒤로'
+                                disabled={!hasOpenBag || playbackPending || bagConnecting}
                             >
                                 <IoPlaySkipBackSharp />
                             </button>
                             <button
                                 type='button'
                                 className='playback-btn playback-play'
-                                onClick={() => setIsPlaying((v) => !v)}
-                                aria-label={isPlaying ? '일시정지' : '재생'}
+                                onClick={() => (isFinished ? replay() : runPlaybackControl(isPlaying ? "pause" : "play"))}
+                                aria-label={isFinished ? '다시 재생' : (isPlaying ? '일시정지' : '재생')}
+                                title={isFinished ? '다시 재생' : undefined}
+                                disabled={!hasOpenBag || playbackPending || bagConnecting}
                             >
-                                {isPlaying ? <FaPause /> : <FaPlay />}
+                                {isFinished
+                                    ? <span style={{ fontSize: 16, lineHeight: 1 }}>⟳</span>
+                                    : (isPlaying ? <FaPause /> : <FaPlay />)}
                             </button>
                             <button
                                 type='button'
                                 className='playback-btn'
-                                aria-label='다음'
+                                onClick={() => runPlaybackControl("seek", {
+                                    position: playbackDurationSec > 0
+                                        ? Math.min(playbackDurationSec, playbackCurrentSec + 10)
+                                        : playbackCurrentSec + 10,
+                                })}
+                                aria-label='10초 앞으로'
+                                title='10초 앞으로'
+                                disabled={!hasOpenBag || playbackPending || bagConnecting}
                             >
                                 <IoPlaySkipForward />
                             </button>
+                            </div>
+                            <select
+                                className='playback-rate'
+                                value={playbackRate}
+                                onChange={(event) => runPlaybackControl("rate", {
+                                    rate: Number(event.target.value),
+                                })}
+                                aria-label='재생 속도'
+                                disabled={!hasOpenBag || playbackPending || bagConnecting}
+                            >
+                                {[0.25, 0.5, 1, 1.5, 2].map((rate) => (
+                                    <option value={rate} key={rate}>{rate}x</option>
+                                ))}
+                            </select>
                         </div>
+                        {bagConnecting && (
+                            <div className='playback-context'>연결중…</div>
+                        )}
                     </div>
+                    )}
                 </div>
+                <div className='footer-mode-actions'>
+                {viewMode === "real" && (
                 <button
                     type='button'
                     className='logging-btn'
@@ -244,9 +354,18 @@ function MainFooter({vehiclesData, onLoggingChange}){
                             setOpen(true);
                         }
                     }}
-                    disabled={loggingPending}
+                    disabled={loggingPending || viewMode !== "real"}
                 >{loggingPending ? "Processing..." : logging ? "Logging Stop" : "Logging"}
                 </button>
+                )}
+                <button
+                    type='button'
+                    className='mode-switch-btn'
+                    onClick={() => onViewModeChange?.(viewMode === "real" ? "bag" : "real")}
+                >
+                    {viewMode === "real" ? "Bag" : "Real"}
+                </button>
+                </div>
                 {!loggingError && (loggingSession?.bagPath || lastBagPath) && (
                     <span className='logging-bag-path' role='status'>
                         {logging ? "저장 중" : "저장 완료"}: {loggingSession?.bagPath || lastBagPath}
@@ -254,6 +373,9 @@ function MainFooter({vehiclesData, onLoggingChange}){
                 )}
                 {loggingError && (
                     <span className='logging-footer-error' role="alert">{loggingError}</span>
+                )}
+                {viewMode === "bag" && playbackError && (
+                    <span className='logging-footer-error' role="alert">{playbackError}</span>
                 )}
 
                 <Modal isOpen={open} onClose={handleCloseLoggingModal}>

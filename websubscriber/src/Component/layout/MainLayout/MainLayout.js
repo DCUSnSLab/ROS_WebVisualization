@@ -30,6 +30,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
         unsubscribeTopic,
         switchDataMode,
         resetPath,
+        clearVehicleTrack,
         disconnectVehicle
     } = UseRosVehicles();
 
@@ -51,6 +52,8 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     const [loggingByVehicle, setLoggingByVehicle] = useState({});
     const [sidebarTopicSearch, setSidebarTopicSearch] = useState("");
     const [bagConnecting, setBagConnecting] = useState(false); // bag 연결중(조작 잠금)
+    const [bagWasPlaying, setBagWasPlaying] = useState(false);  // real로 나갈 때 재생 중이었는지
+    const realConnectedRef = useRef(new Set());                 // real에서 Connect한 이동체 id
     // 사이드바 새로고침으로 bag 변경: null | { vehicleId, phase:"confirm"|"list", files, loading, error }
     const [bagChange, setBagChange] = useState(null);
 
@@ -76,10 +79,10 @@ const MainLayout = ({ name, dropdownContent, content }) => {
         setSidebarTopicSearch("");
 
         if (nextMode === "bag") {
-            // bag 전환: real 데이터 전송 중단(복귀 시 재연결 위해 스냅샷 보관) →
-            // 일시정지 상태의 bag이 있으면 멈췄던 위치에서 재생 재개.
+            // bag 전환: real 데이터 전송 중단(복귀 시 재연결 위해 스냅샷 보관).
+            // 이전에 '재생 중'이었을 때만 재개하고, 사용자가 멈춰둔 경우엔 멈춘 상태를 유지한다.
             switchDataMode("bag");
-            if (bagPlayback.vehicleId && bagPlayback.state === "paused") {
+            if (bagPlayback.vehicleId && bagWasPlaying) {
                 requestBagPlayback({
                     vehicleId: bagPlayback.vehicleId,
                     action: "play",
@@ -88,8 +91,10 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 });
             }
         } else {
-            // real 전환: bag 영상 자동 멈춤(위치는 브리지가 보존) → real 데이터 재연결.
-            if (bagPlayback.vehicleId && bagPlayback.state === "playing") {
+            // real 전환: 재생 중이면 일시정지(위치 보존)하고 '재생 중이었음'을 기억 → real 데이터 재연결.
+            const wasPlaying = bagPlayback.state === "playing";
+            setBagWasPlaying(wasPlaying);
+            if (bagPlayback.vehicleId && wasPlaying) {
                 requestBagPlayback({
                     vehicleId: bagPlayback.vehicleId,
                     action: "pause",
@@ -103,14 +108,29 @@ const MainLayout = ({ name, dropdownContent, content }) => {
         setViewMode(nextMode);
     };
 
+    // 재생 제어 래퍼: seek/stop 시 이동 경로(및 마커)를 초기화한다.
+    //  - seek: 사용자가 시간대를 옮기면 이전 위치에서 이어지는 궤적선이 남지 않도록 경로 리셋
+    //  - stop: 경로 + 마커 완전 제거
+    const handlePlaybackControl = async (params) => {
+        const vehicleId = params?.vehicleId || bagPlayback.vehicleId;
+        if (params?.action === "seek") {
+            // 즉시 리셋 + respawn(~1초) 동안 흘러들어오는 이전 위치 GPS까지 한 번 더 지움
+            resetPath(vehicleId);
+            setTimeout(() => resetPath(vehicleId), 1300);
+        } else if (params?.action === "stop") {
+            clearVehicleTrack(vehicleId); // 경로 + 마커 제거
+        }
+        return requestBagPlayback(params);
+    };
+
     const handleOpenBag = async ({ vehicleId, bagPath }) => {
-        // 이전 bag과 관련된 모든 연결 종료(구독 해제 + 시각화 제거 + 차량 정보 모달 닫기)
+        // 이전 bag과 관련된 모든 연결 종료(구독 해제 + 시각화 제거 + 차량 정보 모달 닫기 + 경로/마커 제거)
         dispatch(hideInfoBox());
         for (const v of bagVisuals) {
             unsubscribeTopic(v.ip, v.topic, { force: true });
         }
         setBagVisuals([]);
-        resetPath(vehicleId);
+        clearVehicleTrack(vehicleId);
         // 연결중: 이 동안 재생 컨트롤을 잠근다(연결이 끝나면 일시정지 상태로 대기)
         setBagConnecting(true);
         try {
@@ -129,6 +149,34 @@ const MainLayout = ({ name, dropdownContent, content }) => {
     // 사이드바 새로고침 버튼: "다른 bag으로 변경?" 확인 → bag 목록 → 선택 → 재연결
     const handleRefreshBag = (vehicleId) => {
         setBagChange({ vehicleId, phase: "confirm", files: [], loading: false, error: "" });
+    };
+
+    // real에서 이동체 연결(Connect): 어떤 이동체를 real로 연결했는지 기록해둔다.
+    const handleRealConnect = (vehicleId) => {
+        if (vehicleId) realConnectedRef.current.add(vehicleId);
+        requestTopicList(vehicleId);
+    };
+
+    // bag 사이드바의 X:
+    //  - real에서도 연결된 이동체면 → bag 재생만 종료(이동체 연결 유지)
+    //  - bag에서만 연결된 이동체면 → 이동체 연결까지 종료
+    const handleCloseBag = (vehicleId) => {
+        const vid = vehicleId || bagPlayback.vehicleId;
+        if (vid) {
+            requestBagPlayback({ vehicleId: vid, action: "stop" }).catch((error) => {
+                console.warn("Failed to stop bag playback on close", error);
+            });
+            clearVehicleTrack(vid);
+        }
+        setBagVisuals([]);
+        setBagWasPlaying(false);
+        dispatch(hideInfoBox());
+
+        // real 연결이 없던(오직 bag) 이동체면 연결까지 종료
+        if (vid && !realConnectedRef.current.has(vid)) {
+            disconnectVehicle(vid);
+            setRealVisuals((prev) => prev.filter((v) => v.ip !== vid));
+        }
     };
 
     const loadBagChangeList = async () => {
@@ -255,6 +303,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
 
     const confirmDisconnect = () => {
         if (!disconnectTarget) return;
+        realConnectedRef.current.delete(disconnectTarget);
         disconnectVehicle(disconnectTarget);
         setRealVisuals((prev) => prev.filter((v) => v.ip !== disconnectTarget));
         setBagVisuals((prev) => prev.filter((v) => v.ip !== disconnectTarget));
@@ -291,7 +340,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 dropdownContent={dropdownContent}
                 onAddVehicle={addVehicle}
                 vehicleList={vehicleList}
-                connectVehicle={requestTopicList}
+                connectVehicle={handleRealConnect}
                 viewMode={viewMode}
                 requestBagList={requestBagList}
                 openBag={handleOpenBag}
@@ -319,11 +368,12 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                                     onPanelSelect={handlePanelSelect}
                                     activePanelsByTopic={activePanelsByTopic}
                                     subscribeTopic={subscribeTopic}
-                                    onDisconnectVehicle={handleDisconnectVehicle}
+                                    onDisconnectVehicle={viewMode === "bag" ? handleCloseBag : handleDisconnectVehicle}
                                     loggingByVehicle={loggingByVehicle}
                                     topicSearch={sidebarTopicSearch}
                                     onRefreshBag={handleRefreshBag}
                                     bagPlayback={bagPlayback}
+                                    viewMode={viewMode}
                                 />
                             )}
                         </div>
@@ -361,7 +411,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                 viewMode={viewMode}
                 onViewModeChange={handleViewModeChange}
                 bagPlayback={bagPlayback}
-                onPlaybackControl={requestBagPlayback}
+                onPlaybackControl={handlePlaybackControl}
                 bagConnecting={bagConnecting}
             />
             <InfoBox vehiclesData={visibleVehiclesData} onResetPath={resetPath} />
@@ -377,7 +427,7 @@ const MainLayout = ({ name, dropdownContent, content }) => {
                     <div
                         onClick={(e) => e.stopPropagation()}
                         style={{
-                            background: "#1B1F3B", color: "#fff", borderRadius: 8,
+                            background: "#593E2E", color: "#fff", borderRadius: 8,
                             padding: "22px 24px", minWidth: 340, maxWidth: 460,
                             boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
                         }}

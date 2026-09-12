@@ -75,8 +75,10 @@ export default function SidebarTop({
                                        loggingByVehicle = {},
                                        topicSearch = "",
                                        onRefreshBag,
-                                       bagPlayback = {}
+                                       bagPlayback = {},
+                                       viewMode = "real"
                                      }) {
+    const isBagMode = viewMode === "bag";
     // 색상이 시간 경과에 따라 갱신되도록 1초마다 리렌더
     const [, setTick] = useState(0);
     const [openTopicKey, setOpenTopicKey] = useState(null);
@@ -99,9 +101,10 @@ export default function SidebarTop({
     return (
         <div className="siderbar-scroll">
             {connectedVehicles.map(([vehicleId, vehicleData]) => {
+                // bag 이름은 bag 모드에서만 표시(real에서는 숨김). 로드되어 있으면 재생/배속과 무관하게 유지.
                 const runningBagName =
-                    bagPlayback?.vehicleId === vehicleId && bagPlayback?.state !== "idle"
-                        ? (bagPlayback?.bagName || bagPlayback?.bagPath)
+                    isBagMode && bagPlayback?.vehicleId === vehicleId
+                        ? (bagPlayback?.bagName || bagPlayback?.bagPath || "")
                         : "";
                 return (
                 <AccordionItem
@@ -112,7 +115,7 @@ export default function SidebarTop({
                             : undefined
                     }
                     onRefresh={
-                        onRefreshBag ? () => onRefreshBag(vehicleId) : undefined
+                        isBagMode && onRefreshBag ? () => onRefreshBag(vehicleId) : undefined
                     }
                     title={
                         <span style={{ display: "inline-flex", flexDirection: "column", gap: 2 }}>

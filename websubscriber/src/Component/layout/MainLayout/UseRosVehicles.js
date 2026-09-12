@@ -718,6 +718,23 @@ export default function UseRosVehicles() {
         });
     };
 
+    // 경로(waypoints) + 현재 마커 위치(lat/lng)까지 완전 초기화.
+    // (bag 변경/정지 시 이전 이동 흔적을 지워야 할 때 사용)
+    const clearVehicleTrack = (vehicleId) => {
+        setVehiclesData((prev) => {
+            const next = {};
+            for (const [id, data] of Object.entries(prev)) {
+                if (!vehicleId || id === vehicleId) {
+                    const { lat, lng, ...rest } = data;
+                    next[id] = { ...rest, waypoints: [] };
+                } else {
+                    next[id] = data;
+                }
+            }
+            return next;
+        });
+    };
+
 
     return {
         vehiclesData,
@@ -734,6 +751,7 @@ export default function UseRosVehicles() {
         switchDataMode,
         getAverageLatency,
         resetPath,
+        clearVehicleTrack,
         disconnectVehicle
     };
 }
